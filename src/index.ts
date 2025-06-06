@@ -220,7 +220,7 @@ class OpenAPIMCPServer {
         properties[paramName] = {
           type: component?.schema?.type || "string",
           description: component?.description || `${component?.in} parameter`,
-          required: component?.required || false,
+          // required: component?.required || false,
         };
         if (component?.required) {
           required.push(paramName);
@@ -240,7 +240,7 @@ class OpenAPIMCPServer {
           // if in is defined then name is also defined
           type: param.schema?.type || "string",
           description: param.description || `${param.in} parameter`,
-          required: param.required || false,
+          // required: param.required || false,
         };
 
         if (param.required) {
@@ -259,7 +259,7 @@ class OpenAPIMCPServer {
         };
 
         if (operation.requestBody.required) {
-          properties.body.required = true;
+          // set-repository-privacyproperties.body.required = true;
           required.push("body");
         }
         if (jsonContent.schema.properties) {
@@ -267,7 +267,7 @@ class OpenAPIMCPServer {
             jsonContent.schema.properties
           )) {
             if ((prop as any).required) {
-              (prop as any).required = true;
+              // (prop as any).required = true;
               required.push(`"body"."${propName}"`);
             }
           }

@@ -62,7 +62,9 @@
         "summary": "Update info of multiple repositories at once",
         "description": "PAT scope: `repo:admin`\n",
         "operationId": "bulk-update-repositories",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/bulk_update_repository"
         },
@@ -89,7 +91,9 @@
         "summary": "Creates a new repository",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/`\n",
         "operationId": "create-repository",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/create_repository"
         },
@@ -112,7 +116,9 @@
         "summary": "Lists repositories under namespace",
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/`\n",
         "operationId": "list-repositories",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -184,7 +190,10 @@
         "summary": "Get namespace storage info",
         "description": "PAT scope: `repo:admin`\n",
         "operationId": "get-namespace-storage-info",
-        "tags": ["repositories", "storage"],
+        "tags": [
+          "repositories",
+          "storage"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -245,7 +254,9 @@
         "summary": "Gets repository info",
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/`\n",
         "operationId": "get-repository-info",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/get_repository"
@@ -259,7 +270,9 @@
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/`\n",
         "summary": "Check repository",
         "operationId": "check-repository",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "200": {
             "description": "Repository exists"
@@ -273,7 +286,9 @@
         "summary": "Updates repository info",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/`\n\nUpdates a repository info\n",
         "operationId": "update-repository-info",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/update_repository"
         },
@@ -293,7 +308,9 @@
         "summary": "Deletes repository",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/`\n",
         "operationId": "delete-repository",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "202": {
             "description": "Repository marked for deletion"
@@ -323,7 +340,9 @@
         "summary": "Unmoderates a repository",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/unmoderate`\n",
         "operationId": "unmoderate-repository",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/unmoderate_repository"
         },
@@ -356,7 +375,9 @@
         "summary": "Moderates a repository",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/moderate`\n",
         "operationId": "moderate-repository",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/moderate_repository"
         },
@@ -389,7 +410,9 @@
         "summary": "Sets repository privacy",
         "description": "Legacy endpoint: `/v2/repositories/{namespace}/{repository}/privacy`\n",
         "operationId": "set-repository-privacy",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/set_privacy"
         },
@@ -419,7 +442,9 @@
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/dockerfile/`\n",
         "summary": "Gets dockerfile for automated repository",
         "operationId": "get-repository-dockerfile",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/get_repository_dockerfile"
@@ -432,7 +457,9 @@
       "put": {
         "summary": "Sets Dockerfile for automated repository",
         "operationId": "set-repository-dockerfile",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "description": "PAT scope: `repo:admin`\nM2M: true\n",
         "requestBody": {
           "$ref": "#/components/requestBodies/set_dockerfile"
@@ -466,7 +493,9 @@
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags`\n",
         "summary": "List repository tags",
         "operationId": "list-repository-tags",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/page"
@@ -497,7 +526,9 @@
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags`\n",
         "summary": "Check repository tags",
         "operationId": "check-repository-tags",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "200": {
             "description": "Repository contains tags"
@@ -527,7 +558,9 @@
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags/{tag}`\n",
         "summary": "Read repository tag",
         "operationId": "read-repository-tag",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/get_tag"
@@ -544,7 +577,9 @@
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags/{tag}`\n",
         "summary": "Check repository tag",
         "operationId": "check-repository-tag",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "200": {
             "description": "Repository tag exists"
@@ -561,7 +596,9 @@
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags{tag}`\n",
         "summary": "Deletes a repository tag",
         "operationId": "delete-repository-tag",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "204": {
             "description": "Tag successfully deleted"
@@ -591,7 +628,9 @@
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags/{tag}/images`\n",
         "summary": "Read tag images",
         "operationId": "read-tag-images",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/get_tag_images"
@@ -618,7 +657,9 @@
         "description": "PAT scope: `repo:read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/groups`\n\nList organization groups and permissions under a repository that this user has access to\n",
         "summary": "List repository's group permissions",
         "operationId": "list-repository-groups",
-        "tags": ["repositories-groups"],
+        "tags": [
+          "repositories-groups"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/page"
@@ -643,7 +684,9 @@
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/groups`\n\nAdds repository read/write/admin permissions to an organization's group\n",
         "summary": "Adds repository permissions to a group",
         "operationId": "add-repository-permissions-to-group",
-        "tags": ["repositories-groups"],
+        "tags": [
+          "repositories-groups"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/create_group"
         },
@@ -676,7 +719,9 @@
         "description": "PAT scope: `repo:read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/groups/{group_id}`\n\nGets an organization group and permissions under a repository\n",
         "summary": "Get repository's group's permissions",
         "operationId": "get-repository-group-permissions",
-        "tags": ["repositories-groups"],
+        "tags": [
+          "repositories-groups"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/get_group"
@@ -696,7 +741,9 @@
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/groups/{group_id}`\n\nUpdates the permissions of an existing repository in an organization's group\n",
         "summary": "Update repository permissions in a group",
         "operationId": "update-repository-permissions-in-group",
-        "tags": ["repositories-groups"],
+        "tags": [
+          "repositories-groups"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/update_group"
         },
@@ -719,7 +766,9 @@
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/groups/{group_id}`\n\nRemoves repository permissions from an organization's group\n",
         "summary": "Remove repository permissions from a group",
         "operationId": "remove-repository-permissions-from-group",
-        "tags": ["repositories-groups"],
+        "tags": [
+          "repositories-groups"
+        ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -746,7 +795,9 @@
         "summary": "Adds a collaborator to repository",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/<namespace>/<name>/collaborators`\n",
         "operationId": "add-collaborator-to-repository",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/add_repository_collaborator"
         },
@@ -769,7 +820,9 @@
         "summary": "List repository collaborators",
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/collaborators`\n",
         "operationId": "list-repository-collaborators",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/page"
@@ -810,7 +863,9 @@
         "summary": "Delete repository collaborator",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/collaborators/{collaborator}`\n",
         "operationId": "delete-repository-collaborator",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "204": {
             "description": "Collaborator successfully deleted"
@@ -837,7 +892,9 @@
         "summary": "Lists repositories user is collaborating on",
         "description": "Legacy endpoint: `/v2/users/{username}/repositories/contributed`\n",
         "operationId": "list-repositories-user-is-collaborating-on",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/page"
@@ -872,7 +929,9 @@
         "summary": "Create repository webhook pipeline",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/repositories/{namespace}/{repository}/webhook_pipeline`\n",
         "operationId": "create-repository-webhook-pipeline",
-        "tags": ["repositories-webhooks"],
+        "tags": [
+          "repositories-webhooks"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/create_repository_webhook_pipeline"
         },
@@ -892,7 +951,9 @@
         "summary": "List repository webhook pipelines",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/repositories/{namespace}/{repository}/webhook_pipeline`\n",
         "operationId": "list-repository-webhook-pipelines",
-        "tags": ["repositories-webhooks"],
+        "tags": [
+          "repositories-webhooks"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/list_repository_webhook_pipelines"
@@ -922,7 +983,9 @@
         "summary": "Delete repository webhook pipelines",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/repositories/{namespace}/{repository}/webhook_pipeline/{pipeline_slug}`\n",
         "operationId": "delete-repository-webhook-pipelines",
-        "tags": ["repositories-webhooks"],
+        "tags": [
+          "repositories-webhooks"
+        ],
         "responses": {
           "204": {
             "description": "Webhook pipeline deleted"
@@ -952,7 +1015,9 @@
         "summary": "List repository webhook pipeline history",
         "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/repositories/{namespace}/{repository}/webhook_pipeline/{pipeline_slug}/history/`\n",
         "operationId": "list-repository-webhook-pipeline-history",
-        "tags": ["repositories-webhooks"],
+        "tags": [
+          "repositories-webhooks"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/repository_webhook_pipeline_history"
@@ -979,7 +1044,9 @@
         "summary": "List the usernames who starred a repository",
         "description": "PAT scope: `repo:read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/stars`\n",
         "operationId": "list-repository-star-usernames",
-        "tags": ["repositories-stars"],
+        "tags": [
+          "repositories-stars"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/list_repository_star_usernames"
@@ -993,7 +1060,9 @@
         "summary": "Star a repository",
         "description": "PAT scope: `repo:read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/stars`\n",
         "operationId": "star-repository",
-        "tags": ["repositories-stars"],
+        "tags": [
+          "repositories-stars"
+        ],
         "responses": {
           "204": {
             "description": "Repository successfully starred"
@@ -1013,7 +1082,9 @@
         "summary": "Delete a repository star",
         "description": "PAT scope: `repo:read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/stars`\n",
         "operationId": "delete-repository-star",
-        "tags": ["repositories-stars"],
+        "tags": [
+          "repositories-stars"
+        ],
         "responses": {
           "204": {
             "description": "Repository star successfully deleted"
@@ -1037,7 +1108,9 @@
         "summary": "Get repository stars count",
         "description": "PAT scope: `repo:read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/stars/count`\n",
         "operationId": "get-repository-stars-count",
-        "tags": ["repositories-stars"],
+        "tags": [
+          "repositories-stars"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/stars_count"
@@ -1058,7 +1131,9 @@
         "description": "Returns current namespace repository limits, collaborator counts and default registry settings",
         "summary": "Get namespace repository limits",
         "operationId": "get-namespace-repository-limits",
-        "tags": ["registry-settings"],
+        "tags": [
+          "registry-settings"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/get_registry_settings"
@@ -1084,7 +1159,9 @@
       "get": {
         "summary": "Gets repository's auto build configuration",
         "operationId": "get-repository-autobuild",
-        "tags": ["repositories-autobuilds"],
+        "tags": [
+          "repositories-autobuilds"
+        ],
         "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/autobuild`\n",
         "responses": {
           "200": {
@@ -1109,7 +1186,9 @@
           "$ref": "#/components/requestBodies/default_repo_visibility"
         },
         "operationId": "update-default-repository-visibility",
-        "tags": ["registry-settings"],
+        "tags": [
+          "registry-settings"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/default_repo_visibility"
@@ -1139,7 +1218,9 @@
         "summary": "Get summary of repository's images",
         "description": "PAT scope: `repo:read_public`\n\nGets the number of images in a repository and the number of images\ncounted as active and inactive.\n",
         "operationId": "get-repository-advanced-images-summary",
-        "tags": ["repositories-advanced-images"],
+        "tags": [
+          "repositories-advanced-images"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/repository_advanced_images_summary"
@@ -1166,14 +1247,19 @@
         "summary": "Get details of repository's images",
         "description": "PAT scope: `repo:read_public`\n\nGets details on the images in a repository.\n",
         "operationId": "get-repository-images",
-        "tags": ["repositories-advanced-images"],
+        "tags": [
+          "repositories-advanced-images"
+        ],
         "parameters": [
           {
             "in": "query",
             "name": "status",
             "schema": {
               "type": "string",
-              "enum": ["active", "inactive"]
+              "enum": [
+                "active",
+                "inactive"
+              ]
             },
             "description": "Filters to only show images of this status."
           },
@@ -1190,7 +1276,12 @@
             "name": "ordering",
             "schema": {
               "type": "string",
-              "enum": ["last_activity", "-last_activity", "digest", "-digest"]
+              "enum": [
+                "last_activity",
+                "-last_activity",
+                "digest",
+                "-digest"
+              ]
             },
             "description": "Orders the results by this property.\nPrefixing with `-` sorts by descending order.\n"
           },
@@ -1242,7 +1333,9 @@
         "summary": "Get image's tags",
         "description": "PAT scope: `repo:read_public`\n\nGets current and historical tags for an image.\n",
         "operationId": "get-repository-advanced-images-tags",
-        "tags": ["repositories-advanced-images"],
+        "tags": [
+          "repositories-advanced-images"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/page"
@@ -1277,7 +1370,9 @@
         "summary": "Bulk delete images",
         "description": "PAT scope: `repo:admin`\n\nDeletes one or more images within a namespace. This is currently limited to a single\nrepository.\n\nIf you attempt to delete images that are marked as active or are currently tagged, the deletion does not happen and it displays the warnings.\nTo continue with the deletion, you must ignore these warnings by putting them in the `ignore_warnings` property.\n\nDeleting a currently tagged image deletes the tag from the repository.\n\nYou cannot ignore errors. It is not possible to directly delete children of multi-arch images.\n",
         "operationId": "bulk-delete-images",
-        "tags": ["repositories-advanced-images"],
+        "tags": [
+          "repositories-advanced-images"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/advanced_images_bulk_delete"
         },
@@ -1309,7 +1404,9 @@
       "get": {
         "summary": "List starred repositories for a user",
         "operationId": "list-starred-repositories",
-        "tags": ["repositories-stars"],
+        "tags": [
+          "repositories-stars"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/page"
@@ -1339,7 +1436,9 @@
         "description": "Returns current user repository limits, collaborator counts and default registry settings",
         "summary": "Get user repository limits",
         "operationId": "get-user-repository-limits",
-        "tags": ["registry-settings"],
+        "tags": [
+          "registry-settings"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/get_registry_settings"
@@ -1367,7 +1466,9 @@
         "requestBody": {
           "$ref": "#/components/requestBodies/default_repo_visibility"
         },
-        "tags": ["registry-settings"],
+        "tags": [
+          "registry-settings"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/default_repo_visibility"
@@ -1395,7 +1496,9 @@
         "deprecated": true,
         "description": "DEPRECATED use `GET /v2/namespaces/{namespace}/repositories`",
         "operationId": "list-user-repositories",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/list_user_repositories"
@@ -1422,7 +1525,9 @@
         "description": "Lists all repositories and their permissions under an organization's group\n",
         "summary": "List repository permissions in a group",
         "operationId": "list-repository-permissions-in-group",
-        "tags": ["repositories-groups"],
+        "tags": [
+          "repositories-groups"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/org_repo_groups"
@@ -1444,7 +1549,9 @@
         "description": "Returns current organization repository limits, collaborator counts and default registry settings",
         "summary": "Get organization repository limits",
         "operationId": "get-organization-repository-limits",
-        "tags": ["registry-settings"],
+        "tags": [
+          "registry-settings"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/get_registry_settings"
@@ -1472,7 +1579,9 @@
         "requestBody": {
           "$ref": "#/components/requestBodies/default_repo_visibility"
         },
-        "tags": ["registry-settings"],
+        "tags": [
+          "registry-settings"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/default_repo_visibility"
@@ -1494,7 +1603,9 @@
         "summary": "Get namespaces user is a member of",
         "description": "DEPERECATED: use `GET /v2/user/orgs` to get a list of organizations the user is a member of instead.\n\nPAT scope: `repo:read`\n\nReturns a list of namespaces the user is a member of including:\n* Namespaces of organizations they are an owner or an editor of\n",
         "operationId": "get-user-namespaces",
-        "tags": ["repositories"],
+        "tags": [
+          "repositories"
+        ],
         "deprecated": true,
         "responses": {
           "200": {
@@ -1517,7 +1628,9 @@
         "summary": "Lists repository names in the given namespace",
         "description": "DEPERECATED: use `GET /api/internal/namespaces/{namespace}` to get a list of repositories in the namespace\n",
         "operationId": "list-repository-names",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1605,7 +1718,9 @@
         ],
         "summary": "Get a list of repositories username has access to",
         "operationId": "list-user-repository-access",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/list_repositories"
@@ -1631,7 +1746,9 @@
       "put": {
         "summary": "Sets Dockerfile for automated repository",
         "operationId": "set-repository-dockerfile-internal",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/set_dockerfile"
         },
@@ -1663,7 +1780,9 @@
       "patch": {
         "summary": "Update a repository info",
         "operationId": "update-repository-info-internal",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/internal_update_repository"
         },
@@ -1682,7 +1801,9 @@
       "get": {
         "summary": "Get a repository info",
         "operationId": "get-repository-info-internal",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "responses": {
           "200": {
             "description": "Repository info"
@@ -1702,7 +1823,9 @@
       "get": {
         "summary": "Lists repository names in the given namespace",
         "operationId": "list-namespace-repositories",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1756,7 +1879,9 @@
       "patch": {
         "summary": "Update info of multiple repositories at once",
         "operationId": "bulk-update-repositories-internal",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/bulk_update_repository"
         },
@@ -1777,7 +1902,9 @@
       "post": {
         "summary": "Creates an accounts profile entry",
         "operationId": "create-accounts-profile",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/create_accounts_profile"
         },
@@ -1797,7 +1924,9 @@
       "post": {
         "summary": "Purges PII data for accounts profile",
         "operationId": "purge-accounts-profile-data",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "responses": {
           "204": {
             "description": "Profile data successfully purged"
@@ -1814,7 +1943,9 @@
       "delete": {
         "summary": "Deletes all permissions for an organization group",
         "operationId": "delete-organization-group-permissions",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "responses": {
           "204": {
             "description": "Group successfully deleted"
@@ -1831,7 +1962,9 @@
       "post": {
         "summary": "Sets all repositories under namespace to ModeratedByAdmin",
         "operationId": "moderate-namespace-repositories",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/moderate_repository"
         },
@@ -1851,7 +1984,9 @@
       "post": {
         "summary": "Converts a user profile to an organization",
         "operationId": "convert-user-to-organization",
-        "tags": ["internal-api"],
+        "tags": [
+          "internal-api"
+        ],
         "responses": {
           "204": {
             "description": "User successfully converted to organization"
@@ -1902,7 +2037,9 @@
           },
           "status": {
             "type": "integer",
-            "enum": [6],
+            "enum": [
+              6
+            ],
             "description": "status of the repository:\n  * `1` - Active\n  * `6` - Archived\n"
           }
         }
@@ -1912,7 +2049,11 @@
         "properties": {
           "reason": {
             "type": "string",
-            "enum": ["spam", "support", "user"]
+            "enum": [
+              "spam",
+              "support",
+              "user"
+            ]
           }
         }
       },
@@ -1921,13 +2062,24 @@
         "properties": {
           "reason": {
             "type": "string",
-            "enum": ["not_spam", "support"]
+            "enum": [
+              "not_spam",
+              "support"
+            ]
           }
         }
       },
       "repository_status": {
         "type": "integer",
-        "enum": [0, 1, 2, 3, 4, 5, 6],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
         "description": "status of the repository:\n  * `0` - Initialized\n  * `1` - Active\n  * `2` - Pending Delete\n  * `3` - Locked\n  * `4` - Moderated\n  * `5` - Plan Exceeded\n  * `6` - Archived\n"
       },
       "set_privacy": {
@@ -1935,8 +2087,7 @@
         "properties": {
           "is_private": {
             "type": "boolean",
-            "description": "repository privacy setting",
-            "required": true
+            "description": "repository privacy setting"
           }
         }
       },
@@ -2021,7 +2172,10 @@
           "repository_type": {
             "type": "integer",
             "nullable": true,
-            "enum": [0, 1],
+            "enum": [
+              0,
+              1
+            ],
             "description": "type of the repository:\n  * `0` - Image\n  * `1` - Docker Engine Plugin\n"
           },
           "is_private": {
@@ -2068,7 +2222,13 @@
           },
           "affiliation": {
             "type": "string",
-            "enum": ["", "owner", "editor", "member", "collaborator"],
+            "enum": [
+              "",
+              "owner",
+              "editor",
+              "member",
+              "collaborator"
+            ],
             "description": "how the user is affiliated with the repository:\n  * null - user is unaffiliated\n  * `owner` - user is an owner of the repository\n  * `editor` - user is an editor of the repository\n  * `member` - user is a member of an organization group with access to the repository\n  * `collaborator` - user is a collaborator for the repository\n",
             "nullable": true
           },
@@ -2169,7 +2329,10 @@
           "repository_type": {
             "type": "integer",
             "nullable": true,
-            "enum": [0, 1],
+            "enum": [
+              0,
+              1
+            ],
             "description": "type of the repository:\n  * `0` - Image\n  * `1` - Docker Engine Plugin\n"
           },
           "status": {
@@ -2622,7 +2785,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "inactive"],
+            "enum": [
+              "active",
+              "inactive"
+            ],
             "description": "Status of the image"
           },
           "last_pulled": {
@@ -2692,7 +2858,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "inactive"],
+            "enum": [
+              "active",
+              "inactive"
+            ],
             "description": "whether a tag has been pushed to or pulled in the past month"
           },
           "tag_last_pulled": {
@@ -2779,7 +2948,11 @@
         "properties": {
           "permission": {
             "type": "string",
-            "enum": ["read", "write", "admin"],
+            "enum": [
+              "read",
+              "write",
+              "admin"
+            ],
             "description": "permission level"
           }
         }
@@ -2879,7 +3052,10 @@
           "default_repo_visibility": {
             "type": "string",
             "description": "default visibility when creating new repository",
-            "enum": ["private", "public"]
+            "enum": [
+              "private",
+              "public"
+            ]
           },
           "collaborators_count": {
             "type": "integer",
@@ -2893,7 +3069,10 @@
           "default_repo_visibility": {
             "type": "string",
             "description": "default visibility when creating new repository",
-            "enum": ["private", "public"]
+            "enum": [
+              "private",
+              "public"
+            ]
           }
         }
       },
@@ -2993,7 +3172,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "inactive"],
+            "enum": [
+              "active",
+              "inactive"
+            ],
             "description": "The status of the image based on its last activity against the `active_from` time.\n"
           }
         }
@@ -3067,7 +3249,10 @@
           },
           "warning": {
             "type": "string",
-            "enum": ["is_active", "current_tag"],
+            "enum": [
+              "is_active",
+              "current_tag"
+            ],
             "description": "Warning type.",
             "example": "current_tag"
           },
@@ -3262,7 +3447,14 @@
       },
       "tag_content_type": {
         "type": "string",
-        "enum": ["image", "plugin", "helm", "volume", "wasm", "unrecognized"],
+        "enum": [
+          "image",
+          "plugin",
+          "helm",
+          "volume",
+          "wasm",
+          "unrecognized"
+        ],
         "description": "Content type of a tagged artifact based on it's media type. `unrecognized` means the media type is unrecognized by Docker Hub."
       },
       "internal_update_repository": {
@@ -3294,7 +3486,6 @@
       "namespace": {
         "in": "path",
         "name": "namespace",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3302,7 +3493,6 @@
       "repository": {
         "in": "path",
         "name": "repository",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3310,7 +3500,6 @@
       "tag": {
         "in": "path",
         "name": "tag",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3318,7 +3507,6 @@
       "digest": {
         "in": "path",
         "name": "digest",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3326,7 +3514,6 @@
       "username": {
         "in": "path",
         "name": "username",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3334,7 +3521,6 @@
       "orgname": {
         "in": "path",
         "name": "orgname",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3342,7 +3528,6 @@
       "groupname": {
         "in": "path",
         "name": "groupname",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3350,7 +3535,6 @@
       "group_id": {
         "in": "path",
         "name": "group_id",
-        "required": true,
         "schema": {
           "type": "integer"
         }
@@ -3358,7 +3542,6 @@
       "collaborator": {
         "in": "path",
         "name": "collaborator",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3366,7 +3549,6 @@
       "pipeline_slug": {
         "in": "path",
         "name": "pipeline_slug",
-        "required": true,
         "schema": {
           "type": "string"
         }
@@ -3794,7 +3976,6 @@
     },
     "requestBodies": {
       "create_repository": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3804,7 +3985,6 @@
         }
       },
       "update_repository": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3814,7 +3994,6 @@
         }
       },
       "moderate_repository": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3824,7 +4003,6 @@
         }
       },
       "unmoderate_repository": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3834,7 +4012,6 @@
         }
       },
       "set_privacy": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3844,7 +4021,6 @@
         }
       },
       "add_repository_collaborator": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3854,7 +4030,6 @@
         }
       },
       "create_group": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3864,7 +4039,6 @@
         }
       },
       "update_group": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3874,7 +4048,6 @@
         }
       },
       "create_repository_webhook_pipeline": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3884,7 +4057,6 @@
         }
       },
       "default_repo_visibility": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3894,7 +4066,6 @@
         }
       },
       "advanced_images_bulk_delete": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3904,7 +4075,6 @@
         }
       },
       "set_dockerfile": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3914,7 +4084,6 @@
         }
       },
       "internal_update_repository": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3924,7 +4093,6 @@
         }
       },
       "bulk_update_repository": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
@@ -3934,7 +4102,6 @@
         }
       },
       "create_accounts_profile": {
-        "required": true,
         "content": {
           "application/json": {
             "schema": {
