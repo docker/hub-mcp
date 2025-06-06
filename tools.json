@@ -1,0 +1,1821 @@
+[
+  {
+    "name": "bulk-update-repositories",
+    "description": "Update info of multiple repositories at once",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "nullable": true
+              },
+              "full_description": {
+                "type": "string",
+                "nullable": true,
+                "maxLength": 25000
+              },
+              "status": {
+                "type": "object",
+                "enum": [0, 1, 2, 3, 4, 5, 6],
+                "description": "status of the repository:\n  * `0` - Initialized\n  * `1` - Active\n  * `2` - Pending Delete\n  * `3` - Locked\n  * `4` - Moderated\n  * `5` - Plan Exceeded\n  * `6` - Archived\n"
+              }
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "namespace", "body"]
+    }
+  },
+  {
+    "name": "create-repository",
+    "description": "Creates a new repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "repository name"
+            },
+            "description": {
+              "type": "string",
+              "description": "short description"
+            },
+            "full_description": {
+              "type": "string",
+              "description": "detailed description",
+              "maxLength": 25000
+            },
+            "registry": {
+              "type": "string",
+              "description": "registry address"
+            },
+            "is_private": {
+              "type": "boolean",
+              "description": "repository access"
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "namespace", "body"]
+    }
+  },
+  {
+    "name": "list-repositories",
+    "description": "Lists repositories under namespace",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "description": "search by repository name",
+          "required": false
+        },
+        "ordering": {
+          "type": "string",
+          "description": "query parameter",
+          "required": false
+        },
+        "media_types": {
+          "type": "string",
+          "description": "Comma-delimited list of media types.\nOnly repositories containing one or more artifacts with one of these media types will be returned.\n`null` should be added to the list to get repositories with image artifacts to handle legacy repositories.\n",
+          "required": false
+        },
+        "content_types": {
+          "type": "string",
+          "description": "Comma-delimited list of content types.\nOnly repositories containing one or more artifacts with one of these content types will be returned.\n",
+          "required": false
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "namespace"]
+    }
+  },
+  {
+    "name": "get-namespace-storage-info",
+    "description": "Get namespace storage info",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "description": "search by repository name",
+          "required": false
+        },
+        "ordering": {
+          "type": "string",
+          "description": "query parameter",
+          "required": false
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "namespace"]
+    }
+  },
+  {
+    "name": "get-repository-info",
+    "description": "Gets repository info",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "check-repository",
+    "description": "Check repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "update-repository-info",
+    "description": "Updates repository info",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string",
+              "nullable": true
+            },
+            "full_description": {
+              "type": "string",
+              "nullable": true,
+              "maxLength": 25000
+            },
+            "status": {
+              "type": "integer",
+              "enum": [6],
+              "description": "status of the repository:\n  * `1` - Active\n  * `6` - Archived\n"
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "delete-repository",
+    "description": "Deletes repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "unmoderate-repository",
+    "description": "Unmoderates a repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "enum": ["not_spam", "support"]
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "moderate-repository",
+    "description": "Moderates a repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "enum": ["spam", "support", "user"]
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "set-repository-privacy",
+    "description": "Sets repository privacy",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "is_private": {
+              "type": "boolean",
+              "description": "repository privacy setting",
+              "required": true
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "namespace",
+        "repository",
+        "body",
+        "\"body\".\"is_private\""
+      ]
+    }
+  },
+  {
+    "name": "get-repository-dockerfile",
+    "description": "Gets dockerfile for automated repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "set-repository-dockerfile",
+    "description": "Sets Dockerfile for automated repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "contents": {
+              "type": "string"
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "list-repository-tags",
+    "description": "List repository tags",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        },
+        "architecture": {
+          "type": "string",
+          "description": "Filter to only items containing images supporting this architecture.",
+          "required": false
+        },
+        "os": {
+          "type": "string",
+          "description": "Filter to only items containing images supporting this operating system.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "check-repository-tags",
+    "description": "Check repository tags",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "read-repository-tag",
+    "description": "Read repository tag",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "tag": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "tag",
+        "namespace",
+        "repository",
+        "tag"
+      ]
+    }
+  },
+  {
+    "name": "check-repository-tag",
+    "description": "Check repository tag",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "tag": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "tag",
+        "namespace",
+        "repository",
+        "tag"
+      ]
+    }
+  },
+  {
+    "name": "delete-repository-tag",
+    "description": "Deletes a repository tag",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "tag": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "tag",
+        "namespace",
+        "repository",
+        "tag"
+      ]
+    }
+  },
+  {
+    "name": "read-tag-images",
+    "description": "Read tag images",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "tag": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "tag",
+        "namespace",
+        "repository",
+        "tag"
+      ]
+    }
+  },
+  {
+    "name": "list-repository-groups",
+    "description": "List repository's group permissions",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "add-repository-permissions-to-group",
+    "description": "Adds repository permissions to a group",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "permission": {
+                  "type": "string",
+                  "enum": ["read", "write", "admin"],
+                  "description": "permission level"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "group_id": {
+                  "type": "integer",
+                  "description": "organization group ID"
+                }
+              }
+            }
+          ],
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "get-repository-group-permissions",
+    "description": "Get repository's group's permissions",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "group_id": {
+          "type": "integer",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "group_id",
+        "namespace",
+        "repository",
+        "group_id"
+      ]
+    }
+  },
+  {
+    "name": "update-repository-permissions-in-group",
+    "description": "Update repository permissions in a group",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "group_id": {
+          "type": "integer",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "permission": {
+              "type": "string",
+              "enum": ["read", "write", "admin"],
+              "description": "permission level"
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "group_id",
+        "namespace",
+        "repository",
+        "group_id",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "remove-repository-permissions-from-group",
+    "description": "Remove repository permissions from a group",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "group_id": {
+          "type": "integer",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "group_id",
+        "namespace",
+        "repository",
+        "group_id"
+      ]
+    }
+  },
+  {
+    "name": "add-collaborator-to-repository",
+    "description": "Adds a collaborator to repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "type": "string",
+              "description": "Hub username of the collaborator"
+            },
+            "registry": {
+              "type": "string",
+              "description": "registry address"
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "list-repository-collaborators",
+    "description": "List repository collaborators",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "delete-repository-collaborator",
+    "description": "Delete repository collaborator",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "collaborator": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "collaborator",
+        "namespace",
+        "repository",
+        "collaborator"
+      ]
+    }
+  },
+  {
+    "name": "list-repositories-user-is-collaborating-on",
+    "description": "Lists repositories user is collaborating on",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["username", "username"]
+    }
+  },
+  {
+    "name": "create-repository-webhook-pipeline",
+    "description": "Create repository webhook pipeline",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "name of the pipeline"
+            },
+            "expect_final_callback": {
+              "type": "boolean",
+              "description": "send final callback"
+            },
+            "webhooks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "webhook name"
+                  },
+                  "hook_url": {
+                    "type": "string",
+                    "description": "webhook URL"
+                  }
+                }
+              },
+              "maxItems": 10
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "list-repository-webhook-pipelines",
+    "description": "List repository webhook pipelines",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "delete-repository-webhook-pipelines",
+    "description": "Delete repository webhook pipelines",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "pipeline_slug": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "pipeline_slug",
+        "namespace",
+        "repository",
+        "pipeline_slug"
+      ]
+    }
+  },
+  {
+    "name": "list-repository-webhook-pipeline-history",
+    "description": "List repository webhook pipeline history",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "pipeline_slug": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "pipeline_slug",
+        "namespace",
+        "repository",
+        "pipeline_slug"
+      ]
+    }
+  },
+  {
+    "name": "list-repository-star-usernames",
+    "description": "List the usernames who starred a repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "star-repository",
+    "description": "Star a repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "delete-repository-star",
+    "description": "Delete a repository star",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "get-repository-stars-count",
+    "description": "Get repository stars count",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "get-namespace-repository-limits",
+    "description": "Get namespace repository limits",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "namespace"]
+    }
+  },
+  {
+    "name": "get-repository-autobuild",
+    "description": "Gets repository's auto build configuration",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "update-default-repository-visibility",
+    "description": "Updates default repository visibility",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orgname": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "default_repo_visibility": {
+              "type": "string",
+              "description": "default visibility when creating new repository",
+              "enum": ["private", "public"]
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["orgname", "orgname", "body"]
+    }
+  },
+  {
+    "name": "get-repository-advanced-images-summary",
+    "description": "Get summary of repository's images",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "get-repository-images",
+    "description": "Get details of repository's images",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Filters to only show images of this status.",
+          "required": false
+        },
+        "currently_tagged": {
+          "type": "boolean",
+          "description": "Filters to only show images with:\n- `true`: at least 1 current tag.\n- `false`: no current tags.\n",
+          "required": false
+        },
+        "ordering": {
+          "type": "string",
+          "description": "Orders the results by this property.\nPrefixing with `-` sorts by descending order.\n",
+          "required": false
+        },
+        "active_from": {
+          "type": "string",
+          "description": "Sets the time from which an image must have been pushed or pulled to be counted as active.\n\nDefaults to 1 month before the current time.\n",
+          "required": false
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "get-repository-advanced-images-tags",
+    "description": "Get image's tags",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "digest": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": [
+        "namespace",
+        "repository",
+        "digest",
+        "namespace",
+        "repository",
+        "digest"
+      ]
+    }
+  },
+  {
+    "name": "bulk-delete-images",
+    "description": "Bulk delete images",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "dry_run": {
+              "type": "boolean",
+              "description": "If `true` then will check and return errors and unignored warnings\nfor the deletion request but will not delete any images.\n"
+            },
+            "active_from": {
+              "type": "string",
+              "example": "2020-12-01T12:00:00Z",
+              "description": "Sets the time from which an image must have been pushed or pulled to be counted as active.\n\nDefaults to 1 month before the current time.\n"
+            },
+            "manifests": {
+              "description": "Image manifests to delete.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "repository": {
+                    "type": "string",
+                    "description": "Name fo the repository to delete the image from.",
+                    "example": "myrepo"
+                  },
+                  "digest": {
+                    "type": "string",
+                    "description": "Digest of the image to delete.",
+                    "example": "sha256:1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqr"
+                  }
+                }
+              }
+            },
+            "ignore_warnings": {
+              "description": "Warnings to ignore. If a warning is not ignored then no deletions will happen and the\nwarning is returned in the response with HTTP status 400.\n\nThese warnings include:\n\n- is_active: warning when attempting to delete an image that is marked as active.\n- current_tag: warning when attempting to delete an image that has one or more current\ntags in the repository.\n\nWarnings can be copied from the response to the request.\n",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "repository": {
+                    "type": "string",
+                    "description": "Name of the repository of the image this warning is for.",
+                    "example": "myrepo"
+                  },
+                  "digest": {
+                    "type": "string",
+                    "description": "Digest of the image this warning is for.",
+                    "example": "sha256:1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqr"
+                  },
+                  "warning": {
+                    "type": "string",
+                    "enum": ["is_active", "current_tag"],
+                    "description": "Warning type.",
+                    "example": "current_tag"
+                  },
+                  "tags": {
+                    "description": "Image's current tags.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "latest"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "namespace", "body"]
+    }
+  },
+  {
+    "name": "list-starred-repositories",
+    "description": "List starred repositories for a user",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["username", "username"]
+    }
+  },
+  {
+    "name": "get-user-repository-limits",
+    "description": "Get user repository limits",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["username", "username"]
+    }
+  },
+  {
+    "name": "list-user-repositories",
+    "description": "Lists repositories under user",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["username", "username"]
+    }
+  },
+  {
+    "name": "list-repository-permissions-in-group",
+    "description": "List repository permissions in a group",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orgname": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "groupname": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["orgname", "groupname", "orgname", "groupname"]
+    }
+  },
+  {
+    "name": "get-organization-repository-limits",
+    "description": "Get organization repository limits",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orgname": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["orgname", "orgname"]
+    }
+  },
+  {
+    "name": "get-user-namespaces",
+    "description": "Get namespaces user is a member of",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "list-repository-names",
+    "description": "Lists repository names in the given namespace",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "is_private": {
+          "type": "boolean",
+          "description": "return private repositories only",
+          "required": false
+        },
+        "ordering": {
+          "type": "string",
+          "description": "query parameter",
+          "required": false
+        },
+        "status_in": {
+          "type": "string",
+          "description": "query parameter",
+          "required": false
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "namespace"]
+    }
+  },
+  {
+    "name": "list-user-repository-access",
+    "description": "Get a list of repositories username has access to",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "username": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "ordering": {
+          "type": "string",
+          "description": "query parameter",
+          "required": false
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "username", "namespace", "username"]
+    }
+  },
+  {
+    "name": "set-repository-dockerfile-internal",
+    "description": "Sets Dockerfile for automated repository",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "contents": {
+              "type": "string"
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "update-repository-info-internal",
+    "description": "Update a repository info",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string",
+              "nullable": true
+            },
+            "full_description": {
+              "type": "string",
+              "nullable": true,
+              "maxLength": 25000
+            },
+            "status": {
+              "type": "object",
+              "enum": [0, 1, 2, 3, 4, 5, 6],
+              "description": "status of the repository:\n  * `0` - Initialized\n  * `1` - Active\n  * `2` - Pending Delete\n  * `3` - Locked\n  * `4` - Moderated\n  * `5` - Plan Exceeded\n  * `6` - Archived\n"
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository", "body"]
+    }
+  },
+  {
+    "name": "get-repository-info-internal",
+    "description": "Get a repository info",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "repository": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["namespace", "repository", "namespace", "repository"]
+    }
+  },
+  {
+    "name": "list-namespace-repositories",
+    "description": "Lists repository names in the given namespace",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "is_private": {
+          "type": "boolean",
+          "description": "return private repositories only",
+          "required": false
+        },
+        "ordering": {
+          "type": "string",
+          "description": "query parameter",
+          "required": false
+        },
+        "status_in": {
+          "type": "string",
+          "description": "query parameter",
+          "required": false
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number to get. Defaults to 1.",
+          "required": false
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "Number of items to get per page. Defaults to 10. Max of 100.",
+          "required": false
+        }
+      },
+      "required": ["namespace", "namespace"]
+    }
+  },
+  {
+    "name": "bulk-update-repositories-internal",
+    "description": "Update info of multiple repositories at once",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "nullable": true
+              },
+              "full_description": {
+                "type": "string",
+                "nullable": true,
+                "maxLength": 25000
+              },
+              "status": {
+                "type": "object",
+                "enum": [0, 1, 2, 3, 4, 5, 6],
+                "description": "status of the repository:\n  * `0` - Initialized\n  * `1` - Active\n  * `2` - Pending Delete\n  * `3` - Locked\n  * `4` - Moderated\n  * `5` - Plan Exceeded\n  * `6` - Archived\n"
+              }
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "namespace", "body"]
+    }
+  },
+  {
+    "name": "create-accounts-profile",
+    "description": "Creates an accounts profile entry",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string"
+            },
+            "uuid": {
+              "type": "string"
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["body"]
+    }
+  },
+  {
+    "name": "purge-accounts-profile-data",
+    "description": "Purges PII data for accounts profile",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["username", "username"]
+    }
+  },
+  {
+    "name": "delete-organization-group-permissions",
+    "description": "Deletes all permissions for an organization group",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "group_id": {
+          "type": "integer",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["group_id", "group_id"]
+    }
+  },
+  {
+    "name": "moderate-namespace-repositories",
+    "description": "Sets all repositories under namespace to ModeratedByAdmin",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "enum": ["spam", "support", "user"]
+            }
+          },
+          "description": "Request body data",
+          "required": true
+        }
+      },
+      "required": ["namespace", "namespace", "body"]
+    }
+  },
+  {
+    "name": "convert-user-to-organization",
+    "description": "Converts a user profile to an organization",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "path parameter",
+          "required": true
+        }
+      },
+      "required": ["username", "username"]
+    }
+  }
+]
