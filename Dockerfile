@@ -5,7 +5,7 @@ COPY src/ ./src/
 COPY package.json .
 COPY package-lock.json .
 COPY tsconfig.json .
-COPY openapi.json .
+COPY specs/ ./specs/
 
 RUN npm install
 RUN npm run build
@@ -13,7 +13,7 @@ RUN npm run build
 FROM docker/dhi-node:23-alpine3.21
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/dist /app/dist
-COPY --from=builder /app/openapi.json /app/openapi.json
+COPY --from=builder /app/specs/* /app/specs/
 
 WORKDIR /app
 

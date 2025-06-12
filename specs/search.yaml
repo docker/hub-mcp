@@ -1,0 +1,344 @@
+openapi: 3.0.3
+info:
+  title: Search API
+  version: 1.1.0
+  contact:
+    name: Docker Hub
+    url: https://github.com/docker
+    email: hub@docker.com
+tags:
+  - name: search
+    x-displayName: Search
+    description: |
+      Endpoints for searching public repositories on Docker Hub.
+
+paths:
+  /v4:
+    get:
+      summary: Search V4
+      description: |
+        Search V4 API
+      tags: [search]
+      operationId: search
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: "Search query parameter"
+        - in: query
+          name: badges
+          required: false
+          schema:
+            type: string
+            enum: ["verified_publisher", "open_source", "official", "none"]
+          description: >
+            Filter the results depending on image content type
+              * `official` - Docker Official Images
+              * `verified_publisher` - repositories from Docker Verified Publishers
+              * `open_source` - repositories from Docker Sponsored Open Source publishers
+              * `none` - 'repositories from the community'
+        - in: query
+          name: type
+          required: false
+          schema:
+            type: string
+            enum: ["image", "plugin", "extension"]
+          description: "Filter on repository content type, either Docker Image, Docker Engine plugin or Docker Extension."
+        - in: query
+          name: categories
+          required: false
+          deprecated: true
+          schema:
+            type: string
+          description: "Filter on categories (comma separated list), used with products, not repositories."
+        - in: query
+          name: operating_systems
+          required: false
+          schema:
+            type: string
+          description: "Filter on OS (comma separated list)."
+        - in: query
+          name: architectures
+          required: false
+          schema:
+            type: string
+          description: "Filter on architectures (comma separated list)."
+        - in: query
+          name: images
+          required: false
+          schema:
+            type: string
+          description: "Filter on image names (comma separated list)."
+        - in: query
+          name: extension_reviewed
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: "Filter on reviewed extensions."
+        - in: query
+          name: from
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+            maximum: 2500
+          description: "The number of documents to skip from the beginning of the result set for pagination. The combination of `from` and `size` (sum) can't exceed 2500."
+        - in: query
+          name: size
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 0
+            maximum: 100
+          description: "Maximum number of results to return, for pagination. `The combination of `from` and `size` (sum) can't exceed 2500."
+        - in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+            enum: ["updated_at", "pull_count"]
+          description: "Sort results by a search field. Use `order` parameter to change the order of the result. If the `sort` field is not set, a best match sorting is used by default. When searching extensions, documents are sort alphabetically if none is provided."
+        - in: query
+          name: order
+          required: false
+          schema:
+            type: string
+            enum: ["asc", "desc"]
+          description: "Change the ordering of the results. When searching extensions, `asc` is the default order if none is provided."
+      responses:
+        200:
+          $ref: "#/components/responses/v4_result"
+        400:
+          $ref: "#/components/responses/bad_request"
+        404:
+          $ref: "#/components/responses/not_found"
+
+components:
+  schemas:
+    error:
+      type: object
+      properties:
+        errinfo:
+          type: object
+          items:
+            type: string
+        detail:
+          type: string
+        message:
+          type: string
+
+    v4_result:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: "Total number of results available across all pages."
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: "Repository identifier"
+              name:
+                type: string
+                description: "Repository name"
+              slug:
+                type: string
+                description: "Repository slug name"
+              type:
+                type: string
+                enum: ["image", "plugin", "extension"]
+                description: "Repository content type"
+              publisher:
+                $ref: "#/components/schemas/publisher"
+              created_at:
+                type: string
+                description: "Repository creation date"
+              updated_at:
+                type: string
+                description: "Repository last push date"
+              short_description:
+                type: string
+                description: "Repository short description"
+              badge:
+                type: string
+                enum: ["official", "verfified_publisher", "open_source"]
+                description: "Repository publisher badge"
+              star_count:
+                type: integer
+                description: "Total number of star count"
+              pull_count:
+                type: string
+                description: "Repository aggregated pull count"
+              operating_systems:
+                type: array
+                description: "Repository operating systems"
+                items:
+                  $ref: "#/components/schemas/operating_system"
+              architectures:
+                type: array
+                description: "Repository architectures"
+                items:
+                  $ref: "#/components/schemas/architecture"
+              logo_url:
+                $ref: "#/components/schemas/logo"
+              extension_reviewed:
+                type: boolean
+                description: "Extension has been reviewed"
+              categories:
+                type: array
+                description: "Repository categories"
+                items:
+                  $ref: "#/components/schemas/categories"
+              archived:
+                type: boolean
+                description: "Repository is archived"
+
+    publisher:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Publisher identifier"
+        name:
+          type: string
+          description: "Publisher name"
+
+    logo:
+      type: object
+      properties:
+        large:
+          type: string
+          description: "Large logo URL"
+        small:
+          type: string
+          description: "Small logo URL"
+
+    categories:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: "Category name"
+        name:
+          type: string
+          description: "Display name"
+
+    rate_plan:
+      type: object
+      deprecated: true
+      properties:
+        id:
+          type: string
+          description: "Repository name"
+        operating_systems:
+          type: array
+          description: "Repository operating systems"
+          items:
+            $ref: "#/components/schemas/operating_system"
+        architectures:
+          type: array
+          description: "Repository architectures"
+          items:
+            $ref: "#/components/schemas/architecture"
+        repositories:
+          type: array
+          description: "Repositories"
+          items:
+            $ref: "#/components/schemas/repository"
+
+    operating_system:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "OS name"
+        label:
+          type: string
+          description: "OS display name"
+
+    architecture:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Architecture name"
+        label:
+          type: string
+          description: "Architecture display name"
+
+    repository:
+      type: object
+      deprecated: true
+      properties:
+        name:
+          type: string
+          description: "Repository name"
+        namespace:
+          type: string
+          description: "Repository namespace"
+        description:
+          type: string
+          description: "Repository short description"
+        type:
+          type: string
+          enum: ["image", "plugin", "extension"]
+          description: "Repository type: Docker Image or Docker Engine Plugin"
+        pull_count:
+          type: string
+          nullable: true
+          description: "Repository agregated pull count"
+        is_trusted:
+          type: boolean
+          description: "Autobuild is enabled on the repository."
+        is_official:
+          type: boolean
+          description: "True if the repository an official one."
+        last_pushed_at:
+          type: string
+          description: "Date of the last push on the repository"
+        last_pulled_at:
+          type: string
+          description: "Date of the last pulled on the repository"
+
+  responses:
+    unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+
+    not_found:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+
+    bad_request:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+
+    v4_result:
+      description: Search V4 Result
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/v4_result"
