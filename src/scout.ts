@@ -9,14 +9,18 @@ export class ScoutAPI extends Resource {
     super(config);
     this.scoutClient = new ScoutClient({
       url: "https://api.scout.docker.com/v1/graphql",
-      fetchFn: (input: RequestInfo | URL, init?: RequestInit) => {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      fetchFn: async (input: RequestInfo | URL, init?: RequestInit) => {
+        const headers = {
+          ...init?.headers,
+          "Content-Type": "application/json",
+        };
+        await this.authenticate(headers);
         return fetch(input, {
           ...init,
-          headers: {
-            ...init?.headers,
-            Authorization: `Bearer ${this.config.auth?.token}`,
-            "Content-Type": "application/json",
-          },
+          headers,
         });
       },
       reportErrorFn: (error: Error, onErrorCallback?: () => void) => {

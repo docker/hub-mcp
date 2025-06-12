@@ -155,8 +155,9 @@ const configs: ResourceConfig[] = [
     name: "scout",
     host: "https://api.scout.docker.com",
     auth: {
-      type: "bearer",
-      token: process.env.SCOUT_TOKEN,
+      type: "pat",
+      token: process.env.HUB_PAT_TOKEN,
+      username: process.env.HUB_USERNAME,
     },
   },
 ];
@@ -188,4 +189,3 @@ main().catch((error) => {
   console.error("Failed to start server:", error);
   process.exit(1);
 });
-

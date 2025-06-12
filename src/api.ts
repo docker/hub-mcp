@@ -10,7 +10,6 @@ type Route = {
 export class API extends Resource {
   private components: Map<string, OpenAPIV3.ParameterObject>;
   private routes: Map<string, Route>;
-  private tokens: Map<string, string>;
   constructor(private spec: OpenAPIV3.Document, config: ResourceConfig) {
     super(config);
     this.components = new Map();
@@ -138,7 +137,7 @@ export class API extends Resource {
       }
 
       const url = this.config.host + encodedPath;
-      await this.authenticate(headers, namespace);
+      await this.authenticate(headers);
       console.error(
         `Making ${method.toUpperCase()} ${
           headers["Authorization"] ? "authenticated " : " "
@@ -286,48 +285,5 @@ export class API extends Resource {
       properties,
       required,
     };
-  }
-
-  private async authenticate(
-    headers: Record<string, string>,
-    namespace: string
-  ) {
-    // Add authentication
-    if (this.config.auth) {
-      console.error(`Authenticating with ${this.config.auth.type}`);
-      switch (this.config.auth.type) {
-        case "bearer":
-          if (this.config.auth.token) {
-            headers["Authorization"] = `Bearer ${this.config.auth.token}`;
-          }
-          break;
-        case "pat":
-          let token = this.tokens.get(this.config.auth.username!);
-          if (!token) {
-            token = await this.authenticatePAT(this.config.auth.username!);
-            this.tokens.set(this.config.auth.username!, token);
-          }
-          headers["Authorization"] = `Bearer ${token}`;
-          break;
-      }
-    }
-  }
-
-  private async authenticatePAT(namespace: string): Promise<string> {
-    console.error(`Authenticating PAT for ${namespace}`);
-    const url = `${this.config.host}/v2/users/login`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: namespace,
-        password: this.config.auth?.token,
-      }),
-    });
-    const data = (await response.json()) as {
-      token: string;
-      refresh_token: string;
-    };
-    return data.token;
   }
 }

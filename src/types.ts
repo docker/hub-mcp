@@ -19,8 +19,10 @@ export interface MCPResource {
 
 export class Resource implements MCPResource {
   protected tools: Map<string, Tool>;
+  protected tokens: Map<string, string>;
   constructor(protected config: ResourceConfig) {
     this.tools = new Map();
+    this.tokens = new Map();
   }
   RegisterTools(): void {
     throw new Error("Method not implemented.");
@@ -36,5 +38,45 @@ export class Resource implements MCPResource {
   }
   GetTool(toolName: string): Tool | undefined {
     return this.tools.get(toolName);
+  }
+
+  protected async authenticate(headers: Record<string, string>) {
+    // Add authentication
+    if (this.config.auth) {
+      console.error(`Authenticating with ${this.config.auth.type}`);
+      switch (this.config.auth.type) {
+        case "bearer":
+          if (this.config.auth.token) {
+            headers["Authorization"] = `Bearer ${this.config.auth.token}`;
+          }
+          break;
+        case "pat":
+          let token = this.tokens.get(this.config.auth.username!);
+          if (!token) {
+            token = await this.authenticatePAT(this.config.auth.username!);
+            this.tokens.set(this.config.auth.username!, token);
+          }
+          headers["Authorization"] = `Bearer ${token}`;
+          break;
+      }
+    }
+  }
+
+  protected async authenticatePAT(username: string): Promise<string> {
+    console.error(`Authenticating PAT for ${username}`);
+    const url = `https://hub.docker.com/v2/users/login`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: username,
+        password: this.config.auth?.token,
+      }),
+    });
+    const data = (await response.json()) as {
+      token: string;
+      refresh_token: string;
+    };
+    return data.token;
   }
 }
