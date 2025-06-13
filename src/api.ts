@@ -104,7 +104,12 @@ export class API extends Resource {
       const searchParams = new URLSearchParams();
 
       for (const param of queryParams as OpenAPIV3.ParameterObject[]) {
-        if (args[param.name] !== undefined) {
+        if (
+          args[param.name] !== undefined &&
+          args[param.name] !== null &&
+          args[param.name] !== "" &&
+          args[param.name] !== "null"
+        ) {
           searchParams.append(param.name, String(args[param.name]));
         }
       }
@@ -217,27 +222,18 @@ export class API extends Resource {
   ): any {
     const properties: any = {};
     const required: string[] = [];
-    const routeParams = path.matchAll(/\{([^}]+)\}/g);
-
-    for (const param of routeParams) {
-      const paramName = param[1]; // this gives the path parameter name
-      if (this.components.has(paramName)) {
-        const component = this.components.get(
-          paramName
-        ) as OpenAPIV3.ParameterObject;
-        properties[paramName] = {
-          type: (component.schema as OpenAPIV3.SchemaObject).type || "string",
-          description: component.description || `${component.in} parameter`,
-        };
-        if (component.required) {
-          required.push(paramName);
-        }
-      }
-    }
 
     // Add parameters (path, query, header)
-    const parameters = operation.parameters || [];
-    for (const param of parameters as OpenAPIV3.ParameterObject[]) {
+    let parameters =
+      (operation.parameters as OpenAPIV3.ParameterObject[]) || [];
+
+    // Sort parameters by in (path, query, header)
+    parameters = (parameters as OpenAPIV3.ParameterObject[]).sort((a, b) => {
+      if (a.in === "path" && b.in !== "path") return -1;
+      if (a.in !== "path" && b.in === "path") return 1;
+      return 0;
+    });
+    for (const param of parameters) {
       if (
         param.in === "path" ||
         param.in === "query" ||

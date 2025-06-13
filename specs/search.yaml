@@ -26,6 +26,7 @@ paths:
           schema:
             type: string
           description: "Search query parameter"
+          required: true
         - in: query
           name: badges
           required: false
