@@ -52,13 +52,26 @@ export class API extends Resource {
             method: method.toLowerCase(),
             operation: op,
           });
+          let description =
+            op.description ||
+            op.summary ||
+            `${method.toUpperCase()} ${path} (${this.config.name})`;
+          if (op.responses) {
+            for (const [status, response] of Object.entries(op.responses)) {
+              if ((response as OpenAPIV3.ResponseObject).description) {
+                description += `\n\nWhen response status is ${status} it returns ${
+                  (response as OpenAPIV3.ResponseObject).description
+                }.`;
+              }
+            }
+          }
           this.tools.set(toolName, {
             name: toolName,
-            description:
-              op.summary ||
-              op.description ||
-              `${method.toUpperCase()} ${path} (${this.config.name})`,
+            description,
             inputSchema: this.generateInputSchema(op, path),
+            annotations: {
+              title: op.summary,
+            },
           });
         }
       }
