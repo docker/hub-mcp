@@ -1,0 +1,226 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Accounts API",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Docker Hub",
+      "url": "https://github.com/docker",
+      "email": "hub@docker.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "accounts",
+      "x-displayName": "Accounts",
+      "description": "Endpoints for managing accounts"
+    }
+  ],
+  "paths": {
+    "/v2/user/orgs": {
+      "get": {
+        "summary": "Get organizations/namespaces for a user",
+        "description": "Returns a list of namespaces the user is a member of including namespaces of organizations he is an owner or an editor of. Retrieves the list of organization namespaces the user has access to. Note: This does not include the user's personal namespace, which is named after the user's username.",
+        "operationId": "get-namespaces",
+        "tags": ["accounts"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Page number for pagination. Default is 1.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Number of items per page",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/user_orgs_paginated_response"
+          },
+          "400": {
+            "$ref": "#/components/responses/bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "403": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "organization": {
+        "type": "object",
+        "properties": {
+          "orgname": {
+            "type": "string",
+            "description": "The name of the organization."
+          }
+        }
+      },
+      "pagination_next": {
+        "type": "string",
+        "description": "The URL or link for the next page of items.",
+        "example": "https://hub.docker.com/v2/some/resources/items?page=3&page_size=20"
+      },
+      "pagination_count": {
+        "type": "number",
+        "description": "The total number of items that match with the search.",
+        "example": 120
+      },
+      "pagination_previous": {
+        "type": "string",
+        "description": "The URL or link for the previous page of items.",
+        "example": "https://hub.docker.com/v2/some/resources/items?page=1&page_size=20"
+      },
+      "user_organization": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/organization"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "user_role": {
+                "type": "string",
+                "example": "Owner"
+              },
+              "user_groups": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": ["org123"]
+              },
+              "org_groups_count": {
+                "type": "number",
+                "example": 1
+              },
+              "plan_name": {
+                "type": "string",
+                "example": "free-team"
+              }
+            }
+          }
+        ]
+      },
+      "error": {
+        "type": "object",
+        "properties": {
+          "errinfo": {
+            "type": "object",
+            "items": {
+              "type": "string"
+            }
+          },
+          "detail": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "user_orgs_paginated_response": {
+        "description": "A list of the user's organizations/namespaces. Note: The personal namespace of the authenticated user is not included in the list of namespaces (organizations) returned by this endpoint and must be queried separately. If this endpoint is called in the context of listing all repositories user have access to, then an extra invocation of the `list-repositories-by-namespace` endpoint should be done to get repositories under the personal namespace of the user.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "count": {
+                  "$ref": "#/components/schemas/pagination_count"
+                },
+                "previous": {
+                  "$ref": "#/components/schemas/pagination_previous"
+                },
+                "next": {
+                  "$ref": "#/components/schemas/pagination_next"
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/user_organization"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "bad_request": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "no_content": {
+        "description": "No Content"
+      },
+      "unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "forbidden": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "not_found": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "internal_error": {
+        "description": "Internal",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      }
+    }
+  }
+}
