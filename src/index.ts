@@ -144,6 +144,20 @@ const configs: ResourceConfig[] = [
     },
   },
   {
+    name: "accounts",
+    specPath:
+      process.env.OPENAPI_SPEC_ACCOUNTS &&
+      process.env.OPENAPI_SPEC_ACCOUNTS !== ""
+        ? process.env.OPENAPI_SPEC_ACCOUNTS
+        : "file://./specs/accounts.json",
+    host: "https://hub.docker.com",
+    auth: {
+      type: "pat",
+      token: process.env.HUB_PAT_TOKEN,
+      username: process.env.HUB_USERNAME,
+    },
+  },
+  {
     name: "search",
     specPath:
       process.env.OPENAPI_SPEC_SEARCH && process.env.OPENAPI_SPEC_SEARCH !== ""

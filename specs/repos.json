@@ -29,21 +29,6 @@
       "name": "repositories-webhooks",
       "x-displayName": "Repository webhooks",
       "description": "Endpoints for managing repository webhooks\n"
-    },
-    {
-      "name": "registry-settings",
-      "x-displayName": "Registry settings",
-      "description": "Endpoints for managing org and user registry settings\n"
-    },
-    {
-      "name": "repositories-advanced-images",
-      "x-displayName": "Advanced Image Management",
-      "description": "The Advanced Image Management API endpoints allow you to manage Docker\nimages across all repositories.\n\nFor more information, see [Advanced Image Management dashboard](/docker-hub/image-management/).\n"
-    },
-    {
-      "name": "repositories-autobuilds",
-      "x-displayName": "Repository auto-builds",
-      "description": "Endpoints for managing repository auto-builds\n"
     }
   ],
   "paths": {
@@ -55,7 +40,7 @@
       ],
       "post": {
         "summary": "Creates a new repository",
-        "description": "Creates a new repository in the provided namespace.\n\n The repository can be public or private. PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/`\n",
+        "description": "Creates a new repository in the provided namespace.\n\n The repository can be public or private. PAT scope: `repo:admin`\n",
         "operationId": "create-repository",
         "tags": ["repositories"],
         "requestBody": {
@@ -78,8 +63,8 @@
       },
       "get": {
         "summary": "Lists repositories under namespace",
-        "description": "List all repositories under the provided namespace. If authenticated, the response will include private repositories.\n\nPAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/`\n",
-        "operationId": "list-repositories",
+        "description": "List all repositories under the provided namespace. If authenticated, the response will include private repositories. Namespace is a mandatory parameter. To list repositories under the `personal` namespace, the user must explicitly provide the exact username as the namespace parameter.\n\nPAT scope: `repo:public_read`.\n",
+        "operationId": "list-repositories-by-namespace",
         "tags": ["repositories"],
         "parameters": [
           {
@@ -157,7 +142,7 @@
       ],
       "get": {
         "summary": "Gets repository info",
-        "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/`\n",
+        "description": "PAT scope: `repo:public_read`\n",
         "operationId": "get-repository-info",
         "tags": ["repositories"],
         "responses": {
@@ -170,7 +155,7 @@
         }
       },
       "head": {
-        "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/`\n",
+        "description": "PAT scope: `repo:public_read`\n",
         "summary": "Check repository",
         "operationId": "check-repository",
         "tags": ["repositories"],
@@ -185,7 +170,7 @@
       },
       "patch": {
         "summary": "Updates repository info",
-        "description": "PAT scope: `repo:admin`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/`\n\nUpdates a repository info\n",
+        "description": "PAT scope: `repo:admin`\n",
         "operationId": "update-repository-info",
         "tags": ["repositories"],
         "requestBody": {
@@ -214,7 +199,7 @@
         }
       ],
       "get": {
-        "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/dockerfile/`\n",
+        "description": "PAT scope: `repo:public_read`\n",
         "summary": "Gets dockerfile for repository",
         "operationId": "get-repository-dockerfile",
         "tags": ["repositories"],
@@ -261,7 +246,7 @@
         }
       ],
       "get": {
-        "description": "List all tags for a repository. If the repository is private, the call must be authenticated. PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags`\n",
+        "description": "List all tags for a repository. If the repository is private, the call must be authenticated. PAT scope: `repo:public_read`\n",
         "summary": "List repository tags",
         "operationId": "list-repository-tags",
         "tags": ["repositories"],
@@ -292,7 +277,7 @@
         }
       },
       "head": {
-        "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags`\n",
+        "description": "PAT scope: `repo:public_read`\n",
         "summary": "Check repository tags",
         "operationId": "check-repository-tags",
         "tags": ["repositories"],
@@ -322,7 +307,7 @@
         }
       ],
       "get": {
-        "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags/{tag}`\n",
+        "description": "PAT scope: `repo:public_read`\n",
         "summary": "Read repository tag",
         "operationId": "read-repository-tag",
         "tags": ["repositories"],
@@ -339,7 +324,7 @@
         }
       },
       "head": {
-        "description": "PAT scope: `repo:public_read`\n\nLegacy endpoint: `/v2/repositories/{namespace}/{repository}/tags/{tag}`\n",
+        "description": "PAT scope: `repo:public_read`\n",
         "summary": "Check repository tag",
         "operationId": "check-repository-tag",
         "tags": ["repositories"],
@@ -1905,7 +1890,7 @@
         }
       },
       "list_repositories": {
-        "description": "",
+        "description": "a paginated list of repositories under the provided namespace. If authenticated, the response will include private repositories",
         "content": {
           "application/json": {
             "schema": {
