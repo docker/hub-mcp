@@ -1,4 +1,4 @@
-import { MCPResource, Resource, ResourceConfig } from "./types";
+import { Asset, AssetConfig } from "./asset";
 import { OpenAPI, OpenAPIV3 } from "openapi-types";
 
 type Route = {
@@ -7,14 +7,13 @@ type Route = {
   operation: OpenAPIV3.OperationObject;
 };
 
-export class API extends Resource {
+export class API extends Asset {
   private components: Map<string, OpenAPIV3.ParameterObject>;
   private routes: Map<string, Route>;
-  constructor(private spec: OpenAPIV3.Document, config: ResourceConfig) {
+  constructor(private spec: OpenAPIV3.Document, config: AssetConfig) {
     super(config);
     this.components = new Map();
     this.routes = new Map();
-    this.tokens = new Map();
   }
 
   RegisterTools() {
@@ -155,7 +154,8 @@ export class API extends Resource {
       }
 
       const url = this.config.host + encodedPath;
-      await this.authenticate(headers);
+      const token = await this.authenticate();
+      (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
       console.error(
         `Making ${method.toUpperCase()} ${
           headers["Authorization"] ? "authenticated " : " "

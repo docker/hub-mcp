@@ -1,14 +1,14 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { McpServer as Server } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  Tool as MCPTool,
-} from "@modelcontextprotocol/sdk/types.js";
+import { Tool as MCPTool } from "@modelcontextprotocol/sdk/types.js";
 import SwaggerParser from "@apidevtools/swagger-parser";
 import { ScoutAPI } from "./scout";
-import { MCPResource, ResourceConfig } from "./types";
+import { Asset, AssetConfig } from "./asset";
 import { API } from "./api";
+import path from "path";
+import { Repos } from "./repos";
+import { Accounts } from "./accounts";
+import { Search } from "./search";
 
 interface Parameter {
   $ref?: string;
@@ -37,7 +37,7 @@ interface OpenAPIOperation {
 
 interface ToolInfo {
   scoutEndpoint?: string;
-  config: ResourceConfig;
+  config: AssetConfig;
   path?: string;
   method?: string;
   operation?: OpenAPIOperation;
@@ -49,7 +49,7 @@ const PAT_TOKEN = process.env.PAT_TOKEN;
 
 class HubMCPServer {
   private server: Server;
-  private resources: Map<string, MCPResource> = new Map();
+  private assets: Map<string, Asset> = new Map();
 
   constructor() {
     this.server = new Server(
@@ -63,62 +63,44 @@ class HubMCPServer {
         },
       }
     );
-    this.setupHandlers();
-  }
 
-  async loadResources(config: ResourceConfig): Promise<void> {
-    try {
-      console.error(`Loading resource definition of ${config.name}...`);
-      if (config.name === "scout") {
-        const resource = new ScoutAPI(config);
-        resource.RegisterTools();
-        this.resources.set(config.name, resource);
-        console.error(
-          `✅ Loaded ${config.name} with ${resource.GetToolsCount()} operations`
-        );
-        return;
-      }
-      let spec: any;
-      if (config.specPath && config.specPath.startsWith("https:")) {
-        spec = await SwaggerParser.parse(config.specPath);
-      } else if (config.specPath && config.specPath.startsWith("file:")) {
-        spec = config.specPath.replace("file://", "");
-      }
-      // Parse and dereference the OpenAPI spec
-      spec = await SwaggerParser.dereference(spec);
-      const resource = new API(spec, config);
-      resource.RegisterTools();
-      this.resources.set(config.name, resource);
-      console.error(
-        `✅ Loaded ${config.name} with ${resource.GetToolsCount()} operations`
-      );
-    } catch (error) {
-      console.error(`❌ Failed to load resource ${config.name}:`, error);
-      throw error;
+    // Load all configured APIs
+    const assets: Asset[] = [
+      new Repos(this.server, {
+        name: "repos",
+        host: "https://hub.docker.com/v2",
+        auth: {
+          type: "pat",
+          token: process.env.HUB_PAT_TOKEN,
+          username: process.env.HUB_USERNAME,
+        },
+      }),
+      new Accounts(this.server, {
+        name: "accounts",
+        host: "https://hub.docker.com/v2",
+        auth: {
+          type: "pat",
+          token: process.env.HUB_PAT_TOKEN,
+          username: process.env.HUB_USERNAME,
+        },
+      }),
+      new Search(this.server, {
+        name: "search",
+        host: "https://hub.docker.com/api/search",
+      }),
+      new ScoutAPI(this.server, {
+        name: "scout",
+        host: "https://api.scout.docker.com",
+        auth: {
+          type: "pat",
+          token: process.env.HUB_PAT_TOKEN,
+          username: process.env.HUB_USERNAME,
+        },
+      }),
+    ];
+    for (const asset of assets) {
+      asset.RegisterTools();
     }
-  }
-
-  private setupHandlers(): void {
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      const tools: MCPTool[] = [];
-
-      this.resources.forEach((resource) => {
-        tools.push(...resource.GetTools());
-      });
-      return { tools };
-    });
-
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
-      console.error(`Calling tool: ${name}`);
-      for (const resource of this.resources.values()) {
-        const tool = resource.GetTool(name);
-        if (tool) {
-          return await resource.ExecuteTool(name, args);
-        }
-      }
-      throw new Error(`Tool ${name} not found`);
-    });
   }
 
   async run(): Promise<void> {
@@ -129,7 +111,7 @@ class HubMCPServer {
 }
 
 // Configuration - you can load this from a JSON file
-const configs: ResourceConfig[] = [
+const configs: AssetConfig[] = [
   {
     name: "repos",
     specPath:
@@ -179,16 +161,6 @@ const configs: ResourceConfig[] = [
 // Main execution
 async function main() {
   const server = new HubMCPServer();
-
-  // Load all configured APIs
-  for (const config of configs) {
-    try {
-      await server.loadResources(config);
-    } catch (error) {
-      console.error(`Failed to load API ${config.name}, skipping...`);
-    }
-  }
-
   // Start the server
   await server.run();
 }
