@@ -1,54 +1,20 @@
-import express, { Request, Response } from 'express';
+import express, {Express, Request, Response} from "express";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp";
 import { McpServer as Server } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { Tool as MCPTool } from "@modelcontextprotocol/sdk/types.js";
+import { JSONRPC_VERSION, METHOD_NOT_FOUND, INTERNAL_ERROR } from "@modelcontextprotocol/specification/schema/2025-06-18/schema";
 import { ScoutAPI } from "./scout";
-import { Asset, AssetConfig } from "./asset";
+import { Asset } from "./asset";
 import { Repos } from "./repos";
 import { Accounts } from "./accounts";
 import { Search } from "./search";
 
-interface Parameter {
-  $ref?: string;
-  name?: string;
-  in?: "path" | "query" | "header" | "cookie";
-  required?: boolean;
-  schema?: any;
-  description?: string;
-}
-
-interface OpenAPIOperation {
-  operationId?: string;
-  summary?: string;
-  description?: string;
-  parameters?: Array<Parameter>;
-  requestBody?: {
-    required?: boolean;
-    content?: {
-      "application/json"?: {
-        schema?: any;
-      };
-    };
-  };
-  responses?: any;
-}
-
-interface ToolInfo {
-  scoutEndpoint?: string;
-  config: AssetConfig;
-  path?: string;
-  method?: string;
-  operation?: OpenAPIOperation;
-}
-
-type Tool = MCPTool & ToolInfo;
-
-const PAT_TOKEN = process.env.PAT_TOKEN;
+const DEFAULT_PORT = 3000;
+const STDIO_OPTION = "stdio";
+const STREAMABLE_HTTP_OPTION = "http";
 
 class HubMCPServer {
-  private server: Server;
-  private assets: Map<string, Asset> = new Map();
+  private readonly server: Server;
 
   constructor() {
     this.server = new Server(
@@ -102,136 +68,112 @@ class HubMCPServer {
     }
   }
 
-  async run(transportType: string): Promise<void> {
+  async run(port: number, transportType: string): Promise<void> {
     let transport = null;
     switch (transportType) {
-      case 'stdio':
+      case STDIO_OPTION:
         transport = new StdioServerTransport();
         await this.server.connect(transport);
-        console.log('MCP server listening over stdio');
+        console.info("MCP server listening over stdio");
         break;
-      case 'http':
+      case STREAMABLE_HTTP_OPTION:
         const app = express();
         app.use(express.json());
-
-        app.post('/mcp', async (req: Request, res: Response) => {
-          console.log('Received MCP request:', req.body);
-          try {
-              transport = new StreamableHTTPServerTransport({
-                sessionIdGenerator: undefined,
-                enableJsonResponse: true,
-              });
-
-              await this.server.connect(transport);
-              await transport.handleRequest(req, res, req.body);
-          } catch (error) {
-            console.error('Error handling MCP request:', error);
-            if (!res.headersSent) {
-              res.status(500).json({
-                jsonrpc: '2.0',
-                error: {
-                  code: -32603,
-                  message: 'Internal server error',
-                },
-                id: null,
-              });
-            }
-          }
-        });
-
-        app.get('/mcp', async (req: Request, res: Response) => {
-          console.log('Received GET MCP request');
-          res.writeHead(405).end(JSON.stringify({
-            jsonrpc: "2.0",
-            error: {
-              code: -32000,
-              message: "Method not allowed."
-            },
-            id: null
-          }));
-        });
-
-        app.delete('/mcp', async (req: Request, res: Response) => {
-          console.log('Received DELETE MCP request');
-          res.writeHead(405).end(JSON.stringify({
-            jsonrpc: "2.0",
-            error: {
-              code: -32000,
-              message: "Method not allowed."
-            },
-            id: null
-          }));
-        });
-
-        const PORT = 3000;
-        app.listen(PORT, () => {
-          console.log(`MCP server listening listening on port ${PORT}`);
+        this.registerRoutes(app);
+        app.listen(port, () => {
+          console.info("MCP server listening listening on port ${port}");
         });
         break;
     }
   }
+
+  private registerRoutes(app: Express) {
+    app.post("/mcp", async (req: Request, res: Response) => {
+      console.info("Received MCP request:", req.body);
+      try {
+        let transport = new StreamableHTTPServerTransport({
+          sessionIdGenerator: undefined,
+          enableJsonResponse: true,
+        });
+
+        await this.server.connect(transport);
+        await transport.handleRequest(req, res, req.body);
+      } catch (error) {
+        console.error("Error handling MCP request:", error);
+        if (!res.headersSent) {
+          res.status(500).json({
+            jsonrpc: JSONRPC_VERSION,
+            error: {
+              code: INTERNAL_ERROR,
+              message: "Internal server error",
+            },
+            id: null,
+          });
+        }
+      }
+    });
+
+    app.get("/mcp", async (req: Request, res: Response) => {
+      console.info("Received GET MCP request");
+      res.writeHead(405).end(JSON.stringify({
+        jsonrpc: JSONRPC_VERSION,
+        error: {
+          code: METHOD_NOT_FOUND,
+          message: "Method not allowed."
+        },
+        id: null
+      }));
+    });
+
+    app.delete("/mcp", async (req: Request, res: Response) => {
+      console.log("Received DELETE MCP request");
+      res.writeHead(405).end(JSON.stringify({
+        jsonrpc: JSONRPC_VERSION,
+        error: {
+          code: METHOD_NOT_FOUND,
+          message: "Method not allowed."
+        },
+        id: null
+      }));
+    });
+  }
 }
 
-// Configuration - you can load this from a JSON file
-const configs: AssetConfig[] = [
-  {
-    name: "repos",
-    specPath:
-      process.env.OPENAPI_SPEC_REPOS && process.env.OPENAPI_SPEC_REPOS !== ""
-        ? process.env.OPENAPI_SPEC_REPOS
-        : "file://./specs/repos.json",
-    host: "https://hub.docker.com",
-    auth: {
-      type: "pat",
-      token: process.env.HUB_PAT_TOKEN,
-      username: process.env.HUB_USERNAME,
-    },
-  },
-  {
-    name: "accounts",
-    specPath:
-      process.env.OPENAPI_SPEC_ACCOUNTS &&
-      process.env.OPENAPI_SPEC_ACCOUNTS !== ""
-        ? process.env.OPENAPI_SPEC_ACCOUNTS
-        : "file://./specs/accounts.json",
-    host: "https://hub.docker.com",
-    auth: {
-      type: "pat",
-      token: process.env.HUB_PAT_TOKEN,
-      username: process.env.HUB_USERNAME,
-    },
-  },
-  {
-    name: "search",
-    specPath:
-      process.env.OPENAPI_SPEC_SEARCH && process.env.OPENAPI_SPEC_SEARCH !== ""
-        ? process.env.OPENAPI_SPEC_SEARCH
-        : "file://./specs/search.yaml",
-    host: "https://hub.docker.com/api/search",
-  },
-  {
-    name: "scout",
-    host: "https://api.scout.docker.com",
-    auth: {
-      type: "pat",
-      token: process.env.HUB_PAT_TOKEN,
-      username: process.env.HUB_USERNAME,
-    },
-  },
-];
+function parseTransportFlag(args: string[]): string {
+  let transportArg = args.find(arg => arg.startsWith("--transport="))?.split("=")[1];
+  if (!transportArg) {
+    console.info("transport unspecified, defaulting to ${STDIO_OPTION}");
+    return STDIO_OPTION;
+  }
+
+  return transportArg;
+}
+
+function parsePortFlag(args: string[]): number {
+  let portArg = args.find(arg => arg.startsWith("--port="))?.split("=")[1];
+  if (!portArg || portArg.length === 0) {
+    console.info("port unspecified, defaulting to ${DEFAULT_PORT}");
+    return DEFAULT_PORT;
+  }
+
+  let portParsed = parseInt(portArg, 10);
+  if (isNaN(portParsed)) {
+    console.warn("invalid port specified, defaulting to ${DEFAULT_PORT}");
+    return DEFAULT_PORT;
+  }
+
+    return portParsed;
+}
 
 // Main execution
 async function main() {
-  const args = process.argv.slice(2); // skip node and filename
-  let transportArg = args.find(arg => arg.startsWith('--transport='))?.split('=')[1];
-  if (!transportArg) {
-    console.info(`transport unspecified, defaulting to stdio`)
-    transportArg = 'stdio';
-  }
+  const args = process.argv.slice(2);
+  let transportArg = parseTransportFlag(args);
+  let port = parsePortFlag(args);
 
   const server = new HubMCPServer();
   // Start the server
-  await server.run(transportArg);
+  await server.run(port, transportArg);
   console.error("🚀 OpenAPI MCP Server is running...");
 }
 
@@ -247,7 +189,7 @@ main().catch((error) => {
 });
 
 // Handle server shutdown
-process.on('SIGINT', async () => {
-  console.log('Shutting down server...');
+process.on("SIGINT", async () => {
+  console.log("Shutting down server...");
   process.exit(0);
 });

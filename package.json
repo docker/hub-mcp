@@ -21,6 +21,7 @@
         "@apidevtools/swagger-parser": "^10.1.0",
         "@genql/cli": "^6.3.3",
         "@modelcontextprotocol/sdk": "^1.13.0",
+        "@modelcontextprotocol/specification": "github:modelcontextprotocol/specification",
         "express": "^5.1.0",
         "jwt-decode": "^4.0.0",
         "node-fetch": "^3.3.2",
