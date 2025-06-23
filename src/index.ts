@@ -1,5 +1,7 @@
+import express, { Request, Response } from 'express';
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -121,10 +123,73 @@ class HubMCPServer {
     });
   }
 
-  async run(): Promise<void> {
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-    console.error("🚀 OpenAPI MCP Server is running...");
+  async run(transportType: string): Promise<void> {
+    let transport = null;
+    switch (transportType) {
+      case 'stdio':
+        transport = new StdioServerTransport();
+        await this.server.connect(transport);
+        console.log('MCP server listening over stdio');
+        break;
+      case 'http':
+        const app = express();
+        app.use(express.json());
+
+        app.post('/mcp', async (req: Request, res: Response) => {
+          console.log('Received MCP request:', req.body);
+          try {
+              transport = new StreamableHTTPServerTransport({
+                sessionIdGenerator: undefined,
+                enableJsonResponse: true,
+              });
+
+              await this.server.connect(transport);
+              await transport.handleRequest(req, res, req.body);
+          } catch (error) {
+            console.error('Error handling MCP request:', error);
+            if (!res.headersSent) {
+              res.status(500).json({
+                jsonrpc: '2.0',
+                error: {
+                  code: -32603,
+                  message: 'Internal server error',
+                },
+                id: null,
+              });
+            }
+          }
+        });
+
+        app.get('/mcp', async (req: Request, res: Response) => {
+          console.log('Received GET MCP request');
+          res.writeHead(405).end(JSON.stringify({
+            jsonrpc: "2.0",
+            error: {
+              code: -32000,
+              message: "Method not allowed."
+            },
+            id: null
+          }));
+        });
+
+        app.delete('/mcp', async (req: Request, res: Response) => {
+          console.log('Received DELETE MCP request');
+          res.writeHead(405).end(JSON.stringify({
+            jsonrpc: "2.0",
+            error: {
+              code: -32000,
+              message: "Method not allowed."
+            },
+            id: null
+          }));
+        });
+
+        const PORT = 3000;
+        app.listen(PORT, () => {
+          console.log(`MCP server listening listening on port ${PORT}`);
+        });
+        break;
+    }
   }
 }
 
@@ -178,6 +243,13 @@ const configs: ResourceConfig[] = [
 
 // Main execution
 async function main() {
+  const args = process.argv.slice(2); // skip node and filename
+  let transportArg = args.find(arg => arg.startsWith('--transport='))?.split('=')[1];
+  if (!transportArg) {
+    console.info(`transport unspecified, defaulting to stdio`)
+    transportArg = 'stdio';
+  }
+
   const server = new HubMCPServer();
 
   // Load all configured APIs
@@ -190,7 +262,8 @@ async function main() {
   }
 
   // Start the server
-  await server.run();
+  await server.run(transportArg);
+  console.error("🚀 OpenAPI MCP Server is running...");
 }
 
 // Handle errors and start the server
@@ -202,4 +275,10 @@ process.on("unhandledRejection", (error) => {
 main().catch((error) => {
   console.error("Failed to start server:", error);
   process.exit(1);
+});
+
+// Handle server shutdown
+process.on('SIGINT', async () => {
+  console.log('Shutting down server...');
+  process.exit(0);
 });
