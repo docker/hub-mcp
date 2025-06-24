@@ -74,14 +74,14 @@ class HubMCPServer {
       case STDIO_OPTION:
         transport = new StdioServerTransport();
         await this.server.connect(transport);
-        console.info("MCP server listening over stdio");
+        console.info("mcp server listening over stdio");
         break;
       case STREAMABLE_HTTP_OPTION:
         const app = express();
         app.use(express.json());
         this.registerRoutes(app);
         app.listen(port, () => {
-          console.info("MCP server listening listening on port ${port}");
+          console.info("mcp server listening listening on port ${port}");
         });
         break;
     }
@@ -89,7 +89,7 @@ class HubMCPServer {
 
   private registerRoutes(app: Express) {
     app.post("/mcp", async (req: Request, res: Response) => {
-      console.info("Received MCP request:", req.body);
+      console.info("received mcp request:", req.body);
       try {
         let transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: undefined,
@@ -99,7 +99,7 @@ class HubMCPServer {
         await this.server.connect(transport);
         await transport.handleRequest(req, res, req.body);
       } catch (error) {
-        console.error("Error handling MCP request:", error);
+        console.error("error handling mcp request:", error);
         if (!res.headersSent) {
           res.status(500).json({
             jsonrpc: JSONRPC_VERSION,
@@ -114,7 +114,7 @@ class HubMCPServer {
     });
 
     app.get("/mcp", async (req: Request, res: Response) => {
-      console.info("Received GET MCP request");
+      console.info("received get mcp request");
       res.writeHead(405).end(JSON.stringify({
         jsonrpc: JSONRPC_VERSION,
         error: {
@@ -126,7 +126,7 @@ class HubMCPServer {
     });
 
     app.delete("/mcp", async (req: Request, res: Response) => {
-      console.log("Received DELETE MCP request");
+      console.log("received delete mcp request");
       res.writeHead(405).end(JSON.stringify({
         jsonrpc: JSONRPC_VERSION,
         error: {
@@ -174,22 +174,22 @@ async function main() {
   const server = new HubMCPServer();
   // Start the server
   await server.run(port, transportArg);
-  console.error("🚀 OpenAPI MCP Server is running...");
+  console.error("🚀 openapi mcp server is running...");
 }
 
 // Handle errors and start the server
 process.on("unhandledRejection", (error) => {
-  console.error("Unhandled rejection:", error);
+  console.error("unhandled rejection:", error);
   process.exit(1);
 });
 
 main().catch((error) => {
-  console.error("Failed to start server:", error);
+  console.error("failed to start server:", error);
   process.exit(1);
 });
 
 // Handle server shutdown
 process.on("SIGINT", async () => {
-  console.log("Shutting down server...");
+  console.log("shutting down server...");
   process.exit(0);
 });
