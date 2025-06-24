@@ -46,10 +46,21 @@ const searchResult = z.object({
       label: z.string().describe("The label of the architecture"),
     })
   ),
-  logo_url: z.object({
-    large: z.string().describe("The URL of the large logo"),
-    small: z.string().describe("The URL of the small logo"),
-  }),
+  logo_url: z
+    .object({
+      large: z
+        .string()
+        .nullable()
+        .optional()
+        .describe("The URL of the large logo"),
+      small: z
+        .string()
+        .nullable()
+        .optional()
+        .describe("The URL of the small logo"),
+    })
+    .optional()
+    .nullable(),
   extension_reviewed: z
     .boolean()
     .describe("Whether the repository is reviewed"),

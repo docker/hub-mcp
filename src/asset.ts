@@ -61,8 +61,10 @@ export class Asset implements Asset {
         structuredContent: response as { [x: string]: unknown } | undefined,
       };
     } catch (error) {
+      console.error(`Error calling API '${url}': ${error}`);
       return {
         content: [{ type: "text", text: errMsg || "Error" }],
+        structuredContent: {},
         isError: true,
       };
     }
@@ -90,6 +92,9 @@ export class Asset implements Asset {
   }
 
   protected async authenticatePAT(username: string): Promise<string> {
+    if (username === "") {
+      throw new Error("PAT auth: Username is empty");
+    }
     console.error(`Authenticating PAT for ${username}`);
     const url = `https://hub.docker.com/v2/users/login`;
     const response = await fetch(url, {
@@ -100,6 +105,11 @@ export class Asset implements Asset {
         password: this.config.auth?.token,
       }),
     });
+    if (!response.ok) {
+      throw new Error(
+        `Failed to authenticate PAT for ${username}: ${response.status} ${response.statusText}`
+      );
+    }
     const data = (await response.json()) as {
       token: string;
       refresh_token: string;

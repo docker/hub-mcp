@@ -5,7 +5,6 @@ import { createPaginatedResponseSchema } from "./types";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 
-
 //#region  Types
 const namespace = z.object({
   id: z.string().describe("The ID of the namespace"),
@@ -28,7 +27,11 @@ const namespace = z.object({
   org_groups_count: z
     .number()
     .describe("The number of org groups of the namespace"),
-  plan_name: z.string().describe("The plan name of the namespace"),
+  plan_name: z.string().nullable().describe("The plan name of the namespace"),
+  parent_name: z
+    .string()
+    .nullable()
+    .describe("The parent name of the namespace"),
 });
 
 const namespacePaginatedResponseSchema =
@@ -60,7 +63,7 @@ export class Accounts extends Asset {
         },
         outputSchema: namespacePaginatedResponseSchema.shape,
         annotations: {
-          title: "List Repositories by Namespace",
+          title: "List Namespaces",
         },
       },
       this.listNamespaces.bind(this)
