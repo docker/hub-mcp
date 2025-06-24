@@ -310,22 +310,6 @@ export class Repos extends Asset {
       this.listRepositoryTags.bind(this)
     );
 
-    // Check Repository Tags. Disable for now because the API is not working. It returns success even if the repository does not contain tags.
-    // this.server.registerTool(
-    //   "checkRepositoryTags",
-    //   {
-    //     description: "Check if a repository contains tags",
-    //     inputSchema: z.object({
-    //       namespace: z.string(),
-    //       repository: z.string(),
-    //     }).shape,
-    //     annotations: {
-    //       title: "Check Repository Tags",
-    //     },
-    //   },
-    //   this.checkRepositoryTags.bind(this)
-    // );
-
     // Get Repository Tag
     this.server.registerTool(
       "getRepositoryTag",
@@ -522,26 +506,6 @@ export class Repos extends Asset {
       { method: "HEAD" },
       `Repository :${repository} in ${namespace} contains tag ${tag}.`,
       `Repository :${repository} in ${namespace} does not contain tag ${tag}.`
-    );
-  }
-
-  private async checkRepositoryTags({
-    namespace,
-    repository,
-  }: {
-    namespace: string;
-    repository: string;
-  }): Promise<CallToolResult> {
-    if (!namespace || !repository) {
-      throw new Error("Namespace and repository name are required");
-    }
-    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
-
-    return this.callAPI(
-      url,
-      { method: "HEAD" },
-      `Repository ${repository} in ${namespace} contains tags.`,
-      `Repository ${repository} in ${namespace} does not contain tags.`
     );
   }
 }
