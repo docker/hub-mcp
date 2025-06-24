@@ -7,6 +7,13 @@ npm install
 npm run build
 ```
 
+## Run
+
+```
+npm run start -- --transport=http|stdio --port=3000
+```
+
+
 ## Run in inspector
 
 ```
