@@ -74,14 +74,14 @@ class HubMCPServer {
       case STDIO_OPTION:
         transport = new StdioServerTransport();
         await this.server.connect(transport);
-        console.info("mcp server listening over stdio");
+        console.error("mcp server listening over stdio");
         break;
       case STREAMABLE_HTTP_OPTION:
         const app = express();
         app.use(express.json());
         this.registerRoutes(app);
         app.listen(port, () => {
-          console.info("mcp server listening listening on port ${port}");
+          console.error("mcp server listening listening on port", port);
         });
         break;
     }
@@ -90,7 +90,7 @@ class HubMCPServer {
   private registerRoutes(app: Express) {
     app.post("/mcp", async (req: Request, res: Response) => {
       const sanitizedBody = JSON.stringify(req.body).replace(/\n|\r/g, "");
-      console.info("received mcp request:", sanitizedBody);
+      console.error("received mcp request:", sanitizedBody);
       try {
         let transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: undefined,
@@ -115,7 +115,7 @@ class HubMCPServer {
     });
 
     app.get("/mcp", async (req: Request, res: Response) => {
-      console.info("received get mcp request");
+      console.error("received get mcp request");
       res.writeHead(405).end(JSON.stringify({
         jsonrpc: JSONRPC_VERSION,
         error: {
@@ -127,7 +127,7 @@ class HubMCPServer {
     });
 
     app.delete("/mcp", async (req: Request, res: Response) => {
-      console.log("received delete mcp request");
+      console.error("received delete mcp request");
       res.writeHead(405).end(JSON.stringify({
         jsonrpc: JSONRPC_VERSION,
         error: {
@@ -143,7 +143,7 @@ class HubMCPServer {
 function parseTransportFlag(args: string[]): string {
   let transportArg = args.find(arg => arg.startsWith("--transport="))?.split("=")[1];
   if (!transportArg) {
-    console.info("transport unspecified, defaulting to ${STDIO_OPTION}");
+    console.error("transport unspecified, defaulting to", STDIO_OPTION);
     return STDIO_OPTION;
   }
 
@@ -153,13 +153,13 @@ function parseTransportFlag(args: string[]): string {
 function parsePortFlag(args: string[]): number {
   let portArg = args.find(arg => arg.startsWith("--port="))?.split("=")[1];
   if (!portArg || portArg.length === 0) {
-    console.info("port unspecified, defaulting to ${DEFAULT_PORT}");
+    console.error("port unspecified, defaulting to", DEFAULT_PORT);
     return DEFAULT_PORT;
   }
 
   let portParsed = parseInt(portArg, 10);
   if (isNaN(portParsed)) {
-    console.warn("invalid port specified, defaulting to ${DEFAULT_PORT}");
+    console.error("invalid port specified, defaulting to:", DEFAULT_PORT);
     return DEFAULT_PORT;
   }
 
@@ -191,6 +191,6 @@ main().catch((error) => {
 
 // Handle server shutdown
 process.on("SIGINT", async () => {
-  console.log("shutting down server...");
+  console.error("shutting down server...");
   process.exit(0);
 });
