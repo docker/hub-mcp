@@ -1,10 +1,25 @@
+/*
+   Copyright 2025 Docker Hub MCP Server authors
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { Asset, AssetConfig } from "./asset";
 import { z } from "zod";
 import { createPaginatedResponseSchema } from "./types";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { jwtDecode, JwtPayload } from "jwt-decode";
-
 
 //#region  Types
 const namespace = z.object({
@@ -28,7 +43,11 @@ const namespace = z.object({
   org_groups_count: z
     .number()
     .describe("The number of org groups of the namespace"),
-  plan_name: z.string().describe("The plan name of the namespace"),
+  plan_name: z.string().nullable().describe("The plan name of the namespace"),
+  parent_name: z
+    .string()
+    .nullable()
+    .describe("The parent name of the namespace"),
 });
 
 const namespacePaginatedResponseSchema =
@@ -58,9 +77,9 @@ export class Accounts extends Asset {
             .optional()
             .describe("The page size to list repositories from"),
         },
-        outputSchema: namespacePaginatedResponseSchema.shape,
+        outputSchema: namespacePaginatedResponseSchema.shape || undefined,
         annotations: {
-          title: "List Repositories by Namespace",
+          title: "List Namespaces",
         },
       },
       this.listNamespaces.bind(this)
@@ -111,7 +130,7 @@ export class Accounts extends Asset {
     if (!page_size) {
       page_size = 10;
     }
-    let url = `${this.config.host}/user/orgs?page=${page}&page_size=${page_size}`;
+    const url = `${this.config.host}/user/orgs?page=${page}&page_size=${page_size}`;
 
     return this.callAPI<NamespacePaginatedResponse>(
       url,

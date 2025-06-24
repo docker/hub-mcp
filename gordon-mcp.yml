@@ -2,5 +2,6 @@ services:
   hub:
     image: hub
     environment:
-      - HUB_USERNAME=<your-dockerhub-username>
-      - HUB_PAT_TOKEN=<your-dockerhub-pat-token>
+      - HUB_PAT_TOKEN=<your_pat_token>
+    command:
+      - --username=<your_hub_username>

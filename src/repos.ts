@@ -1,3 +1,19 @@
+/*
+   Copyright 2025 Docker Hub MCP Server authors
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { Asset, AssetConfig } from "./asset";
 import { z } from "zod";
@@ -13,6 +29,19 @@ const Repository = z.object({
     .nullable()
     .optional()
     .describe("The type of the repository"),
+  full_description: z
+    .string()
+    .describe("The full description of the repository"),
+  immutable_tags_settings: z
+    .object({
+      enabled: z
+        .boolean()
+        .describe("Whether the repository has immutable tags"),
+      rules: z.array(z.string()).describe("The rules of the immutable tags"),
+    })
+    .optional()
+    .nullable()
+    .describe("The immutable tags settings of the repository"),
   is_private: z.boolean().describe("Whether the repository is private"),
   status: z.number().describe("The status of the repository"),
   status_description: z
@@ -118,7 +147,11 @@ const RepositoryTag = z.object({
     z.object({
       architecture: z.string().describe("The architecture of the tag"),
       features: z.string().describe("The features of the tag"),
-      variant: z.string().describe("The variant of the tag"),
+      variant: z
+        .string()
+        .optional()
+        .nullable()
+        .describe("The variant of the tag"),
       digest: z.string().nullable().describe("image layer digest"),
       layers: z
         .array(
@@ -205,7 +238,7 @@ export class Repos extends Asset {
             .optional()
             .describe("The page size to list repositories from"),
         },
-        outputSchema: repositoryPaginatedResponseSchema.shape,
+        outputSchema: repositoryPaginatedResponseSchema.shape || undefined,
         annotations: {
           title: "List Repositories by Namespace",
         },
@@ -269,28 +302,12 @@ export class Repos extends Asset {
           architecture: z.string().optional(),
           os: z.string().optional(),
         }).shape,
-        // outputSchema: repositoryTagPaginatedResponseSchema.shape,
+        outputSchema: repositoryTagPaginatedResponseSchema.shape || undefined,
         annotations: {
           title: "List Repository Tags",
         },
       },
       this.listRepositoryTags.bind(this)
-    );
-
-    // Check Repository Tags
-    this.server.registerTool(
-      "checkRepositoryTags",
-      {
-        description: "Check if a repository contains tags",
-        inputSchema: z.object({
-          namespace: z.string(),
-          repository: z.string(),
-        }).shape,
-        annotations: {
-          title: "Check Repository Tags",
-        },
-      },
-      this.checkRepositoryTags.bind(this)
     );
 
     // Get Repository Tag
@@ -346,7 +363,7 @@ export class Repos extends Asset {
     if (!page_size) {
       page_size = 10;
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories?page=${page}&page_size=${page_size}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories?page=${page}&page_size=${page_size}`;
 
     return this.callAPI<RepositoryPaginatedResponse>(
       url,
@@ -399,7 +416,7 @@ export class Repos extends Asset {
   private async createRepository(
     request: z.infer<typeof CreateRepositoryRequest>
   ): Promise<CallToolResult> {
-    let url = `${this.config.host}/namespaces/${request.namespace}/repositories`;
+    const url = `${this.config.host}/namespaces/${request.namespace}/repositories`;
     return this.callAPI<z.infer<typeof Repository>>(
       url,
       { method: "POST", body: JSON.stringify(request) },
@@ -418,7 +435,7 @@ export class Repos extends Asset {
     if (!namespace || !repository) {
       throw new Error("Namespace and repository name are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
 
     return this.callAPI<z.infer<typeof Repository>>(
       url,
@@ -440,7 +457,7 @@ export class Repos extends Asset {
     if (!namespace || !repository || !tag) {
       throw new Error("Namespace, repository name and tag are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
 
     return this.callAPI<z.infer<typeof RepositoryTag>>(
       url,
@@ -460,9 +477,9 @@ export class Repos extends Asset {
     if (!namespace || !repository) {
       throw new Error("Namespace and repository name are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
 
-    return this.callAPI<z.infer<typeof Repository>>(
+    return this.callAPI(
       url,
       { method: "HEAD" },
       `Repository :${repository} in ${namespace} exists.`,
@@ -482,33 +499,13 @@ export class Repos extends Asset {
     if (!namespace || !repository || !tag) {
       throw new Error("Namespace, repository name and tag are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
 
-    return this.callAPI<z.infer<typeof Repository>>(
+    return this.callAPI(
       url,
       { method: "HEAD" },
-      `Repository :${repository} in ${namespace} contains tag :${tag}.`,
-      `Repository :${repository} in ${namespace} does not contain tag :${tag}.`
-    );
-  }
-
-  private async checkRepositoryTags({
-    namespace,
-    repository,
-  }: {
-    namespace: string;
-    repository: string;
-  }): Promise<CallToolResult> {
-    if (!namespace || !repository) {
-      throw new Error("Namespace and repository name are required");
-    }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
-
-    return this.callAPI<z.infer<typeof Repository>>(
-      url,
-      { method: "HEAD" },
-      `Repository :${repository} in ${namespace} contains tags.`,
-      `Repository :${repository} in ${namespace} does not contain tags.`
+      `Repository :${repository} in ${namespace} contains tag ${tag}.`,
+      `Repository :${repository} in ${namespace} does not contain tag ${tag}.`
     );
   }
 }

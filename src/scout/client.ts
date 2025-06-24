@@ -1,3 +1,19 @@
+/*
+   Copyright 2025 Docker Hub MCP Server authors
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 import { createClient, GenqlError, Client, FieldsSelection } from "./genql";
 import type {
   Mutation,
@@ -7,9 +23,6 @@ import type {
 } from "./genql/schema";
 import { RequestInfo, RequestInit, Response, HeadersInit } from "node-fetch";
 
-const DOCKER_CORRELATION_ID_HEADER = "x-docker-correlation-id";
-const SCOUT_CORRELATION_ID_HEADER = "x-atomist-correlation-id";
-
 /**
  * @see https://spec.graphql.org/October2021/#example-8b658
  */
@@ -17,7 +30,7 @@ interface GraphqlError {
   message: string;
   path?: string[];
   locations?: Array<{ line: number; column: number }>;
-  extensions?: KnownErrorExtensions & Record<string, any>;
+  extensions?: KnownErrorExtensions & Record<string, unknown>;
 }
 
 /**
@@ -226,7 +239,7 @@ export class ScoutClient {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
+   
   #shouldReportError(graphQLErrors: GraphqlError[]) {
     // 402 - Scout APIs will return a 402 if the entitlements have been exceeded.
     // 403 - Scout APIs will return a 403 if the user doesn't have permission to access / update a resource.

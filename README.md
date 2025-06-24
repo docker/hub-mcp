@@ -10,17 +10,29 @@ npm run build
 ## Run
 
 ```
-npm run start -- --transport=http|stdio --port=3000
+npm start -- [--transport=http|stdio] [--port=3000]
 ```
 ### Default args:
 * `port=3000`
 * `transport=stdio`
 
-## Run in inspector
+### Run in inspector
 
 ```
-npx @modelcontextprotocol/inspector -e HUB_USERNAME=<your-dockerhub-username> -e HUB_PAT_TOKEN=<your-dockerhub-pat-token> node dist/index.js
+npx @modelcontextprotocol/inspector node dist/index.js [--transport=http|stdio] [--port=3000]
 ```
+
+## Authenticate with docker
+By default this MCP server can only query public content on Docker Hub. In order to manage your repositories you need to provide authentication.
+
+```
+HUB_PAT_TOKEN=<a_pat_token> npm start -- [--username=<the_hub_username_for_the_pat>]
+```
+
+```
+HUB_PAT_TOKEN=<a_pat_token> npx @modelcontextprotocol/inspector node dist/index.js[--username=<the_hub_username_for_the_pat>]
+```
+
 
 ## Gordon instructions
 
@@ -31,8 +43,9 @@ services:
   hub:
     image: hub
     environment:
-      - HUB_USERNAME=<your-dockerhub-username>
-      - HUB_PAT_TOKEN=<your-dockerhub-pat-token>
+      - HUB_PAT_TOKEN=<your_pat_token>
+    command:
+      - --username=<your_hub_username>
 ```
 
 2. Run `docker build -t hub .`
