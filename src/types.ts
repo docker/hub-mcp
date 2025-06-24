@@ -10,7 +10,7 @@ export function createPaginatedResponseSchema<ItemType extends z.ZodTypeAny>(
       previous: z.string().nullable().optional(),
       results: z.array(itemSchema),
     })
-    .optional(); // optional because the response can be empty. This is a workaround for https://github.com/modelcontextprotocol/typescript-sdk/issues/654
+    // .optional(); // optional because the response can be empty. This is a workaround for https://github.com/modelcontextprotocol/typescript-sdk/issues/654
 }
 
 export type Organization = {

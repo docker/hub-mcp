@@ -13,6 +13,19 @@ const Repository = z.object({
     .nullable()
     .optional()
     .describe("The type of the repository"),
+  full_description: z
+    .string()
+    .describe("The full description of the repository"),
+  immutable_tags_settings: z
+    .object({
+      enabled: z
+        .boolean()
+        .describe("Whether the repository has immutable tags"),
+      rules: z.array(z.string()).describe("The rules of the immutable tags"),
+    })
+    .optional()
+    .nullable()
+    .describe("The immutable tags settings of the repository"),
   is_private: z.boolean().describe("Whether the repository is private"),
   status: z.number().describe("The status of the repository"),
   status_description: z
@@ -118,7 +131,11 @@ const RepositoryTag = z.object({
     z.object({
       architecture: z.string().describe("The architecture of the tag"),
       features: z.string().describe("The features of the tag"),
-      variant: z.string().describe("The variant of the tag"),
+      variant: z
+        .string()
+        .optional()
+        .nullable()
+        .describe("The variant of the tag"),
       digest: z.string().nullable().describe("image layer digest"),
       layers: z
         .array(
@@ -205,7 +222,7 @@ export class Repos extends Asset {
             .optional()
             .describe("The page size to list repositories from"),
         },
-        outputSchema: repositoryTagPaginatedResponseSchema,
+        outputSchema: repositoryPaginatedResponseSchema.shape || undefined,
         annotations: {
           title: "List Repositories by Namespace",
         },
@@ -269,7 +286,7 @@ export class Repos extends Asset {
           architecture: z.string().optional(),
           os: z.string().optional(),
         }).shape,
-        outputSchema: repositoryTagPaginatedResponseSchema.shape,
+        outputSchema: repositoryTagPaginatedResponseSchema.shape || undefined,
         annotations: {
           title: "List Repository Tags",
         },
@@ -277,21 +294,21 @@ export class Repos extends Asset {
       this.listRepositoryTags.bind(this)
     );
 
-    // Check Repository Tags
-    this.server.registerTool(
-      "checkRepositoryTags",
-      {
-        description: "Check if a repository contains tags",
-        inputSchema: z.object({
-          namespace: z.string(),
-          repository: z.string(),
-        }).shape,
-        annotations: {
-          title: "Check Repository Tags",
-        },
-      },
-      this.checkRepositoryTags.bind(this)
-    );
+    // Check Repository Tags. Disable for now because the API is not working. It returns success even if the repository does not contain tags.
+    // this.server.registerTool(
+    //   "checkRepositoryTags",
+    //   {
+    //     description: "Check if a repository contains tags",
+    //     inputSchema: z.object({
+    //       namespace: z.string(),
+    //       repository: z.string(),
+    //     }).shape,
+    //     annotations: {
+    //       title: "Check Repository Tags",
+    //     },
+    //   },
+    //   this.checkRepositoryTags.bind(this)
+    // );
 
     // Get Repository Tag
     this.server.registerTool(
@@ -462,7 +479,7 @@ export class Repos extends Asset {
     }
     const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
 
-    return this.callAPI<z.infer<typeof Repository>>(
+    return this.callAPI(
       url,
       { method: "HEAD" },
       `Repository :${repository} in ${namespace} exists.`,
@@ -484,11 +501,11 @@ export class Repos extends Asset {
     }
     const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
 
-    return this.callAPI<z.infer<typeof Repository>>(
+    return this.callAPI(
       url,
       { method: "HEAD" },
-      `Repository :${repository} in ${namespace} contains tag :${tag}.`,
-      `Repository :${repository} in ${namespace} does not contain tag :${tag}.`
+      `Repository :${repository} in ${namespace} contains tag ${tag}.`,
+      `Repository :${repository} in ${namespace} does not contain tag ${tag}.`
     );
   }
 
@@ -504,11 +521,11 @@ export class Repos extends Asset {
     }
     const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
 
-    return this.callAPI<z.infer<typeof Repository>>(
+    return this.callAPI(
       url,
       { method: "HEAD" },
-      `Repository :${repository} in ${namespace} contains tags.`,
-      `Repository :${repository} in ${namespace} does not contain tags.`
+      `Repository ${repository} in ${namespace} contains tags.`,
+      `Repository ${repository} in ${namespace} does not contain tags.`
     );
   }
 }

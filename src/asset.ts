@@ -21,7 +21,10 @@ export class Asset implements Asset {
     throw new Error("Method not implemented.");
   }
 
-  protected async authFetch<T>(url: string, options: RequestInit): Promise<T> {
+  protected async authFetch<T>(
+    url: string,
+    options: RequestInit
+  ): Promise<T | null> {
     const headers = options.headers || {
       "Content-Type": "application/json",
     };
@@ -33,10 +36,28 @@ export class Asset implements Asset {
         `HTTP error! status: ${response.status} ${response.statusText}`
       );
     }
-    return response.json() as Promise<T>;
+    try {
+      return (await response.json()) as T;
+    } catch (err) {
+      console.warn(`Response is not JSON: ${await response.text()}. ${err}`);
+      return null as T;
+    }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected async callAPI<T>(
+    url: string,
+    options: RequestInit,
+    outMsg?: string,
+    errMsg?: string
+  ): Promise<CallToolResult>;
+  protected async callAPI(
+    url: string,
+    options: RequestInit,
+    outMsg?: string,
+    errMsg?: string
+  ): Promise<CallToolResult>;
+  protected async callAPI<T = unknown>(
     url: string,
     options: RequestInit,
     outMsg?: string,
@@ -47,15 +68,22 @@ export class Asset implements Asset {
       if (outMsg?.includes(":response")) {
         outMsg = outMsg.replace(":response", JSON.stringify(response));
       }
-      return {
+      
+      const result: CallToolResult = {
         content: [
           {
             type: "text",
             text: outMsg || "Success",
           },
         ],
-        structuredContent: response as { [x: string]: unknown } | undefined,
       };
+
+      // If T is specified (not 'any'), include structuredContent
+      if (response !== null && typeof response === 'object') {
+        result.structuredContent = response as { [x: string]: unknown };
+      }
+
+      return result;
     } catch (error) {
       console.error(`Error calling API '${url}': ${error}`);
       return {
