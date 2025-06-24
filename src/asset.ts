@@ -3,7 +3,6 @@ import { CallToolResult, Tool } from "@modelcontextprotocol/sdk/types";
 export type AssetConfig = {
   name: string;
   host: string;
-  specPath?: string;
   auth?: {
     type: "bearer" | "pat";
     token?: string;

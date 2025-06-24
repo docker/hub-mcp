@@ -7,6 +7,15 @@ npm install
 npm run build
 ```
 
+## Run
+
+```
+npm run start -- --transport=http|stdio --port=3000
+```
+### Default args:
+* `port=3000`
+* `transport=stdio`
+
 ## Run in inspector
 
 ```
