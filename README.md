@@ -19,7 +19,7 @@ npm start -- [--transport=http|stdio] [--port=3000]
 ### Run in inspector
 
 ```
-npx @modelcontextprotocol/inspector -e node dist/index.js -- [--transport=http|stdio] [--port=3000]
+npx @modelcontextprotocol/inspector node dist/index.js [--transport=http|stdio] [--port=3000]
 ```
 
 ## Authenticate with docker
@@ -30,7 +30,7 @@ HUB_PAT_TOKEN=<a_pat_token> npm start -- [--username=<the_hub_username_for_the_p
 ```
 
 ```
-HUB_PAT_TOKEN=<a_pat_token> npx @modelcontextprotocol/inspector -e node dist/index.js -- [--username=<the_hub_username_for_the_pat>]
+HUB_PAT_TOKEN=<a_pat_token> npx @modelcontextprotocol/inspector node dist/index.js[--username=<the_hub_username_for_the_pat>]
 ```
 
 
