@@ -29,7 +29,6 @@ class HubMCPServer {
       }
     );
 
-    // Load all configured APIs
     const assets: Asset[] = [
       new Repos(this.server, {
         name: "repos",
@@ -178,7 +177,6 @@ async function main() {
   console.error("🚀 openapi mcp server is running...");
 }
 
-// Handle errors and start the server
 process.on("unhandledRejection", (error) => {
   console.error("unhandled rejection:", error);
   process.exit(1);

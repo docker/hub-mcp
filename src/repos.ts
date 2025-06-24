@@ -205,7 +205,7 @@ export class Repos extends Asset {
             .optional()
             .describe("The page size to list repositories from"),
         },
-        outputSchema: repositoryPaginatedResponseSchema.shape,
+        outputSchema: repositoryTagPaginatedResponseSchema,
         annotations: {
           title: "List Repositories by Namespace",
         },
@@ -269,7 +269,7 @@ export class Repos extends Asset {
           architecture: z.string().optional(),
           os: z.string().optional(),
         }).shape,
-        // outputSchema: repositoryTagPaginatedResponseSchema.shape,
+        outputSchema: repositoryTagPaginatedResponseSchema.shape,
         annotations: {
           title: "List Repository Tags",
         },
@@ -346,7 +346,7 @@ export class Repos extends Asset {
     if (!page_size) {
       page_size = 10;
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories?page=${page}&page_size=${page_size}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories?page=${page}&page_size=${page_size}`;
 
     return this.callAPI<RepositoryPaginatedResponse>(
       url,
@@ -399,7 +399,7 @@ export class Repos extends Asset {
   private async createRepository(
     request: z.infer<typeof CreateRepositoryRequest>
   ): Promise<CallToolResult> {
-    let url = `${this.config.host}/namespaces/${request.namespace}/repositories`;
+    const url = `${this.config.host}/namespaces/${request.namespace}/repositories`;
     return this.callAPI<z.infer<typeof Repository>>(
       url,
       { method: "POST", body: JSON.stringify(request) },
@@ -418,7 +418,7 @@ export class Repos extends Asset {
     if (!namespace || !repository) {
       throw new Error("Namespace and repository name are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
 
     return this.callAPI<z.infer<typeof Repository>>(
       url,
@@ -440,7 +440,7 @@ export class Repos extends Asset {
     if (!namespace || !repository || !tag) {
       throw new Error("Namespace, repository name and tag are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
 
     return this.callAPI<z.infer<typeof RepositoryTag>>(
       url,
@@ -460,7 +460,7 @@ export class Repos extends Asset {
     if (!namespace || !repository) {
       throw new Error("Namespace and repository name are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
 
     return this.callAPI<z.infer<typeof Repository>>(
       url,
@@ -482,7 +482,7 @@ export class Repos extends Asset {
     if (!namespace || !repository || !tag) {
       throw new Error("Namespace, repository name and tag are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
 
     return this.callAPI<z.infer<typeof Repository>>(
       url,
@@ -502,7 +502,7 @@ export class Repos extends Asset {
     if (!namespace || !repository) {
       throw new Error("Namespace and repository name are required");
     }
-    let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
+    const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
 
     return this.callAPI<z.infer<typeof Repository>>(
       url,

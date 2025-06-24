@@ -4,7 +4,6 @@ COPY src/ ./src/
 COPY package.json .
 COPY package-lock.json .
 COPY tsconfig.json .
-COPY specs/ ./specs/
 
 RUN npm install
 RUN npm run build

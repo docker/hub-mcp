@@ -7,9 +7,6 @@ import type {
 } from "./genql/schema";
 import { RequestInfo, RequestInit, Response, HeadersInit } from "node-fetch";
 
-const DOCKER_CORRELATION_ID_HEADER = "x-docker-correlation-id";
-const SCOUT_CORRELATION_ID_HEADER = "x-atomist-correlation-id";
-
 /**
  * @see https://spec.graphql.org/October2021/#example-8b658
  */
@@ -17,7 +14,7 @@ interface GraphqlError {
   message: string;
   path?: string[];
   locations?: Array<{ line: number; column: number }>;
-  extensions?: KnownErrorExtensions & Record<string, any>;
+  extensions?: KnownErrorExtensions & Record<string, unknown>;
 }
 
 /**
@@ -226,7 +223,7 @@ export class ScoutClient {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
+   
   #shouldReportError(graphQLErrors: GraphqlError[]) {
     // 402 - Scout APIs will return a 402 if the entitlements have been exceeded.
     // 403 - Scout APIs will return a 403 if the user doesn't have permission to access / update a resource.

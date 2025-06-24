@@ -1,4 +1,3 @@
-import { Tool } from "@modelcontextprotocol/sdk/types";
 import { Asset, AssetConfig } from "./asset";
 import { ScoutClient } from "./scout/client";
 import fetch, { RequestInfo, RequestInit } from "node-fetch";

@@ -7,6 +7,7 @@
         "build": "tsc",
         "start": "node dist/index.js",
         "clean": "rm -rf dist",
+        "lint": "eslint --ext .ts .",
         "inspect": "tsc -w & nodemon --watch dist --exec 'npx @modelcontextprotocol/inspector node dist/index.js'",
         "genql.scout": "genql --endpoint https://api.scout.docker.com/v1/graphql --output ./src/scout/genql"
     },

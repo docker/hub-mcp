@@ -114,7 +114,7 @@ export class Accounts extends Asset {
     if (!page_size) {
       page_size = 10;
     }
-    let url = `${this.config.host}/user/orgs?page=${page}&page_size=${page_size}`;
+    const url = `${this.config.host}/user/orgs?page=${page}&page_size=${page_size}`;
 
     return this.callAPI<NamespacePaginatedResponse>(
       url,

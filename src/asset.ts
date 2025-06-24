@@ -10,10 +10,6 @@ export type AssetConfig = {
   };
 };
 
-export interface Asset {
-  RegisterTools(): void;
-}
-
 export class Asset implements Asset {
   protected tools: Map<string, Tool>;
   protected tokens: Map<string, string>;
@@ -79,13 +75,17 @@ export class Asset implements Asset {
           if (this.config.auth.token) {
             return this.config.auth.token;
           }
+          break;
         case "pat":
-          let token = this.tokens.get(this.config.auth.username!);
-          if (!token) {
-            token = await this.authenticatePAT(this.config.auth.username!);
-            this.tokens.set(this.config.auth.username!, token);
+          if (!this.tokens.get(this.config.auth.username!)) {
+            this.tokens.set(
+              this.config.auth.username!,
+              await this.authenticatePAT(this.config.auth.username!)
+            );
           }
-          return token;
+          return this.tokens.get(this.config.auth.username!)!;
+        default:
+          throw new Error(`Unsupported auth type: ${this.config.auth.type}`);
       }
     }
     return "";
