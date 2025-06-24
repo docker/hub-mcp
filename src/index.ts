@@ -1,6 +1,6 @@
 import express, {Express, Request, Response} from "express";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { McpServer as Server } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { JSONRPC_VERSION, METHOD_NOT_FOUND, INTERNAL_ERROR } from "@modelcontextprotocol/specification/schema/2025-06-18/schema";
 import { ScoutAPI } from "./scout";
