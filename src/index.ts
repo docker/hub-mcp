@@ -101,7 +101,7 @@ class HubMCPServer {
         app.use(express.json());
         this.registerRoutes(app);
         app.listen(port, () => {
-          logger.info("mcp server listening listening on port", port);
+          logger.info(`mcp server listening on port ${port}`);
         });
         break;
       }
@@ -111,7 +111,7 @@ class HubMCPServer {
   private registerRoutes(app: Express) {
     app.post("/mcp", async (req: Request, res: Response) => {
       const sanitizedBody = JSON.stringify(req.body).replace(/\n|\r/g, "");
-      logger.info("received mcp request:", sanitizedBody);
+      logger.info(`received mcp request: ${sanitizedBody}`);
       try {
         const transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: undefined,
@@ -121,7 +121,7 @@ class HubMCPServer {
         await this.server.connect(transport);
         await transport.handleRequest(req, res, req.body);
       } catch (error) {
-        logger.info("error handling mcp request:", error);
+        logger.info(`error handling mcp request: ${error}`);
         if (!res.headersSent) {
           res.status(500).json({
             jsonrpc: JSONRPC_VERSION,
@@ -185,20 +185,20 @@ function parsUsernameFlag(args: string[]): string | undefined {
     logger.info("username unspecified");
     return undefined;
   }
-  
+
   return usernameArg;
 }
 
 function parsePortFlag(args: string[]): number {
   const portArg = args.find((arg) => arg.startsWith("--port="))?.split("=")[1];
   if (!portArg || portArg.length === 0) {
-    logger.info("port unspecified, defaulting to", DEFAULT_PORT);
+    logger.info(`port unspecified, defaulting to ${DEFAULT_PORT}`);
     return DEFAULT_PORT;
   }
 
   const portParsed = parseInt(portArg, 10);
   if (isNaN(portParsed)) {
-    logger.info("invalid port specified, defaulting to:", DEFAULT_PORT);
+    logger.info(`invalid port specified, defaulting to ${DEFAULT_PORT}`);
     return DEFAULT_PORT;
   }
 
@@ -221,12 +221,12 @@ async function main() {
 }
 
 process.on("unhandledRejection", (error) => {
-  logger.info("unhandled rejection:", error);
+  logger.info(`unhandled rejection: ${error}`);
   process.exit(1);
 });
 
 main().catch((error) => {
-  logger.info("failed to start server:", error);
+  logger.info(`failed to start server: ${error}`);
   process.exit(1);
 });
 
