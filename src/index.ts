@@ -89,7 +89,8 @@ class HubMCPServer {
 
   private registerRoutes(app: Express) {
     app.post("/mcp", async (req: Request, res: Response) => {
-      console.info("received mcp request:", req.body);
+      const sanitizedBody = JSON.stringify(req.body).replace(/\n|\r/g, "");
+      console.info("received mcp request:", sanitizedBody);
       try {
         let transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: undefined,
