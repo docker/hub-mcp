@@ -16,17 +16,16 @@
 
 import { z } from "zod";
 
+// all items in the types are optional and nullable because structured content is always evaluated even when an error occurs.
+// See https://github.com/modelcontextprotocol/typescript-sdk/issues/654
 export function createPaginatedResponseSchema<ItemType extends z.ZodTypeAny>(
   itemSchema: ItemType
 ) {
-  return z
-    .object({
-      count: z.number(),
-      next: z.string().nullable().optional(),
-      previous: z.string().nullable().optional(),
-      results: z.array(itemSchema),
-    })
-    // Currently we can't have optional object as a schema because structured content is always evaluated even when an error occurs.
-    // See https://github.com/modelcontextprotocol/typescript-sdk/issues/654
+  return z.object({
+    count: z.number().optional().nullable(),
+    next: z.string().nullable().optional(),
+    previous: z.string().nullable().optional(),
+    results: z.array(itemSchema).optional().nullable(),
+    error: z.string().optional().nullable(),
+  });
 }
-

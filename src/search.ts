@@ -18,6 +18,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { Asset, AssetConfig } from "./asset";
 import { z } from "zod";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
+import { logger } from "./logger";
 
 //#region  Types
 const searchResult = z.object({
@@ -43,10 +44,10 @@ const searchResult = z.object({
     .string()
     .describe("The short description of the repository"),
   badge: z
-    .enum(["official", "verified_publisher", "open_source"])
+    .enum(["official", "verified_publisher", "open_source", "none"])
     .nullable()
     .describe(
-      "The badge of the repository. If the repository is from community publisher, the badge is null."
+      "The badge of the repository. If the repository is from community publisher, the badge is either 'none' or null."
     ),
   star_count: z.number().describe("The number of stars the repository has"),
   pull_count: z.string().describe("The number of pulls the repository has"),
@@ -90,8 +91,11 @@ const searchResult = z.object({
 });
 
 const searchResults = z.object({
-  total: z.number().describe("The total number of repositories found"),
-  results: z.array(searchResult),
+  total: z
+    .number()
+    .optional()
+    .describe("The total number of repositories found"),
+  results: z.array(searchResult).optional().describe("The repositories found"),
 });
 
 //#endregion
@@ -143,7 +147,7 @@ export class Search extends Asset {
             .optional()
             .describe("The number of repositories to return"),
           sort: z
-            .enum(["relevance", "stars", "pulls", "last_updated"])
+            .enum(["pull_count", "updated_at"])
             .optional()
             .describe(
               "The criteria to sort the search results by. If the `sort` field is not set, pull count is used by default. When search extensions, documents are sort alphabetically if none is provided."
@@ -176,10 +180,11 @@ export class Search extends Asset {
     extension_reviewed?: boolean;
     from?: number;
     size?: number;
-    sort?: "relevance" | "stars" | "pulls" | "last_updated";
+    sort?: "pull_count" | "updated_at";
     order?: "asc" | "desc";
     images?: string[];
   }): Promise<CallToolResult> {
+    logger.info(`Searching for repositories with query: ${request.query}`);
     let url = `${this.config.host}/v4`;
     if (!request.query) {
       return {
@@ -204,7 +209,7 @@ export class Search extends Asset {
       url,
       { method: "GET" },
       `Here are the search results: :response`,
-      `Error getting repositories for ${request.query}`
+      `Error finding repositories for query: ${request.query}`
     );
   }
 }
