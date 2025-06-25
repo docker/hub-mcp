@@ -77,7 +77,7 @@ export class Accounts extends Asset {
             .optional()
             .describe("The page size to list repositories from"),
         },
-        outputSchema: namespacePaginatedResponseSchema.shape || undefined,
+        outputSchema: namespacePaginatedResponseSchema.shape,
         annotations: {
           title: "List Namespaces",
         },

@@ -21,7 +21,7 @@
     "dependencies": {
         "@apidevtools/swagger-parser": "^10.1.0",
         "@genql/cli": "^6.3.3",
-        "@modelcontextprotocol/sdk": "^1.13.0",
+        "@modelcontextprotocol/sdk": "^1.13.1",
         "@modelcontextprotocol/specification": "github:modelcontextprotocol/specification",
         "express": "^5.1.0",
         "jwt-decode": "^4.0.0",

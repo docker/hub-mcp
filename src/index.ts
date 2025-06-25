@@ -217,7 +217,7 @@ async function main() {
   const server = new HubMCPServer(username, patToken);
   // Start the server
   await server.run(port, transportArg);
-  logger.info("🚀 openapi mcp server is running...");
+  logger.info("🚀 dockerhub mcp server is running...");
 }
 
 process.on("unhandledRejection", (error) => {

@@ -15,6 +15,7 @@
 */
 
 import { CallToolResult, Tool } from "@modelcontextprotocol/sdk/types";
+import { logger } from "./logger";
 
 export type AssetConfig = {
   name: string;
@@ -48,14 +49,24 @@ export class Asset implements Asset {
     (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
     const response = await fetch(url, { ...options, headers });
     if (!response.ok) {
+      // try to get the error message from the response
+      const error = await response.text();
+      logger.error(
+        `HTTP error on '${url}' with request: ${JSON.stringify(
+          options
+        )}\n status: ${response.status} ${
+          response.statusText
+        }\n error: ${error}`
+      );
+
       throw new Error(
-        `HTTP error! status: ${response.status} ${response.statusText}`
+        `HTTP error! status: ${response.status} ${response.statusText} ${error}`
       );
     }
     try {
       return (await response.json()) as T;
     } catch (err) {
-      console.warn(`Response is not JSON: ${await response.text()}. ${err}`);
+      logger.warn(`Response is not JSON: ${await response.text()}. ${err}`);
       return null as T;
     }
   }
@@ -79,12 +90,15 @@ export class Asset implements Asset {
     outMsg?: string,
     errMsg?: string
   ): Promise<CallToolResult> {
+    logger.info(
+      `Calling API '${url}' with request: ${JSON.stringify(options)}`
+    );
     try {
       const response = await this.authFetch<T>(url, options);
       if (outMsg?.includes(":response")) {
         outMsg = outMsg.replace(":response", JSON.stringify(response));
       }
-      
+
       const result: CallToolResult = {
         content: [
           {
@@ -95,16 +109,20 @@ export class Asset implements Asset {
       };
 
       // If T is specified (not 'any'), include structuredContent
-      if (response !== null && typeof response === 'object') {
+      if (response !== null && typeof response === "object") {
         result.structuredContent = response as { [x: string]: unknown };
       }
-
+      logger.info(
+        `API call '${url}' completed successfully with response: ${JSON.stringify(
+          result
+        )}`
+      );
       return result;
     } catch (error) {
-      console.error(`Error calling API '${url}': ${error}`);
+      logger.error(`Error calling API '${url}': ${error}`);
       return {
         content: [{ type: "text", text: errMsg || "Error" }],
-        structuredContent: {},
+        structuredContent: { error: (error as Error).message },
         isError: true,
       };
     }
