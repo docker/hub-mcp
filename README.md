@@ -9,7 +9,7 @@ The Docker Hub MCP Server is a [Model Context Protocol (MCP)](https://modelconte
 
 ## Prerequisites
 - [Docker](https://docs.docker.com/get-docker/) installed
-- [Node.js](https://nodejs.org/) (version X+)
+- [Node.js](https://nodejs.org/) (version 22+)
 - [Optional] A [Docker Personal Access Token (PAT)](https://docs.docker.com/security/for-developers/access-tokens/) with appropriate permissions
 
 
@@ -214,7 +214,7 @@ $ docker ai "Can you help me update my Dockerfile to use a docker hardened image
   - `namespace`: Repository namespace (string, required)
   - `repository`: Repository name (string, required)
 
-  - **update_repository_info** - Update repository information
+- **update_repository_info** - Update repository information
   - `namespace`: Repository namespace (string, required)
   - `repository`: Repository name (string, required)
   - `body`: Request body data (object, optional)
