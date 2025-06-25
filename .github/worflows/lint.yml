@@ -5,7 +5,7 @@ on:
   # plan to use this action with forks, see the Limitations section
   pull_request:
     branches:
-      - main
+      - '**'
 
 
 jobs:
