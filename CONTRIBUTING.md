@@ -42,7 +42,7 @@ Documentation improvements are always welcome:
    ```
 3. Add the upstream remote:
    ```bash
-   git remote add upstream https://github.com/docker/dockerhub-mcp.git
+   git remote add upstream https://github.com/docker/hub-mcp.git
    ```
 4. Create a branch:
    ```bash
@@ -58,7 +58,7 @@ This section gives the experienced contributor some tips and guidelines.
 Not sure if that typo is worth a pull request? Found a bug and know how to fix
 it? Do it! We will appreciate it. Any significant change, like adding a backend,
 should be documented as
-[a GitHub issue](https://github.com/docker/dockerhub-mcp/issues)
+[a GitHub issue](https://github.com/docker/hub-mcp/issues)
 before anybody starts working on it.
 
 We are always thrilled to receive pull requests. We do our best to process them
