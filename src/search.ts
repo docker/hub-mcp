@@ -96,7 +96,7 @@ const searchResults = z.object({
     .optional()
     .describe("The total number of repositories found"),
   results: z.array(searchResult).optional().describe("The repositories found"),
-  error: z.string().optional().describe("The error message if any"),
+  error: z.string().optional().nullable(),
 });
 
 //#endregion
