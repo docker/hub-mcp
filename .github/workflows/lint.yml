@@ -1,5 +1,8 @@
 name: Lint
 
+permissions:
+  contents: read
+
 on:
   # Replace pull_request with pull_request_target if you
   # plan to use this action with forks, see the Limitations section

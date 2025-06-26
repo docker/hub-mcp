@@ -1,7 +1,0 @@
-services:
-  hub:
-    image: hub
-    environment:
-      - HUB_PAT_TOKEN=<your_pat_token>
-    command:
-      - --username=<your_hub_username>
