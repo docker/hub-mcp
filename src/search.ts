@@ -71,8 +71,12 @@ const searchResult = z.object({
 });
 
 const searchResults = z.object({
-    total: z.number().optional().describe('The total number of repositories found'),
-    results: z.array(searchResult).optional().describe('The repositories found'),
+  total: z
+    .number()
+    .optional()
+    .describe("The total number of repositories found"),
+  results: z.array(searchResult).optional().describe("The repositories found"),
+  error: z.string().optional().nullable(),
 });
 
 //#endregion
