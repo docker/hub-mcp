@@ -113,7 +113,7 @@ Fork the repository and make changes on your fork in a feature branch:
   issue.
 
 Write clean code. Universally formatted code promotes ease of writing, reading,
-and maintenance. Always run `npm run lint` before
+and maintenance. Always run `npm run lint` and `npm run format:fix` before
 committing your changes. Most editors have plug-ins helping reducing the time spent on fixing linting issues.
 
 Pull request descriptions should be as clear as possible and include a reference
