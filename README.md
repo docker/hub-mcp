@@ -285,19 +285,12 @@ $ docker ai "Can you help me update my Dockerfile to use a docker hardened image
   - `namespace`: Repository namespace (string, required)
   - `body`: Request body data (object, optional)
 
-- **get_repository_dockerfile** - Get the Dockerfile for a repository
-  - `namespace`: Repository namespace (string, required)
-  - `repository`: Repository name (string, required)
 
 - **update_repository_info** - Update repository information
   - `namespace`: Repository namespace (string, required)
   - `repository`: Repository name (string, required)
   - `body`: Request body data (object, optional)
 
-- **set_repository_dockerfile** - Set or update the Dockerfile for a repository
-  - `namespace`: Repository namespace (string, required)
-  - `repository`: Repository name (string, required)
-  - `body`: Request body data (object, optional)
  
 ### Tag Management
 - **list_repository_tags** - List all tags for a repository
@@ -313,10 +306,6 @@ $ docker ai "Can you help me update my Dockerfile to use a docker hardened image
   - `repository`: Repository name (string, required)
   - `tag`: Tag name (string, required)
 
-- **read_repository_tag** - Get details of a specific repository tag
-  - `namespace`: Repository namespace (string, required)
-  - `repository`: Repository name (string, required)
-  - `tag`: Tag name (string, required)
 
 
 
