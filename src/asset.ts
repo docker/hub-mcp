@@ -28,6 +28,12 @@ export type AssetConfig = {
     };
 };
 
+export type AssetResponse<T> = {
+    content: T | null;
+    isAuthenticated: boolean;
+    code: number;
+};
+
 export class Asset implements Asset {
     protected tools: Map<string, RegisteredTool>;
     protected tokens: Map<string, string>;
@@ -43,12 +49,14 @@ export class Asset implements Asset {
         return this.tools;
     }
 
-    protected async authFetch<T>(url: string, options: RequestInit): Promise<T | null> {
+    protected async authFetch<T>(url: string, options: RequestInit): Promise<AssetResponse<T>> {
         const headers = options.headers || {
             'Content-Type': 'application/json',
         };
         const token = await this.authenticate();
-        (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+        if (token) {
+            (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+        }
         const response = await fetch(url, { ...options, headers });
         if (!response.ok) {
             // try to get the error message from the response
@@ -64,10 +72,19 @@ export class Asset implements Asset {
             );
         }
         try {
-            return (await response.json()) as T;
+            return {
+                content: (await response.json()) as T,
+                isAuthenticated: token !== '',
+                code: response.status,
+            };
         } catch (err) {
-            logger.warn(`Response is not JSON: ${await response.text()}. ${err}`);
-            return null as T;
+            const txt = await response.text();
+            logger.warn(`Response is not JSON: ${txt}. ${err}`);
+            return {
+                content: txt as T,
+                isAuthenticated: token !== '',
+                code: response.status,
+            };
         }
     }
 
@@ -76,19 +93,22 @@ export class Asset implements Asset {
         url: string,
         options: RequestInit,
         outMsg?: string,
-        errMsg?: string
+        errMsg?: string,
+        unAuthMsg?: string
     ): Promise<CallToolResult>;
     protected async callAPI(
         url: string,
         options: RequestInit,
         outMsg?: string,
-        errMsg?: string
+        errMsg?: string,
+        unAuthMsg?: string
     ): Promise<CallToolResult>;
     protected async callAPI<T = unknown>(
         url: string,
         options: RequestInit,
         outMsg?: string,
-        errMsg?: string
+        errMsg?: string,
+        unAuthMsg?: string
     ): Promise<CallToolResult> {
         logger.info(`Calling API '${url}' with request: ${JSON.stringify(options)}`);
         try {
@@ -107,8 +127,14 @@ export class Asset implements Asset {
             };
 
             // If T is specified (not 'any'), include structuredContent
-            if (response !== null && typeof response === 'object') {
-                result.structuredContent = response as { [x: string]: unknown };
+            if (response.content !== null && typeof response.content === 'object') {
+                result.structuredContent = response.content as { [x: string]: unknown };
+            }
+            if (!response.isAuthenticated) {
+                result.content.push({
+                    type: 'text',
+                    text: `The request was not authenticated. ${unAuthMsg || ''}`,
+                });
             }
             logger.info(
                 `API call '${url}' completed successfully with response: ${JSON.stringify(result)}`
@@ -140,7 +166,10 @@ export class Asset implements Asset {
                     }
                     break;
                 case 'pat':
-                    if (!this.tokens.get(this.config.auth.username!)) {
+                    if (!this.config.auth.username || !this.config.auth.token) {
+                        logger.warn(`No username or token provided for PAT auth`);
+                        this.tokens.set(this.config.auth.username!, '');
+                    } else if (!this.tokens.get(this.config.auth.username!)) {
                         this.tokens.set(
                             this.config.auth.username!,
                             await this.authenticatePAT(this.config.auth.username!)
