@@ -105,15 +105,13 @@ services:
   "mcpServers": {
     "docker-hub": {
       "command": "node",
-      "args": ["/FULL/PATH/TO/YOUR/docker-hub-mcp-server/dist/index.js", "--transport=stdio"],
+      "args": ["/FULL/PATH/TO/YOUR/docker-hub-mcp-server/dist/index.js", "--transport=stdio", "--username=YOUR_DOCKER_HUB_USERNAME"],
       "env": {
-        "HUB_USERNAME": "YOUR_DOCKER_HUB_USERNAME",
         "HUB_PAT_TOKEN": "YOUR_DOCKER_HUB_PERSONAL_ACCESS_TOKEN"
       }
     }
   }
 }
-```
 2. Save the configuration file and completely restart Claude Desktop for the changes to take effect.
 
 ## Usage with VS Code
