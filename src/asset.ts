@@ -112,7 +112,7 @@ export class Asset implements Asset {
         } catch (error) {
             logger.error(`Error calling API '${url}': ${error}`);
             return {
-                content: [{ type: 'text', text: `${errMsg}: ${(error as Error).message}` }],
+                content: [{ type: 'text', text: `${errMsg? errMsg + ': ' :''}${(error as Error).message}` }],
                 structuredContent: { error: (error as Error).message },
                 isError: true,
             };
