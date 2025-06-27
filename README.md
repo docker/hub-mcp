@@ -78,6 +78,79 @@ services:
 2. Run `docker build -t hub .`
 3. Run `docker ai`
 
+## Usage with Claude Desktop
+1. Add the Docker Hub MCP Server configuration to your `claude_desktop_config.json`:
+
+#### For public repositories only:
+
+   - `/FULL/PATH/TO/YOUR/docker-hub-mcp-server` - The complete path to where you cloned this repository
+```json
+{
+  "mcpServers": {
+    "docker-hub": {
+      "command": "node",
+      "args": ["/FULL/PATH/TO/YOUR/docker-hub-mcp-server/dist/index.js", "--transport=stdio"]
+    }
+  }
+}
+```
+#### For authenticated access (recommended):
+ Replace the following values:
+   - `YOUR_DOCKER_HUB_USERNAME` - Your Docker Hub username
+   - `YOUR_DOCKER_HUB_PERSONAL_ACCESS_TOKEN` - Your Docker Hub Personal Access Token
+  - `/FULL/PATH/TO/YOUR/docker-hub-mcp-server` - The complete path to where you cloned this 
+
+```json
+{
+  "mcpServers": {
+    "docker-hub": {
+      "command": "node",
+      "args": ["/FULL/PATH/TO/YOUR/docker-hub-mcp-server/dist/index.js", "--transport=stdio", "--username=YOUR_DOCKER_HUB_USERNAME"],
+      "env": {
+        "HUB_PAT_TOKEN": "YOUR_DOCKER_HUB_PERSONAL_ACCESS_TOKEN"
+      }
+    }
+  }
+}
+2. Save the configuration file and completely restart Claude Desktop for the changes to take effect.
+
+## Usage with VS Code
+1. Add the Docker Hub MCP Server configuration to your User Settings (JSON) file in VS Code. You can do this by opening the `Command Palette` and typing `Preferences: Open User Settings (JSON)`.
+
+#### For public repositories only:
+
+   - `/FULL/PATH/TO/YOUR/docker-hub-mcp-server` - The complete path to where you cloned this repository
+```json
+{
+  "mcpServers": {
+    "docker-hub": {
+      "command": "node",
+      "args": ["/FULL/PATH/TO/YOUR/docker-hub-mcp-server/dist/index.js", "--transport=stdio"]
+    }
+  }
+}
+```
+#### For authenticated access (recommended):
+ Replace the following values:
+   - `YOUR_DOCKER_HUB_USERNAME` - Your Docker Hub username
+   - `YOUR_DOCKER_HUB_PERSONAL_ACCESS_TOKEN` - Your Docker Hub Personal Access Token
+  - `/FULL/PATH/TO/YOUR/docker-hub-mcp-server` - The complete path to where you cloned this 
+
+```json
+{
+  "mcpServers": {
+    "docker-hub": {
+      "command": "node",
+      "args": ["/FULL/PATH/TO/YOUR/docker-hub-mcp-server/dist/index.js", "--transport=stdio", "--username=YOUR_DOCKER_HUB_USERNAME"],
+      "env": {
+        "HUB_PAT_TOKEN": "YOUR_DOCKER_HUB_PERSONAL_ACCESS_TOKEN"
+      }
+    }
+  }
+}
+2. Open the `Command Palette` and type `MCP: List Servers`.
+3. Select `docker-hub` and select `Start Server`.
+
 
 ## Task Examples
 ### Finding images 
@@ -212,19 +285,12 @@ $ docker ai "Can you help me update my Dockerfile to use a docker hardened image
   - `namespace`: Repository namespace (string, required)
   - `body`: Request body data (object, optional)
 
-- **get_repository_dockerfile** - Get the Dockerfile for a repository
-  - `namespace`: Repository namespace (string, required)
-  - `repository`: Repository name (string, required)
 
 - **update_repository_info** - Update repository information
   - `namespace`: Repository namespace (string, required)
   - `repository`: Repository name (string, required)
   - `body`: Request body data (object, optional)
 
-- **set_repository_dockerfile** - Set or update the Dockerfile for a repository
-  - `namespace`: Repository namespace (string, required)
-  - `repository`: Repository name (string, required)
-  - `body`: Request body data (object, optional)
  
 ### Tag Management
 - **list_repository_tags** - List all tags for a repository
@@ -240,10 +306,6 @@ $ docker ai "Can you help me update my Dockerfile to use a docker hardened image
   - `repository`: Repository name (string, required)
   - `tag`: Tag name (string, required)
 
-- **read_repository_tag** - Get details of a specific repository tag
-  - `namespace`: Repository namespace (string, required)
-  - `repository`: Repository name (string, required)
-  - `tag`: Tag name (string, required)
 
 
 
