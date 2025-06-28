@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+import path from 'path';
 import winston, { format } from 'winston';
 const logsDir = parseLogsDir(process.argv.slice(2));
 
@@ -44,12 +45,12 @@ export const logger = winston.createLogger({
               // - Write all logs with importance level of `error` or higher to `error.log`
               //   (i.e., error, fatal, but not other levels)
               //
-              new winston.transports.File({ filename: 'logs/error.log', level: 'warn' }),
+              new winston.transports.File({ filename: path.join(logsDir, 'error.log'), level: 'warn' }),
               //
               // - Write all logs with importance level of `info` or higher to `combined.log`
               //   (i.e., fatal, error, warn, and info, but not trace)
               //
-              new winston.transports.File({ filename: 'logs/mcp.log', level: 'info' }),
+              new winston.transports.File({ filename: path.join(logsDir, 'mcp.log'), level: 'info' }),
           ]
         : [],
 });
