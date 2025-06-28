@@ -112,6 +112,7 @@ services:
     }
   }
 }
+```
 2. Save the configuration file and completely restart Claude Desktop for the changes to take effect.
 
 ## Usage with VS Code
