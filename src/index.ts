@@ -204,7 +204,7 @@ function parsePortFlag(args: string[]): number {
 // Main execution
 async function main() {
     const args = process.argv.slice(2);
-    logger.info(`args: ${args}`);
+    logger.info(args.length > 0 ? `provided arguments: ${args}` : 'no arguments provided');
     const transportArg = parseTransportFlag(args);
     const port = parsePortFlag(args);
     const username = parsUsernameFlag(args);

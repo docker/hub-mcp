@@ -27,18 +27,7 @@ export const logger = winston.createLogger({
         format.json()
     ),
     defaultMeta: { service: 'dockerhub-mcp-server' },
-    transports: [
-        //
-        // - Write all logs with importance level of `error` or higher to `error.log`
-        //   (i.e., error, fatal, but not other levels)
-        //
-        new winston.transports.File({ filename: 'logs/error.log', level: 'warn' }),
-        //
-        // - Write all logs with importance level of `info` or higher to `combined.log`
-        //   (i.e., fatal, error, warn, and info, but not trace)
-        //
-        new winston.transports.File({ filename: 'logs/mcp.log', level: 'info' }),
-    ],
+    transports: [],
 });
 
 //
@@ -53,5 +42,18 @@ if (process.env.NODE_ENV !== 'production') {
                 console.error(info.message);
             },
         })
+    );
+} else {
+    logger.transports.push(
+        //
+        // - Write all logs with importance level of `error` or higher to `error.log`
+        //   (i.e., error, fatal, but not other levels)
+        //
+        new winston.transports.File({ filename: 'logs/error.log', level: 'warn' }),
+        //
+        // - Write all logs with importance level of `info` or higher to `combined.log`
+        //   (i.e., fatal, error, warn, and info, but not trace)
+        //
+        new winston.transports.File({ filename: 'logs/mcp.log', level: 'info' })
     );
 }
