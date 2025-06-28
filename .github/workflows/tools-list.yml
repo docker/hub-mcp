@@ -27,5 +27,8 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
+      - name: Build
+        run: npm run build
+
       - name: Check tools list
         run: npm run list-tools:check
