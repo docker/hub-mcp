@@ -11,8 +11,8 @@ on:
       - "**"
 
 jobs:
-  run-linters:
-    name: Run linters
+  run-tools-list:
+    name: Run tools list
     runs-on: ubuntu-latest
 
     steps:
