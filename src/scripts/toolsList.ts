@@ -1,5 +1,5 @@
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { HubMCPServer } from '..';
+import { HubMCPServer } from '../server';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import _ from 'lodash';
 import fs from 'fs';
@@ -11,18 +11,38 @@ const EMPTY_OBJECT_JSON_SCHEMA = {
 };
 
 program
-    .name('check-tools-list')
+    .command('check-tools-list')
     .description('Check if the tools list is up to date')
     .action(() => {
+        let code = 0;
         const currentToolsList = loadCurrentToolsList();
         const newToolsList = getToolDefinitionList();
         if (compareToolDefinitionList(currentToolsList, newToolsList)) {
             console.log('Tools list is up to date');
         } else {
             console.log('Tools list is not up to date');
+            code = 1;
         }
+
+        const currentToolsNames = loadCurrentToolsNames();
+        const newToolsNames = newToolsList.tools.map((tool) => tool.name);
+        if (compareToolNames(currentToolsNames, newToolsNames)) {
+            console.log('Tools names are up to date');
+        } else {
+            console.log('Tools names are not up to date');
+            code = 1;
+        }
+
+        process.exit(code);
     });
 
+program
+    .command('update-tools-list')
+    .description('Update the tools list')
+    .action(() => {
+        const newToolsList = getToolDefinitionList();
+        saveToolsList(newToolsList);
+    });
 
 program.parse();
 
@@ -34,7 +54,6 @@ function getToolDefinitionList(): { tools: Tool[] } {
             tools.forEach((tool, name) => {
                 const toolDefinition: Tool = {
                     name,
-                    title: tool.title,
                     description: tool.description,
                     inputSchema: tool.inputSchema
                         ? (zodToJsonSchema(tool.inputSchema, {
@@ -64,6 +83,27 @@ function loadCurrentToolsList(): { tools: Tool[] } {
     return JSON.parse(toolsList);
 }
 
+function loadCurrentToolsNames(): string[] {
+    const toolsList = fs.readFileSync(path.join(__dirname, '../..', 'tools.txt'), 'utf8');
+    return toolsList.split('\n').map((line) => line.split('- name: ')[1].replace(/^"|"$/g, ''));
+}
+
+function saveToolsList(toolsList: { tools: Tool[] }) {
+    fs.writeFileSync(
+        path.join(__dirname, '../..', 'tools.json'),
+        JSON.stringify(toolsList, null, 2)
+    );
+
+    fs.writeFileSync(
+        path.join(__dirname, '../..', 'tools.txt'),
+        toolsList.tools.map((tool) => `- name: ${tool.name}`).join('\n')
+    );
+}
+
 function compareToolDefinitionList(list1: { tools: Tool[] }, list2: { tools: Tool[] }) {
     return _.isEqual(list1.tools, list2.tools);
+}
+
+function compareToolNames(list1: string[], list2: string[]) {
+    return _.isEqual(list1, list2);
 }
