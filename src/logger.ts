@@ -14,46 +14,46 @@
    limitations under the License.
 */
 
+import path from 'path';
 import winston, { format } from 'winston';
+export let logger: winston.Logger;
 
-export const logger = winston.createLogger({
-    level: 'info',
-    format: format.combine(
-        format.timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss',
-        }),
-        format.errors({ stack: true }),
-        format.splat(),
-        format.json()
-    ),
-    defaultMeta: { service: 'dockerhub-mcp-server' },
-    transports: [],
-});
+export function initLogger(logsDir?: string) {
+    logger = winston.createLogger({
+        level: 'info',
+        format: format.combine(
+            format.timestamp({
+                format: 'YYYY-MM-DD HH:mm:ss',
+            }),
+            format.errors({ stack: true }),
+            format.splat(),
+            format.json()
+        ),
+        defaultMeta: { service: 'dockerhub-mcp-server' },
+        transports: [],
+    });
 
-//
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+    if (process.env.NODE_ENV === 'production' && !logsDir) {
+        logsDir = '/app/logs';
+        console.warn(`logs dir unspecified, defaulting to ${logsDir}`);
+    }
 
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(
-        new winston.transports.Console({
-            format: winston.format.simple(),
-            log: (info) => {
-                console.error(info.message);
-            },
-        })
-    );
-} else {
-    logger.transports.push(
-        //
-        // - Write all logs with importance level of `error` or higher to `error.log`
-        //   (i.e., error, fatal, but not other levels)
-        //
-        new winston.transports.File({ filename: 'logs/error.log', level: 'warn' }),
-        //
-        // - Write all logs with importance level of `info` or higher to `combined.log`
-        //   (i.e., fatal, error, warn, and info, but not trace)
-        //
-        new winston.transports.File({ filename: 'logs/mcp.log', level: 'info' })
-    );
+    if (logsDir) {
+        logger.transports.push(
+            new winston.transports.File({
+                filename: path.join(logsDir, 'error.log'),
+                level: 'warn',
+            }),
+            new winston.transports.File({ filename: path.join(logsDir, 'mcp.log'), level: 'info' })
+        );
+    } else {
+        logger.add(
+            new winston.transports.Console({
+                format: winston.format.simple(),
+                log: (info) => {
+                    console.error(info.message);
+                },
+            })
+        );
+    }
 }
