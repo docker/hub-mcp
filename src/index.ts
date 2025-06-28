@@ -175,7 +175,7 @@ function parseTransportFlag(args: string[]): string {
     return transportArg;
 }
 
-function parsUsernameFlag(args: string[]): string | undefined {
+function parseUsernameFlag(args: string[]): string | undefined {
     const usernameArg = args.find((arg) => arg.startsWith('--username='))?.split('=')[1];
     if (!usernameArg) {
         logger.info('username unspecified');
@@ -204,10 +204,10 @@ function parsePortFlag(args: string[]): number {
 // Main execution
 async function main() {
     const args = process.argv.slice(2);
-    logger.info(`args: ${args}`);
+    logger.info(args.length > 0 ? `provided arguments: ${args}` : 'no arguments provided');
     const transportArg = parseTransportFlag(args);
     const port = parsePortFlag(args);
-    const username = parsUsernameFlag(args);
+    const username = parseUsernameFlag(args);
     const patToken = process.env.HUB_PAT_TOKEN;
 
     const server = new HubMCPServer(username, patToken);
