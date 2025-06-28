@@ -28,7 +28,7 @@ import { Asset } from './asset';
 import { Repos } from './repos';
 import { Accounts } from './accounts';
 import { Search } from './search';
-import { initLogger, logger } from './logger';
+import { logger } from './logger';
 
 const DEFAULT_PORT = 3000;
 const STDIO_OPTION = 'stdio';
@@ -185,16 +185,6 @@ function parseUsernameFlag(args: string[]): string | undefined {
     return usernameArg;
 }
 
-function parseLogsDir(args: string[]): string | undefined {
-    const logsDirArg = args.find((arg) => arg.startsWith('--logs-dir='))?.split('=')[1];
-    if (!logsDirArg) {
-        console.warn('logs dir unspecified');
-        return undefined;
-    }
-
-    return logsDirArg;
-}
-
 function parsePortFlag(args: string[]): number {
     const portArg = args.find((arg) => arg.startsWith('--port='))?.split('=')[1];
     if (!portArg || portArg.length === 0) {
@@ -214,8 +204,6 @@ function parsePortFlag(args: string[]): number {
 // Main execution
 async function main() {
     const args = process.argv.slice(2);
-    const logsDir = parseLogsDir(args);
-    initLogger(logsDir);
     logger.info(args.length > 0 ? `provided arguments: ${args}` : 'no arguments provided');
     const transportArg = parseTransportFlag(args);
     const port = parsePortFlag(args);
