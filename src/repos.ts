@@ -229,160 +229,185 @@ export class Repos extends Asset {
 
     RegisterTools(): void {
         // List Repositories by Namespace
-        this.server.registerTool(
+        this.tools.set(
             'listRepositoriesByNamespace',
-            {
-                description: 'List paginated repositories by namespace',
-                inputSchema: {
-                    namespace: z.string().describe('The namespace to list repositories from'),
-                    page: z
-                        .number()
-                        .optional()
-                        .describe('The page number to list repositories from'),
-                    page_size: z
-                        .number()
-                        .optional()
-                        .describe('The page size to list repositories from'),
+            this.server.registerTool(
+                'listRepositoriesByNamespace',
+                {
+                    description: 'List paginated repositories by namespace',
+                    inputSchema: {
+                        namespace: z.string().describe('The namespace to list repositories from'),
+                        page: z
+                            .number()
+                            .optional()
+                            .describe('The page number to list repositories from'),
+                        page_size: z
+                            .number()
+                            .optional()
+                            .describe('The page size to list repositories from'),
+                    },
+                    outputSchema: repositoryPaginatedResponseSchema.shape,
+                    annotations: {
+                        title: 'List Repositories by Namespace',
+                    },
                 },
-                outputSchema: repositoryPaginatedResponseSchema.shape,
-                annotations: {
-                    title: 'List Repositories by Namespace',
-                },
-            },
-            this.listRepositoriesByNamespace.bind(this)
+                this.listRepositoriesByNamespace.bind(this)
+            )
         );
-
         // Create Repository
-        this.server.registerTool(
+        this.tools.set(
             'createRepository',
-            {
-                description:
-                    'Create a new repository in the given namespace. User must pass the repository name and if the repository has to be public or private. Can optionally pass a description.',
-                inputSchema: CreateRepositoryRequest.shape,
-                outputSchema: Repository.shape,
-                annotations: {
-                    title: 'Create Repository in namespace',
+            this.server.registerTool(
+                'createRepository',
+                {
+                    description:
+                        'Create a new repository in the given namespace. User must pass the repository name and if the repository has to be public or private. Can optionally pass a description.',
+                    inputSchema: CreateRepositoryRequest.shape,
+                    outputSchema: Repository.shape,
+                    annotations: {
+                        title: 'Create Repository in namespace',
+                    },
                 },
-            },
-            this.createRepository.bind(this)
+                this.createRepository.bind(this)
+            )
         );
-
         // Get Repository Info
-        this.server.registerTool(
+        this.tools.set(
             'getRepositoryInfo',
-            {
-                description: 'Get the details of a repository in the given namespace.',
-                inputSchema: z.object({ namespace: z.string(), repository: z.string() }).shape,
-                outputSchema: Repository.shape,
-                annotations: {
-                    title: 'Get Repository Info',
+            this.server.registerTool(
+                'getRepositoryInfo',
+                {
+                    description: 'Get the details of a repository in the given namespace.',
+                    inputSchema: z.object({ namespace: z.string(), repository: z.string() }).shape,
+                    outputSchema: Repository.shape,
+                    annotations: {
+                        title: 'Get Repository Info',
+                    },
                 },
-            },
-            this.getRepositoryInfo.bind(this)
+                this.getRepositoryInfo.bind(this)
+            )
         );
 
         // Update Repository Info
-        this.server.registerTool(
+        this.tools.set(
             'updateRepositoryInfo',
-            {
-                description: 'Update the details of a repository in the given namespace.',
-                inputSchema: z.object({
-                    namespace: z.string(),
-                    repository: z.string(),
-                    description: z.string().optional(),
-                    full_description: z.string().max(25000).optional(),
-                    status: z.number().optional(),
-                }).shape,
-                outputSchema: Repository.shape,
-                annotations: {
-                    title: 'Get Repository Info',
+            this.server.registerTool(
+                'updateRepositoryInfo',
+                {
+                    description: 'Update the details of a repository in the given namespace.',
+                    inputSchema: z.object({
+                        namespace: z.string(),
+                        repository: z.string(),
+                        description: z.string().optional(),
+                        full_description: z.string().max(25000).optional(),
+                        status: z.number().optional(),
+                    }).shape,
+                    outputSchema: Repository.shape,
+                    annotations: {
+                        title: 'Get Repository Info',
+                    },
                 },
-            },
-            this.updateRepositoryInfo.bind(this)
+                this.updateRepositoryInfo.bind(this)
+            )
         );
 
         // Check Repository Exists
-        this.server.registerTool(
+        this.tools.set(
             'checkRepository',
-            {
-                description: 'Check if a repository exists in the given namespace.',
-                inputSchema: z.object({ namespace: z.string(), repository: z.string() }).shape,
-                annotations: {
-                    title: 'Check Repository Exists',
+            this.server.registerTool(
+                'checkRepository',
+                {
+                    description: 'Check if a repository exists in the given namespace.',
+                    inputSchema: z.object({ namespace: z.string(), repository: z.string() }).shape,
+                    annotations: {
+                        title: 'Check Repository Exists',
+                    },
                 },
-            },
-            this.checkRepository.bind(this)
+                this.checkRepository.bind(this)
+            )
         );
 
         // List Repository Tags
-        this.server.registerTool(
+        this.tools.set(
             'listRepositoryTags',
-            {
-                description: 'List paginated tags by repository',
-                inputSchema: z.object({
-                    namespace: z
-                        .string()
-                        .optional()
-                        .describe(
-                            "The namespace of the repository. If not provided the 'library' namespace will be used for official images."
-                        ),
-                    repository: z.string().describe('The repository to list tags from'),
-                    page: z.number().optional().describe('The page number to list tags from'),
-                    page_size: z.number().optional().describe('The page size to list tags from'),
-                    architecture: z
-                        .string()
-                        .optional()
-                        .describe(
-                            'The architecture to list tags from. If not provided, all architectures will be listed.'
-                        ),
-                    os: z
-                        .string()
-                        .optional()
-                        .describe(
-                            'The operating system to list tags from. If not provided, all operating systems will be listed.'
-                        ),
-                }).shape,
-                outputSchema: repositoryTagPaginatedResponseSchema.shape,
-                annotations: {
-                    title: 'List Repository Tags',
+            this.server.registerTool(
+                'listRepositoryTags',
+                {
+                    description: 'List paginated tags by repository',
+                    inputSchema: z.object({
+                        namespace: z
+                            .string()
+                            .optional()
+                            .describe(
+                                "The namespace of the repository. If not provided the 'library' namespace will be used for official images."
+                            ),
+                        repository: z.string().describe('The repository to list tags from'),
+                        page: z.number().optional().describe('The page number to list tags from'),
+                        page_size: z
+                            .number()
+                            .optional()
+                            .describe('The page size to list tags from'),
+                        architecture: z
+                            .string()
+                            .optional()
+                            .describe(
+                                'The architecture to list tags from. If not provided, all architectures will be listed.'
+                            ),
+                        os: z
+                            .string()
+                            .optional()
+                            .describe(
+                                'The operating system to list tags from. If not provided, all operating systems will be listed.'
+                            ),
+                    }).shape,
+                    outputSchema: repositoryTagPaginatedResponseSchema.shape,
+                    annotations: {
+                        title: 'List Repository Tags',
+                    },
                 },
-            },
-            this.listRepositoryTags.bind(this)
+                this.listRepositoryTags.bind(this)
+            )
         );
 
         // Get Repository Tag
-        this.server.registerTool(
+        this.tools.set(
             'getRepositoryTag',
-            {
-                description:
-                    'Get the details of a tag in a repository. It can be use to show the latest tag details for example.',
-                inputSchema: z.object({
-                    namespace: z.string(),
-                    repository: z.string(),
-                    tag: z.string(),
-                }).shape,
-                outputSchema: RepositoryTag.shape,
-                annotations: {
-                    title: 'Get Repository Tag',
+            this.server.registerTool(
+                'getRepositoryTag',
+                {
+                    description:
+                        'Get the details of a tag in a repository. It can be use to show the latest tag details for example.',
+                    inputSchema: z.object({
+                        namespace: z.string(),
+                        repository: z.string(),
+                        tag: z.string(),
+                    }).shape,
+                    outputSchema: RepositoryTag.shape,
+                    annotations: {
+                        title: 'Get Repository Tag',
+                    },
                 },
-            },
-            this.getRepositoryTag.bind(this)
+                this.getRepositoryTag.bind(this)
+            )
         );
         // Check Repository Tag
-        this.server.registerTool(
+        this.tools.set(
             'checkRepositoryTag',
-            {
-                description: 'Check if a tag exists in a repository',
-                inputSchema: z.object({
-                    namespace: z.string(),
-                    repository: z.string(),
-                    tag: z.string(),
-                }).shape,
-                annotations: {
-                    title: 'Check Repository Tag',
+            this.server.registerTool(
+                'checkRepositoryTag',
+                {
+                    description: 'Check if a tag exists in a repository',
+                    inputSchema: z.object({
+                        namespace: z.string(),
+                        repository: z.string(),
+                        tag: z.string(),
+                    }).shape,
+                    annotations: {
+                        title: 'Check Repository Tag',
+                    },
                 },
-            },
-            this.checkRepositoryTag.bind(this)
+                this.checkRepositoryTag.bind(this)
+            )
         );
     }
 

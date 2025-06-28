@@ -34,8 +34,9 @@ const DEFAULT_PORT = 3000;
 const STDIO_OPTION = 'stdio';
 const STREAMABLE_HTTP_OPTION = 'http';
 
-class HubMCPServer {
+export class HubMCPServer {
     private readonly server: Server;
+    private readonly assets: Asset[];
 
     constructor(username?: string, patToken?: string) {
         this.server = new Server(
@@ -50,7 +51,7 @@ class HubMCPServer {
             }
         );
 
-        const assets: Asset[] = [
+        this.assets = [
             new Repos(this.server, {
                 name: 'repos',
                 host: 'https://hub.docker.com/v2',
@@ -83,7 +84,7 @@ class HubMCPServer {
                 },
             }),
         ];
-        for (const asset of assets) {
+        for (const asset of this.assets) {
             asset.RegisterTools();
         }
     }
@@ -162,6 +163,10 @@ class HubMCPServer {
                 })
             );
         });
+    }
+
+    public GetAssets(): Asset[] {
+        return this.assets;
     }
 }
 
