@@ -66,7 +66,8 @@ HUB_PAT_TOKEN=<a_pat_token> npx @modelcontextprotocol/inspector node dist/index.
 
 You can configure Gordon to be a client that can interact with the Docker Hub MCP server.
 
-1. Replace environment variables in the [`gordon-mcp.yml` file](https://docs.docker.com/ai/gordon/mcp/yaml/) with your Docker Hub username and a PAT token.
+1. Create the [`gordon-mcp.yml` file](https://docs.docker.com/ai/gordon/mcp/yaml/) file in your working directory.
+2. Replace environment variables in the `gordon-mcp.yml`  with your Docker Hub username and a PAT token.
 
 ```
 services:
