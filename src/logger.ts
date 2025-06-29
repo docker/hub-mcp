@@ -14,7 +14,19 @@
    limitations under the License.
 */
 
+import path from 'path';
 import winston, { format } from 'winston';
+const logsDir = parseLogsDir(process.argv.slice(2));
+
+function parseLogsDir(args: string[]): string | undefined {
+    const logsDirArg = args.find((arg) => arg.startsWith('--logs-dir='))?.split('=')[1];
+    if (!logsDirArg) {
+        console.warn('logs dir unspecified');
+        return undefined;
+    }
+
+    return logsDirArg;
+}
 
 export const logger = winston.createLogger({
     level: 'info',
@@ -27,18 +39,26 @@ export const logger = winston.createLogger({
         format.json()
     ),
     defaultMeta: { service: 'dockerhub-mcp-server' },
-    transports: [
-        //
-        // - Write all logs with importance level of `error` or higher to `error.log`
-        //   (i.e., error, fatal, but not other levels)
-        //
-        new winston.transports.File({ filename: 'logs/error.log', level: 'warn' }),
-        //
-        // - Write all logs with importance level of `info` or higher to `combined.log`
-        //   (i.e., fatal, error, warn, and info, but not trace)
-        //
-        new winston.transports.File({ filename: 'logs/mcp.log', level: 'info' }),
-    ],
+    transports: logsDir
+        ? [
+              //
+              // - Write all logs with importance level of `error` or higher to `error.log`
+              //   (i.e., error, fatal, but not other levels)
+              //
+              new winston.transports.File({
+                  filename: path.join(logsDir, 'error.log'),
+                  level: 'warn',
+              }),
+              //
+              // - Write all logs with importance level of `info` or higher to `combined.log`
+              //   (i.e., fatal, error, warn, and info, but not trace)
+              //
+              new winston.transports.File({
+                  filename: path.join(logsDir, 'mcp.log'),
+                  level: 'info',
+              }),
+          ]
+        : [],
 });
 
 //
