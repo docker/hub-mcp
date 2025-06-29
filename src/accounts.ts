@@ -56,57 +56,64 @@ export class Accounts extends Asset {
     }
 
     RegisterTools(): void {
-        this.server.registerTool(
+        this.tools.set(
             'listNamespaces',
-            {
-                description: 'List paginated namespaces',
-                inputSchema: {
-                    page: z
-                        .number()
-                        .optional()
-                        .describe('The page number to list repositories from'),
-                    page_size: z
-                        .number()
-                        .optional()
-                        .describe('The page size to list repositories from'),
+            this.server.registerTool(
+                'listNamespaces',
+                {
+                    description: 'List paginated namespaces',
+                    inputSchema: {
+                        page: z
+                            .number()
+                            .optional()
+                            .describe('The page number to list repositories from'),
+                        page_size: z
+                            .number()
+                            .optional()
+                            .describe('The page size to list repositories from'),
+                    },
+                    outputSchema: namespacePaginatedResponseSchema.shape,
+                    annotations: {
+                        title: 'List Namespaces',
+                    },
                 },
-                outputSchema: namespacePaginatedResponseSchema.shape,
-                annotations: {
-                    title: 'List Namespaces',
-                },
-            },
-            this.listNamespaces.bind(this)
+                this.listNamespaces.bind(this)
+            )
         );
-
-        this.server.registerTool(
+        this.tools.set(
             'getPersonalNamespace',
-            {
-                description: 'Get the personal namespace name',
-                annotations: {
-                    title: 'Get Personal Namespace',
+            this.server.registerTool(
+                'getPersonalNamespace',
+                {
+                    description: 'Get the personal namespace name',
+                    annotations: {
+                        title: 'Get Personal Namespace',
+                    },
                 },
-            },
-            this.getPersonalNamespace.bind(this)
+                this.getPersonalNamespace.bind(this)
+            )
         );
-
-        this.server.registerTool(
+        this.tools.set(
             'listAllNamespacesMemberOf',
-            {
-                description: 'List all namespaces the user is a member of',
-                annotations: {
-                    title: 'List All Namespaces user is a member of',
+            this.server.registerTool(
+                'listAllNamespacesMemberOf',
+                {
+                    description: 'List all namespaces the user is a member of',
+                    annotations: {
+                        title: 'List All Namespaces user is a member of',
+                    },
                 },
-            },
-            () => {
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: "To get all namespaces the user is a member of, call the 'listNamespaces' tool and the 'getPersonalNamespace' tool to get the personal namespace name.",
-                        },
-                    ],
-                };
-            }
+                () => {
+                    return {
+                        content: [
+                            {
+                                type: 'text',
+                                text: "To get all namespaces the user is a member of, call the 'listNamespaces' tool and the 'getPersonalNamespace' tool to get the personal namespace name.",
+                            },
+                        ],
+                    };
+                }
+            )
         );
     }
 

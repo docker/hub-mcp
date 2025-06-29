@@ -87,61 +87,67 @@ export class Search extends Asset {
     }
 
     RegisterTools(): void {
-        this.server.registerTool(
+        this.tools.set(
             'search',
-            {
-                description: 'Search for repositories',
-                inputSchema: {
-                    query: z.string().describe('The query to search for'),
-                    badges: z
-                        .array(z.enum(['official', 'verified_publisher', 'open_source']))
-                        .optional()
-                        .describe('The trusted content to search for'),
-                    type: z
-                        .string()
-                        .optional()
-                        .describe('The type of the repository to search for'),
-                    categories: z
-                        .array(z.string())
-                        .optional()
-                        .describe('The categories names to filter search results'),
-                    architectures: z
-                        .array(z.string())
-                        .optional()
-                        .describe('The architectures to filter search results'),
-                    operating_systems: z
-                        .array(z.string())
-                        .optional()
-                        .describe('The operating systems to filter search results'),
-                    extension_reviewed: z
-                        .boolean()
-                        .optional()
-                        .describe(
-                            'Whether to filter search results to only include reviewed extensions'
-                        ),
-                    from: z.number().optional().describe('The number of repositories to skip'),
-                    size: z.number().optional().describe('The number of repositories to return'),
-                    sort: z
-                        .enum(['pull_count', 'updated_at'])
-                        .optional()
-                        .describe(
-                            'The criteria to sort the search results by. If the `sort` field is not set, pull count is used by default. When search extensions, documents are sort alphabetically if none is provided.'
-                        ),
-                    order: z
-                        .enum(['asc', 'desc'])
-                        .optional()
-                        .describe('The order to sort the search results by'),
-                    images: z
-                        .array(z.string())
-                        .optional()
-                        .describe('The images to filter search results'),
+            this.server.registerTool(
+                'search',
+                {
+                    description: 'Search for repositories',
+                    inputSchema: {
+                        query: z.string().describe('The query to search for'),
+                        badges: z
+                            .array(z.enum(['official', 'verified_publisher', 'open_source']))
+                            .optional()
+                            .describe('The trusted content to search for'),
+                        type: z
+                            .string()
+                            .optional()
+                            .describe('The type of the repository to search for'),
+                        categories: z
+                            .array(z.string())
+                            .optional()
+                            .describe('The categories names to filter search results'),
+                        architectures: z
+                            .array(z.string())
+                            .optional()
+                            .describe('The architectures to filter search results'),
+                        operating_systems: z
+                            .array(z.string())
+                            .optional()
+                            .describe('The operating systems to filter search results'),
+                        extension_reviewed: z
+                            .boolean()
+                            .optional()
+                            .describe(
+                                'Whether to filter search results to only include reviewed extensions'
+                            ),
+                        from: z.number().optional().describe('The number of repositories to skip'),
+                        size: z
+                            .number()
+                            .optional()
+                            .describe('The number of repositories to return'),
+                        sort: z
+                            .enum(['pull_count', 'updated_at'])
+                            .optional()
+                            .describe(
+                                'The criteria to sort the search results by. If the `sort` field is not set, pull count is used by default. When search extensions, documents are sort alphabetically if none is provided.'
+                            ),
+                        order: z
+                            .enum(['asc', 'desc'])
+                            .optional()
+                            .describe('The order to sort the search results by'),
+                        images: z
+                            .array(z.string())
+                            .optional()
+                            .describe('The images to filter search results'),
+                    },
+                    outputSchema: searchResults.shape,
+                    annotations: {
+                        title: 'List Repositories by Namespace',
+                    },
                 },
-                outputSchema: searchResults.shape,
-                annotations: {
-                    title: 'List Repositories by Namespace',
-                },
-            },
-            this.search.bind(this)
+                this.search.bind(this)
+            )
         );
     }
 

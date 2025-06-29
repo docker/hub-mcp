@@ -1,6 +1,7 @@
 - name: listRepositoriesByNamespace
 - name: createRepository
 - name: getRepositoryInfo
+- name: updateRepositoryInfo
 - name: checkRepository
 - name: listRepositoryTags
 - name: getRepositoryTag

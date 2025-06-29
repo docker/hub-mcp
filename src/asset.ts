@@ -14,8 +14,9 @@
    limitations under the License.
 */
 
-import { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { logger } from './logger';
+import { RegisteredTool } from '@modelcontextprotocol/sdk/server/mcp';
 
 export type AssetConfig = {
     name: string;
@@ -28,7 +29,7 @@ export type AssetConfig = {
 };
 
 export class Asset implements Asset {
-    protected tools: Map<string, Tool>;
+    protected tools: Map<string, RegisteredTool>;
     protected tokens: Map<string, string>;
     constructor(protected config: AssetConfig) {
         this.tools = new Map();
@@ -36,6 +37,10 @@ export class Asset implements Asset {
     }
     RegisterTools(): void {
         throw new Error('Method not implemented.');
+    }
+
+    ListTools(): Map<string, RegisteredTool> {
+        return this.tools;
     }
 
     protected async authFetch<T>(url: string, options: RequestInit): Promise<T | null> {

@@ -53,54 +53,57 @@ export class ScoutAPI extends Asset {
         });
     }
     RegisterTools(): void {
-        this.server.registerTool(
+        this.tools.set(
             'docker-hardened-images',
-            {
-                description:
-                    'Docker Hardened Images (DHI) API. This API is used to query for mirrored DHIs in the namespace. It lists all the secure, minimal, production-ready images available to get near-zero CVEs and enterprise-grade SLA.',
-                inputSchema: z.object({
-                    namespace: z
-                        .string()
-                        .describe('The namespace to query for mirrored hardened repositories'),
-                }).shape,
-                annotations: {
-                    title: 'List available Docker Hardened Images',
-                },
-            },
-            async ({ namespace }) => {
-                const { data, errors } = await this.scoutClient.query({
-                    dhiListMirroredRepositories: {
-                        __args: {
-                            context: { organization: namespace },
-                        },
-                        mirroredRepositories: {
-                            destinationRepository: {
-                                name: true,
-                                namespace: true,
-                            },
-                            dhiSourceRepository: {
-                                displayName: true,
-                                namespace: true,
-                                name: true,
-                            },
-                        },
+            this.server.registerTool(
+                'docker-hardened-images',
+                {
+                    description:
+                        'Docker Hardened Images (DHI) API. This API is used to query for mirrored DHIs in the namespace. It lists all the secure, minimal, production-ready images available to get near-zero CVEs and enterprise-grade SLA.',
+                    inputSchema: z.object({
+                        namespace: z
+                            .string()
+                            .describe('The namespace to query for mirrored hardened repositories'),
+                    }).shape,
+                    annotations: {
+                        title: 'List available Docker Hardened Images',
                     },
-                });
-                if (errors) {
+                },
+                async ({ namespace }) => {
+                    const { data, errors } = await this.scoutClient.query({
+                        dhiListMirroredRepositories: {
+                            __args: {
+                                context: { organization: namespace },
+                            },
+                            mirroredRepositories: {
+                                destinationRepository: {
+                                    name: true,
+                                    namespace: true,
+                                },
+                                dhiSourceRepository: {
+                                    displayName: true,
+                                    namespace: true,
+                                    name: true,
+                                },
+                            },
+                        },
+                    });
+                    if (errors) {
+                        return {
+                            content: [{ type: 'text', text: JSON.stringify(errors, null, 2) }],
+                            isError: true,
+                        };
+                    }
                     return {
-                        content: [{ type: 'text', text: JSON.stringify(errors, null, 2) }],
-                        isError: true,
+                        content: [
+                            {
+                                type: 'text',
+                                text: JSON.stringify(data, null, 2),
+                            },
+                        ],
                     };
                 }
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(data, null, 2),
-                        },
-                    ],
-                };
-            }
+            )
         );
     }
 }
