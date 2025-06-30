@@ -3430,7 +3430,7 @@
         },
         {
             "name": "search",
-            "description": "Search for repositories",
+            "description": "Search for repositories. It sorts results by best match if no sort criteria is provided.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -3484,13 +3484,41 @@
                         "description": "The number of repositories to return"
                     },
                     "sort": {
-                        "type": "string",
-                        "enum": ["pull_count", "updated_at"],
-                        "description": "The criteria to sort the search results by. If the `sort` field is not set, pull count is used by default. When search extensions, documents are sort alphabetically if none is provided."
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": ["pull_count", "updated_at"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The criteria to sort the search results by. If the `sort` field is not set, the best match is used by default. When search extensions, documents are sort alphabetically if none is provided. Do not use it unless user explicitly asks for it."
                     },
                     "order": {
-                        "type": "string",
-                        "enum": ["asc", "desc"],
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": ["asc", "desc"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "description": "The order to sort the search results by"
                     },
                     "images": {
