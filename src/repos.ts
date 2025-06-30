@@ -245,6 +245,31 @@ export class Repos extends Asset {
                             .number()
                             .optional()
                             .describe('The page size to list repositories from'),
+                        ordering: z
+                            .enum([
+                                'last_updated',
+                                '-last_updated',
+                                'name',
+                                '-name',
+                                'pull_count',
+                                '-pull_count',
+                            ])
+                            .optional()
+                            .describe(
+                                'The ordering of the repositories. Use "-" to reverse the ordering. For example, "last_updated" will order the repositories by last updated in descending order while "-last_updated" will order the repositories by last updated in ascending order.'
+                            ),
+                        media_types: z
+                            .string()
+                            .optional()
+                            .describe(
+                                'Comma-delimited list of media types. Only repositories containing one or more artifacts with one of these media types will be returned. null should be added to the list to get repositories with image artifacts to handle legacy repositories.'
+                            ),
+                        content_types: z
+                            .string()
+                            .optional()
+                            .describe(
+                                'Comma-delimited list of content types. Only repositories containing one or more artifacts with one of these content types will be returned.'
+                            ),
                     },
                     outputSchema: repositoryPaginatedResponseSchema.shape,
                     annotations: {
@@ -415,10 +440,16 @@ export class Repos extends Asset {
         namespace,
         page,
         page_size,
+        ordering,
+        media_types,
+        content_types,
     }: {
         namespace: string;
         page?: number;
         page_size?: number;
+        ordering?: string;
+        media_types?: string;
+        content_types?: string;
     }): Promise<CallToolResult> {
         if (!namespace) {
             throw new Error('Namespace is required');
@@ -429,7 +460,16 @@ export class Repos extends Asset {
         if (!page_size) {
             page_size = 10;
         }
-        const url = `${this.config.host}/namespaces/${namespace}/repositories?page=${page}&page_size=${page_size}`;
+        let url = `${this.config.host}/namespaces/${namespace}/repositories?page=${page}&page_size=${page_size}`;
+        if (ordering) {
+            url += `&ordering=${ordering}`;
+        }
+        if (media_types) {
+            url += `&media_types=${media_types}`;
+        }
+        if (content_types) {
+            url += `&content_types=${content_types}`;
+        }
 
         return this.callAPI<RepositoryPaginatedResponse>(
             url,
@@ -464,11 +504,15 @@ export class Repos extends Asset {
             page_size = 10;
         }
         let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
+        const params: Record<string, string> = {};
         if (architecture) {
-            url += `?architecture=${architecture}`;
+            params.architecture = architecture;
         }
         if (os) {
-            url += `?os=${os}`;
+            params.os = os;
+        }
+        if (Object.keys(params).length > 0) {
+            url += `?${new URLSearchParams(params).toString()}`;
         }
 
         return this.callAPI<RepositoryTagPaginatedResponse>(

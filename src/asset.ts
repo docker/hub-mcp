@@ -17,6 +17,7 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { logger } from './logger';
 import { RegisteredTool } from '@modelcontextprotocol/sdk/server/mcp';
+import { jwtDecode } from 'jwt-decode';
 
 export type AssetConfig = {
     name: string;
@@ -28,12 +29,18 @@ export type AssetConfig = {
     };
 };
 
+export type AssetResponse<T> = {
+    content: T | null;
+    isAuthenticated: boolean;
+    code: number;
+};
+
 export class Asset implements Asset {
     protected tools: Map<string, RegisteredTool>;
-    protected tokens: Map<string, string>;
+    protected tokens: Map<string, { token: string; expirationDate: Date }>;
     constructor(protected config: AssetConfig) {
-        this.tools = new Map();
         this.tokens = new Map();
+        this.tools = new Map();
     }
     RegisterTools(): void {
         throw new Error('Method not implemented.');
@@ -43,31 +50,41 @@ export class Asset implements Asset {
         return this.tools;
     }
 
-    protected async authFetch<T>(url: string, options: RequestInit): Promise<T | null> {
+    protected async authFetch<T>(url: string, options: RequestInit): Promise<AssetResponse<T>> {
         const headers = options.headers || {
             'Content-Type': 'application/json',
         };
         const token = await this.authenticate();
-        (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+        if (token) {
+            (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+        }
         const response = await fetch(url, { ...options, headers });
+        const responseText = await response.text();
         if (!response.ok) {
             // try to get the error message from the response
-            const error = await response.text();
             logger.error(
                 `HTTP error on '${url}' with request: ${JSON.stringify(
                     options
-                )}\n status: ${response.status} ${response.statusText}\n error: ${error}`
+                )}\n status: ${response.status} ${response.statusText}\n error: ${responseText}`
             );
 
             throw new Error(
-                `HTTP error! status: ${response.status} ${response.statusText} ${error}`
+                `HTTP error! status: ${response.status} ${response.statusText} ${responseText}`
             );
         }
         try {
-            return (await response.json()) as T;
+            return {
+                content: responseText ? (JSON.parse(responseText) as T) : null,
+                isAuthenticated: token !== '',
+                code: response.status,
+            };
         } catch (err) {
-            logger.warn(`Response is not JSON: ${await response.text()}. ${err}`);
-            return null as T;
+            logger.warn(`Response is not JSON: ${responseText}. ${err}`);
+            return {
+                content: responseText as T,
+                isAuthenticated: token !== '',
+                code: response.status,
+            };
         }
     }
 
@@ -76,19 +93,22 @@ export class Asset implements Asset {
         url: string,
         options: RequestInit,
         outMsg?: string,
-        errMsg?: string
+        errMsg?: string,
+        unAuthMsg?: string
     ): Promise<CallToolResult>;
     protected async callAPI(
         url: string,
         options: RequestInit,
         outMsg?: string,
-        errMsg?: string
+        errMsg?: string,
+        unAuthMsg?: string
     ): Promise<CallToolResult>;
     protected async callAPI<T = unknown>(
         url: string,
         options: RequestInit,
         outMsg?: string,
-        errMsg?: string
+        errMsg?: string,
+        unAuthMsg?: string
     ): Promise<CallToolResult> {
         logger.info(`Calling API '${url}' with request: ${JSON.stringify(options)}`);
         try {
@@ -107,8 +127,14 @@ export class Asset implements Asset {
             };
 
             // If T is specified (not 'any'), include structuredContent
-            if (response !== null && typeof response === 'object') {
-                result.structuredContent = response as { [x: string]: unknown };
+            if (response.content !== null && typeof response.content === 'object') {
+                result.structuredContent = response.content as { [x: string]: unknown };
+            }
+            if (!response.isAuthenticated) {
+                result.content.push({
+                    type: 'text',
+                    text: `The request was not authenticated. ${unAuthMsg || ''}`,
+                });
             }
             logger.info(
                 `API call '${url}' completed successfully with response: ${JSON.stringify(result)}`
@@ -139,14 +165,31 @@ export class Asset implements Asset {
                         return this.config.auth.token;
                     }
                     break;
-                case 'pat':
-                    if (!this.tokens.get(this.config.auth.username!)) {
-                        this.tokens.set(
-                            this.config.auth.username!,
-                            await this.authenticatePAT(this.config.auth.username!)
-                        );
+                case 'pat': {
+                    if (!this.config.auth.username || !this.config.auth.token) {
+                        logger.warn(`No username or token provided for PAT auth`);
+                        this.tokens.set(this.config.auth.username!, {
+                            token: '',
+                            expirationDate: new Date('2030-01-01'),
+                        });
+                        return '';
                     }
-                    return this.tokens.get(this.config.auth.username!)!;
+                    if (!this.tokens.get(this.config.auth.username!)) {
+                        const token = await this.authenticatePAT(this.config.auth.username!);
+                        // get expiration date from token
+                        const decoded = jwtDecode<{ exp: number }>(token);
+                        const expirationDate = new Date(decoded.exp * 1000);
+                        this.tokens.set(this.config.auth.username!, { token, expirationDate });
+                        return token;
+                    }
+                    const token = this.tokens.get(this.config.auth.username!)!;
+                    if (token.expirationDate < new Date()) {
+                        // invalidate token
+                        this.tokens.delete(this.config.auth.username!);
+                        return this.authenticate();
+                    }
+                    return token.token;
+                }
                 default:
                     throw new Error(`Unsupported auth type: ${this.config.auth.type}`);
             }
@@ -155,7 +198,7 @@ export class Asset implements Asset {
     }
 
     protected async authenticatePAT(username: string): Promise<string> {
-        if (username === '') {
+        if (!username) {
             throw new Error('PAT auth: Username is empty');
         }
         console.error(`Authenticating PAT for ${username}`);
