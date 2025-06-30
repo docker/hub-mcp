@@ -213,13 +213,6 @@ export class Search extends Asset {
                     }
                     break;
                 }
-                case 'from':
-                case 'size': {
-                    if (request[param] !== undefined && request[param] !== null) {
-                        queryParams.set(param, request[param].toString());
-                    }
-                    break;
-                }
                 default: {
                     logger.warn(`Unknown parameter: ${param}`);
                     break;
