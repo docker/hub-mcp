@@ -136,9 +136,8 @@ export class Asset implements Asset {
                     text: `The request was not authenticated. ${unAuthMsg || ''}`,
                 });
             }
-            logger.info(
-                `API call '${url}' completed successfully with response: ${JSON.stringify(result)}`
-            );
+            logger.info(`API call '${url}' completed successfully.`);
+            logger.debug(`Response: ${JSON.stringify(result)}`);
             return result;
         } catch (error) {
             logger.error(`Error calling API '${url}': ${error}`);

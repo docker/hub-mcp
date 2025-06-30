@@ -92,7 +92,8 @@ export class Search extends Asset {
             this.server.registerTool(
                 'search',
                 {
-                    description: 'Search for repositories',
+                    description:
+                        'Search for repositories. It sorts results by best match if no sort criteria is provided.',
                     inputSchema: {
                         query: z.string().describe('The query to search for'),
                         badges: z
@@ -129,12 +130,14 @@ export class Search extends Asset {
                         sort: z
                             .enum(['pull_count', 'updated_at'])
                             .optional()
+                            .nullable()
                             .describe(
-                                'The criteria to sort the search results by. If the `sort` field is not set, pull count is used by default. When search extensions, documents are sort alphabetically if none is provided.'
+                                'The criteria to sort the search results by. If the `sort` field is not set, the best match is used by default. When search extensions, documents are sort alphabetically if none is provided. Do not use it unless user explicitly asks for it.'
                             ),
                         order: z
                             .enum(['asc', 'desc'])
                             .optional()
+                            .nullable()
                             .describe('The order to sort the search results by'),
                         images: z
                             .array(z.string())
@@ -161,11 +164,11 @@ export class Search extends Asset {
         extension_reviewed?: boolean;
         from?: number;
         size?: number;
-        sort?: 'pull_count' | 'updated_at';
-        order?: 'asc' | 'desc';
+        sort?: 'pull_count' | 'updated_at' | null;
+        order?: 'asc' | 'desc' | null;
         images?: string[];
     }): Promise<CallToolResult> {
-        logger.info(`Searching for repositories with query: ${request.query}`);
+        logger.info(`Searching for repositories with request: ${JSON.stringify(request)}`);
         let url = `${this.config.host}/v4?custom_boosted_results=true`;
         if (!request.query) {
             return {
@@ -176,19 +179,92 @@ export class Search extends Asset {
         }
         const queryParams = new URLSearchParams();
         for (const key in request) {
-            if (
-                request[key as keyof typeof request] !== undefined &&
-                request[key as keyof typeof request] !== null
-            ) {
-                queryParams.set(key, request[key as keyof typeof request] as string);
+            const param = key as keyof typeof request;
+            switch (param) {
+                case 'badges':
+                case 'categories':
+                case 'architectures':
+                case 'operating_systems':
+                case 'images': {
+                    if (request[param] && request[param].length > 0) {
+                        queryParams.set(param, request[param].join(','));
+                    }
+                    break;
+                }
+                case 'query':
+                case 'type':
+                case 'order':
+                case 'sort':
+                case 'from':
+                case 'size': {
+                    if (
+                        request[param] !== undefined &&
+                        request[param] !== null &&
+                        request[param] !== ''
+                    ) {
+                        queryParams.set(param, request[param].toString());
+                        logger.info(`Setting parameter: ${param} to ${request[param]}`);
+                    }
+                    break;
+                }
+                case 'extension_reviewed': {
+                    if (request[param]) {
+                        queryParams.set(param, 'true');
+                    }
+                    break;
+                }
+                case 'from':
+                case 'size': {
+                    if (request[param] !== undefined && request[param] !== null) {
+                        queryParams.set(param, request[param].toString());
+                    }
+                    break;
+                }
+                default: {
+                    logger.warn(`Unknown parameter: ${param}`);
+                    break;
+                }
             }
         }
-        url += `?${queryParams.toString()}`;
-        return this.callAPI<typeof searchResults>(
+        if (queryParams.size > 0) {
+            url += `&${queryParams.toString()}`;
+        }
+        const response = await this.callAPI<typeof searchResults>(
             url,
             { method: 'GET' },
             `Here are the search results: :response`,
             `Error finding repositories for query: ${request.query}`
         );
+        // let's try to find if the query is an exact match
+        if (!response.isError) {
+            if (response.structuredContent) {
+                try {
+                    const results = searchResults.parse(response.structuredContent).results;
+                    if (results && results.length > 0) {
+                        const [namespace, repository] = results[0].name.split('/');
+                        if (
+                            !namespace.toLowerCase().includes(request.query.toLowerCase()) ||
+                            !repository.toLowerCase().includes(request.query.toLowerCase())
+                        ) {
+                            return {
+                                content: [
+                                    {
+                                        type: 'text',
+                                        text: `We could not find any repository exactly matching '${request.query}'. However we found some repositories that might be relevant.`,
+                                    },
+                                    ...response.content,
+                                ],
+                                structuredContent: response.structuredContent,
+                            };
+                        }
+                    }
+                } catch (error) {
+                    logger.error(`Error parsing search results: ${error}`);
+                    // return the original response if we can't parse the results
+                    return response;
+                }
+            }
+        }
+        return response;
     }
 }
