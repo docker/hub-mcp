@@ -34,18 +34,18 @@ program
         const currentToolsList = loadCurrentToolsList();
         const newToolsList = getToolDefinitionList();
         if (compareToolDefinitionList(currentToolsList, newToolsList)) {
-            console.log('Tools list is up to date');
+            console.log('Tools list is up to date. ✅');
         } else {
-            console.log('Tools list is not up to date');
+            console.log('Tools list is not up to date. ❌');
             code = 1;
         }
 
         const currentToolsNames = loadCurrentToolsNames();
         const newToolsNames = newToolsList.tools.map((tool) => tool.name);
         if (compareToolNames(currentToolsNames, newToolsNames)) {
-            console.log('Tools names are up to date');
+            console.log('Tools names are up to date. ✅');
         } else {
-            console.log('Tools names are not up to date');
+            console.log('Tools names are not up to date. ❌');
             code = 1;
         }
 
