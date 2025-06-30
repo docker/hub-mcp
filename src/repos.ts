@@ -206,7 +206,7 @@ const RepositoryTag = z.object({
     tag_last_pushed: z.string().optional().nullable().describe('datetime of last push'),
     media_type: z.string().optional().nullable().describe('media type of this tagged artifact'),
     content_type: z
-        .enum(['image', 'plugin', 'helm', 'volume', 'wasm', 'unrecognized'])
+        .enum(['image', 'plugin', 'helm', 'volume', 'wasm', 'compose', 'unrecognized', 'model'])
         .optional()
         .nullable()
         .describe(

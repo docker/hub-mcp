@@ -2667,7 +2667,9 @@
                                                                         "helm",
                                                                         "volume",
                                                                         "wasm",
-                                                                        "unrecognized"
+                                                                        "compose",
+                                                                        "unrecognized",
+                                                                        "model"
                                                                     ]
                                                                 }
                                                             ]
@@ -3142,7 +3144,9 @@
                                             "helm",
                                             "volume",
                                             "wasm",
-                                            "unrecognized"
+                                            "compose",
+                                            "unrecognized",
+                                            "model"
                                         ]
                                     }
                                 ]

@@ -21,6 +21,9 @@ const logsDir = parseLogsDir(process.argv.slice(2));
 function parseLogsDir(args: string[]): string | undefined {
     const logsDirArg = args.find((arg) => arg.startsWith('--logs-dir='))?.split('=')[1];
     if (!logsDirArg) {
+        if (process.env.NODE_ENV === 'production') {
+            return '/app/logs';
+        }
         console.warn('logs dir unspecified');
         return undefined;
     }
