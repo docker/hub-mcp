@@ -63,7 +63,9 @@ export class ScoutAPI extends Asset {
                     inputSchema: z.object({
                         namespace: z
                             .string()
-                            .describe('The organisation for which a DHI is queried for. Required to be input by the user.'),
+                            .describe(
+                                'The organisation for which a DHI is queried for. Required to be input by the user.'
+                            ),
                     }).shape,
                     annotations: {
                         title: 'List available Docker Hardened Images',
