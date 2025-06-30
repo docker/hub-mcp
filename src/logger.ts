@@ -14,44 +14,67 @@
    limitations under the License.
 */
 
-import winston, { format } from "winston";
+import path from 'path';
+import winston, { format } from 'winston';
+const logsDir = parseLogsDir(process.argv.slice(2));
+
+function parseLogsDir(args: string[]): string | undefined {
+    const logsDirArg = args.find((arg) => arg.startsWith('--logs-dir='))?.split('=')[1];
+    if (!logsDirArg) {
+        if (process.env.NODE_ENV === 'production') {
+            return '/app/logs';
+        }
+        console.warn('logs dir unspecified');
+        return undefined;
+    }
+
+    return logsDirArg;
+}
 
 export const logger = winston.createLogger({
-  level: "info",
-  format: format.combine(
-    format.timestamp({
-      format: "YYYY-MM-DD HH:mm:ss",
-    }),
-    format.errors({ stack: true }),
-    format.splat(),
-    format.json()
-  ),
-  defaultMeta: { service: "dockerhub-mcp-server" },
-  transports: [
-    //
-    // - Write all logs with importance level of `error` or higher to `error.log`
-    //   (i.e., error, fatal, but not other levels)
-    //
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    //
-    // - Write all logs with importance level of `info` or higher to `combined.log`
-    //   (i.e., fatal, error, warn, and info, but not trace)
-    //
-    new winston.transports.File({ filename: "logs/mcp.log" }),
-  ],
+    level: 'info',
+    format: format.combine(
+        format.timestamp({
+            format: 'YYYY-MM-DD HH:mm:ss',
+        }),
+        format.errors({ stack: true }),
+        format.splat(),
+        format.json()
+    ),
+    defaultMeta: { service: 'dockerhub-mcp-server' },
+    transports: logsDir
+        ? [
+              //
+              // - Write all logs with importance level of `error` or higher to `error.log`
+              //   (i.e., error, fatal, but not other levels)
+              //
+              new winston.transports.File({
+                  filename: path.join(logsDir, 'error.log'),
+                  level: 'warn',
+              }),
+              //
+              // - Write all logs with importance level of `info` or higher to `combined.log`
+              //   (i.e., fatal, error, warn, and info, but not trace)
+              //
+              new winston.transports.File({
+                  filename: path.join(logsDir, 'mcp.log'),
+                  level: 'info',
+              }),
+          ]
+        : [],
 });
 
 //
 // If we're not in production then log to the `console` with the format:
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
 
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple(),
-      log: (info) => {
-        console.error(info.message);
-      },
-    })
-  );
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(
+        new winston.transports.Console({
+            format: winston.format.simple(),
+            log: (info) => {
+                console.error(info.message);
+            },
+        })
+    );
 }
