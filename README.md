@@ -86,6 +86,8 @@ services:
 
 1. Add the Docker Hub MCP Server configuration to your `claude_desktop_config.json`:
 
+> NOTE: if you are using [nvm](https://github.com/nvm-sh/nvm) to manage node versions, you should put the node binary path in the `command` property. This ensure MCP server runs with the right node version. You can find your binary path by running `which node` in your shell
+
 #### For public repositories only:
 
 - `/FULL/PATH/TO/YOUR/docker-hub-mcp-server` - The complete path to where you cloned this repository
@@ -94,7 +96,7 @@ services:
 {
     "mcpServers": {
         "docker-hub": {
-            "command": "node",
+            "command": "node", // or absoulute binary path
             "args": ["/FULL/PATH/TO/YOUR/docker-hub-mcp-server/dist/index.js", "--transport=stdio"]
         }
     }
