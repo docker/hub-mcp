@@ -3753,7 +3753,7 @@
         },
         {
             "name": "docker-hardened-images",
-            "description": "Docker Hardened Images (DHI) API. This API is used to query for mirrored DHIs in the namespace. It lists all the secure, minimal, production ready images available to get near-zero CVEs and enterprise-grade SLA.",
+            "description": "Docker Hardened Images (DHI) API. This API is used to query for mirrored DHIs in the namespace. It lists all the secure, minimal, production-ready images available to get near-zero CVEs and enterprise-grade SLA.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
