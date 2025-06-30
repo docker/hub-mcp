@@ -166,7 +166,7 @@ export class Search extends Asset {
         images?: string[];
     }): Promise<CallToolResult> {
         logger.info(`Searching for repositories with query: ${request.query}`);
-        let url = `${this.config.host}/v4`;
+        let url = `${this.config.host}/v4?custom_boosted_results=true`;
         if (!request.query) {
             return {
                 content: [{ type: 'text', text: 'Please provide a query to search for' }],
