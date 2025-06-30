@@ -40,6 +40,7 @@ export class Asset implements Asset {
     protected tokens: Map<string, { token: string; expirationDate: Date }>;
     constructor(protected config: AssetConfig) {
         this.tokens = new Map();
+        this.tools = new Map();
     }
     RegisterTools(): void {
         throw new Error('Method not implemented.');
