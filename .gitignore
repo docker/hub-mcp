@@ -3,3 +3,4 @@ dist/
 .vscode/
 .env
 logs/
+gordon-mcp.yml
