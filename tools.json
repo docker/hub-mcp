@@ -3759,7 +3759,7 @@
                 "properties": {
                     "namespace": {
                         "type": "string",
-                        "description": "The namespace to query for mirrored hardened repositories"
+                        "description": "The organisation for which a DHI is queried for. Required to be input by the user."
                     }
                 },
                 "required": ["namespace"],
