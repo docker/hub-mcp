@@ -244,7 +244,8 @@ export class Search extends Asset {
                         const [namespace, repository] = results[0].name.split('/');
                         if (
                             !namespace.toLowerCase().includes(request.query.toLowerCase()) ||
-                            !repository.toLowerCase().includes(request.query.toLowerCase())
+                            (repository &&
+                                !repository.toLowerCase().includes(request.query.toLowerCase()))
                         ) {
                             return {
                                 content: [
