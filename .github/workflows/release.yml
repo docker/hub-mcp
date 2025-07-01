@@ -1,0 +1,251 @@
+name: Release Docker Image
+
+run-name: Release Docker Image ${{ github.event_name == 'workflow_dispatch' && inputs.service || '(auto-deploy)' }}
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: |
+          Version (of the form "1.2.3") or Branch (of the form "origin/branch-name").
+          Leave empty to bump the latest version.
+        type: string
+      build_local:
+        type: boolean
+        default: false
+        description: Uses build-cloud by default. If Build Cloud is down, set this to true to build locally.
+      dry_run:
+        description: If true, the workflow will not push the image to the registry.
+        type: boolean
+        default: false
+      mirror_ecr:
+        description: Push release image both to DockerHub and AWS ECR.
+        default: "false"
+      aws_role_to_assume_arn:
+        description: role to assume.
+        default: arn:aws:iam::710015040892:role/CiHubPlatformTerraform-20230302144600629400000001
+      aws_region:
+        description: The AWS region where we will mirror the image in.
+        default: us-east-1
+      aws_ecr_repository_name:
+        description: The ECR repository to mirror image in.
+
+env:
+  GOPRIVATE: github.com/docker
+  NAME: dockerhub-mcp
+
+jobs:
+  release:
+    name: Release Service
+    permissions:
+      pull-requests: write
+      # This permission is required to update the PR body content
+      repository-projects: write
+      # These permissions are needed to interact with GitHub's OIDC Token
+      # endpoint. We need it in order to make requests to AWS ECR for image
+      # mirroring.
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    # Internally the create-release action attempts to push a commit to
+    # cloud-manifests in a loop to avoid race-conditions. However, this could
+    # have the side-effect of making the action hang for ever if we come across
+    # a scenario that we haven't thought of. This timeout makes sure to fail the
+    # workflow if that happens.
+    timeout-minutes: 10
+    steps:
+      - name: Setup
+        uses: docker/actions/setup-go@setup-go/v1
+        id: setup_go
+        with:
+          app_id: ${{ secrets.HUB_PLATFORM_APP_ID }}
+          app_private_key: ${{ secrets.HUB_PLATFORM_APP_PRIVATE_KEY }}
+          go_version: '1.24'
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+        with:
+          token: ${{ steps.setup_go.outputs.token }}
+          fetch-depth: 0
+
+      - name: Bump Version
+        id: bump_version
+        if: github.event_name == 'push' && inputs.version == ''
+        uses: docker/actions/bump-version@bump-version/v1.1.0
+        with:
+          name: ${{ env.NAME }}
+
+      - name: Get Latest Version
+        id: latest_version
+        if: github.event_name != 'push' && inputs.version == ''
+        uses: docker/actions/bump-version@bump-version/v1.1.0
+        with:
+          name: ${{ env.NAME }}
+          include_tag: false
+
+      - name: Get Release Version
+        id: release_version
+        shell: bash
+        run: |
+          if [[ '${{ steps.bump_version.outcome }}' == 'success' ]]; then
+            echo "version=${{ steps.bump_version.outputs.next_version_number }}" >> $GITHUB_OUTPUT
+            echo "tag=${{ steps.bump_version.outputs.next_version }}" >> $GITHUB_OUTPUT
+          elif [[ '${{ steps.latest_version.outcome }}' == 'success' ]]; then
+            echo "version=${{ steps.latest_version.outputs.latest_version_number }}" >> $GITHUB_OUTPUT
+          elif [[ '${{ inputs.version }}' != '' ]]; then
+            echo "Using already provided version: ${{ inputs.version }}."
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "Unable to compute version for staging environment."
+            exit 42
+          fi
+
+      - name: Hub Login
+        uses: docker/login-action@v2
+        with:
+          username: dockerbuildbot
+          password: ${{ secrets.DOCKERBUILDBOT_WRITE_PAT }}
+
+      - name: Setup Hydrobuild
+        uses: docker/setup-buildx-action@v3
+        if: ${{ ! inputs.build_local }}
+        with:
+          version: "lab:latest"
+          driver: cloud
+          endpoint: docker/platform-experience
+          install: true
+
+      - name: Check Docker image exists
+        id: hub_image_exists
+        shell: bash
+        run: |
+          if docker manifest inspect docker/${{ env.NAME }}:${{ steps.latest_version.outputs.latest_version_number }}; then
+            echo 'exists=true' >> $GITHUB_OUTPUT
+          else
+            echo 'exists=false' >> $GITHUB_OUTPUT
+          fi
+
+      - name: Ensure attestations are supported
+        shell: bash
+        # docker buildx inspect | grep Driver
+        # Driver:        docker
+        # indicates that we need to enable containerd so
+        # we can compute sboms.
+        run: |
+          driver=$(docker buildx inspect | grep "Driver:")
+          if [[ "$driver" == *"docker"* ]]; then
+            echo "detected driver, needs containerd snapshotter enabled: $driver"
+            sudo mkdir -p /etc/docker
+            if [ -f /etc/docker/daemon.json ]; then
+              cat /etc/docker/daemon.json | jq '. + {"features": {"containerd-snapshotter": true}}' | sudo tee /etc/docker/daemon.json
+            else
+              echo '{"features": {"containerd-snapshotter": true}}' | sudo tee /etc/docker/daemon.json
+            fi
+            sudo systemctl restart docker
+          fi
+  
+      - name: Build and push service image
+        if: steps.hub_image_exists.outputs.exists == 'false'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            SERVICE_NAME=${{ env.NAME }}
+            SERVICE_VERSION=${{ steps.release_version.outputs.version }}
+          push: ${{ inputs.dry_run != 'true' }}
+          tags: |
+            docker/${{ env.NAME }}:${{ steps.release_version.outputs.version }}
+            docker/${{ env.NAME }}:latest
+          labels: |
+            org.opencontainers.image.revision=${{ github.event.pull_request.head.sha || github.event.after || github.event.release.tag_name }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            com.docker.image.source.entrypoint=Dockerfile
+          provenance: mode=max
+          sbom: true
+  
+      - name: Configure AWS Credentials
+        if: inputs.mirror_ecr == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-session-name: gha-release-service-go-workflow
+          role-to-assume: ${{ inputs.aws_role_to_assume_arn }}
+          aws-region: ${{ inputs.aws_region }}
+  
+      - name: Log in to Amazon ECR
+        if: inputs.mirror_ecr == 'true'
+        id: login_ecr
+        uses: aws-actions/amazon-ecr-login@v2
+  
+      ## Note: We're disabling this for now so branch images can be overriden
+      ## on-demand. This is pending revisiting branch-based deployments.
+      # - name: Check image exists in AWS ECR
+      #   if: inputs.mirror_ecr == 'true'
+      #   id: ecr_image_exists
+      #   shell: bash
+      #   run: |
+      #     if docker manifest inspect ${{ steps.login_ecr.outputs.registry }}/${{ inputs.service_name }}:${{ steps.image_tag.outputs.tag }}; then
+      #       echo 'exists=true' >> $GITHUB_OUTPUT
+      #     else
+      #       echo 'exists=false' >> $GITHUB_OUTPUT
+      #     fi
+  
+      - name: Vendor modules
+        # Basically, if the Hub image exists, then we need to make sure to vendor
+        # for building the ECR image.
+        if: steps.hub_image_exists.outputs.exists == 'true'
+        working-directory: ${{ inputs.service_directory }}
+        shell: bash
+        run: |
+          if [[ -f "go.mod" ]]; then
+            go mod vendor
+          fi
+  
+      - name: Build and push Docker image to ECR
+        if: inputs.mirror_ecr == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            SERVICE_NAME=${{ env.NAME }}
+            SERVICE_VERSION=${{ steps.release_version.outputs.version }}
+          push: ${{ inputs.dry_run != 'true' }}
+          tags: |
+            ${{ steps.login_ecr.outputs.registry }}/${{ inputs.aws_ecr_repository_name }}:${{ steps.release_version.outputs.version }}
+            ${{ steps.login_ecr.outputs.registry }}/${{ inputs.aws_ecr_repository_name }}:latest
+          labels: |
+            org.opencontainers.image.revision=${{ github.event.pull_request.head.sha || github.event.after || github.event.release.tag_name }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            com.docker.image.source.entrypoint=Dockerfile
+          provenance: mode=max
+          sbom: true
+  
+      - name: Log out of Amazon ECR
+        if: inputs.mirror_ecr == true
+        shell: bash
+        run: docker logout ${{ steps.login_ecr.outputs.registry }}
+  
+  
+      - name: Restore repository to initial HEAD
+        shell: bash
+        run: git checkout "${{steps.base_branch.outputs.git_ref}}"
+
+      - name: Delete git tag created by this workflow
+        if: failure() && steps.release_version.outputs.tag != ''
+        shell: bash
+        run: |
+          git push --delete origin ${{ steps.release_version.outputs.tag }}
+          # TODO: Some other things to do on cleanup:
+          #
+          # 1. revert deploy commit in cloud-manifests.
+          #
+          # 2. delete image from Hub. Doesn't create friction often; but might cause
+          # confusion.
+          #
+          # 3. delete image from ECR. Doesn't create friction often; but might cause
+          # confusion.
