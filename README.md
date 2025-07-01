@@ -4,6 +4,13 @@ The Docker Hub MCP Server is a [Model Context Protocol (MCP)](https://modelconte
 
 Developers building with containers, especially in AI and LLM-powered workflows, often face inadequate context across the vast landscape of Docker Hub images. As a result, LLMs struggle to recommend the right images, and developers lose time manually searching instead of building.
 
+<p align="center">
+  <img src="hubmcp.gif" 
+       alt="Demo"
+       width="50%" 
+       style="border: 1px solid #ccc; border-radius: 8px;" />
+</p>
+
 ### Use Cases
 
 - AI-powered image recommendations - LLMs access real-time Docker Hub data for accurate container image suggestions.
