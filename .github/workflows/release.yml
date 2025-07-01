@@ -15,6 +15,15 @@ on:
           Version (of the form "1.2.3") or Branch (of the form "origin/branch-name").
           Leave empty to bump the latest version.
         type: string
+      version_level:
+        description: The level of the version to bump.
+        type: choice
+        default: 'minor'
+        required: false
+        options:
+          - 'major'
+          - 'minor'
+          - 'patch' 
       build_local:
         type: boolean
         default: false
@@ -78,6 +87,7 @@ jobs:
         uses: docker/actions/bump-version@132452b833c5fae71bc674fe54384c9242173f96 # v2.5.0
         with:
           name: ${{ env.NAME }}
+          level: ${{ inputs.version_level }}
 
 
       - name: Get Release Version
@@ -116,7 +126,7 @@ jobs:
         id: hub_image_exists
         shell: bash
         run: |
-          if docker manifest inspect docker/${{ env.NAME }}:${{ steps.bump_version.outputs.new_version }}; then
+          if docker manifest inspect registrymcp/${{ env.NAME }}:${{ steps.bump_version.outputs.new_version }}; then
             echo 'exists=true' >> $GITHUB_OUTPUT
           else
             echo 'exists=false' >> $GITHUB_OUTPUT
@@ -158,8 +168,8 @@ jobs:
             SERVICE_VERSION=${{ steps.release_version.outputs.version }}
           push: ${{ inputs.dry_run != 'true' }}
           tags: |
-            docker/${{ env.NAME }}:${{ steps.release_version.outputs.version }}
-            docker/${{ env.NAME }}:latest
+            registrymcp/${{ env.NAME }}:${{ steps.release_version.outputs.version }}
+            registrymcp/${{ env.NAME }}:latest
           labels: |
             org.opencontainers.image.revision=${{ github.event.pull_request.head.sha || github.event.after || github.event.release.tag_name }}
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
