@@ -3,9 +3,10 @@ name: Release Docker Image
 run-name: Release Docker Image ${{ github.event_name == 'workflow_dispatch' && inputs.service || '(auto-deploy)' }}
 
 on:
-  push:
-    branches:
-      - main
+  # TODO: Uncomment this when wf is ready to be triggered by push
+  # push:
+  #   branches:
+  #     - main
 
   workflow_dispatch:
     inputs:
