@@ -13,8 +13,8 @@
         "format:fix": "prettier --write \"**/*.+(ts|json)\"",
         "format:check": "prettier --check \"**/*.+(ts|json)\"",
         "format": "npm run format:fix",
-        "list-tools:check": "node dist/scripts/toolsList.js check-tools-list",
-        "list-tools:update": "node dist/scripts/toolsList.js update-tools-list",
+        "list-tools:check": "npm run build && node dist/scripts/toolsList.js check-tools-list",
+        "list-tools:update": "npm run build && node dist/scripts/toolsList.js update-tools-list",
         "list-tools": "npm run list-tools:check && npm run list-tools:update"
     },
     "keywords": [
