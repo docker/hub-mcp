@@ -74,7 +74,6 @@ jobs:
 
       - name: Bump Version
         id: bump_version
-        if: github.event_name == 'push' && inputs.version == ''
         uses: docker/actions/bump-version@132452b833c5fae71bc674fe54384c9242173f96 # v2.5.0
         with:
           name: ${{ env.NAME }}
