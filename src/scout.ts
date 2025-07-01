@@ -19,6 +19,10 @@ import { ScoutClient } from './scout/client';
 import fetch, { RequestInfo, RequestInit } from 'node-fetch';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
+import { logger } from './logger';
+
+const DHI_DISCLAIMER = `Docker Hardened Images are available for organizations entitled to DHIs.If you're interested in accessing Docker Hardened Images, please visit:
+https://www.docker.com/products/hardened-images/`;
 
 export class ScoutAPI extends Asset {
     private scoutClient: ScoutClient;
@@ -59,7 +63,7 @@ export class ScoutAPI extends Asset {
                 'docker-hardened-images',
                 {
                     description:
-                        'Docker Hardened Images (DHI) API. This API is used to query for mirrored DHIs in the namespace. It lists all the secure, minimal, production-ready images available to get near-zero CVEs and enterprise-grade SLA.',
+                        'Docker Hardened Images (DHI) API. This API is used to query for mirrored DHIs in the namespace. It lists all the secure, minimal, production ready images available to get near-zero CVEs and enterprise-grade SLA.',
                     inputSchema: z.object({
                         namespace: z
                             .string()
@@ -72,6 +76,7 @@ export class ScoutAPI extends Asset {
                     },
                 },
                 async ({ namespace }) => {
+                    logger.info(`Querying for mirrored DHI images for organization: ${namespace}`);
                     const { data, errors } = await this.scoutClient.query({
                         dhiListMirroredRepositories: {
                             __args: {
@@ -91,16 +96,51 @@ export class ScoutAPI extends Asset {
                         },
                     });
                     if (errors) {
+                        logger.error(
+                            `Error querying for mirrored DHI images: ${JSON.stringify(errors)}`
+                        );
                         return {
-                            content: [{ type: 'text', text: JSON.stringify(errors, null, 2) }],
+                            content: [
+                                { type: 'text', text: JSON.stringify(errors, null, 2) },
+                                {
+                                    type: 'text',
+                                    text: DHI_DISCLAIMER,
+                                },
+                            ],
                             isError: true,
                         };
                     }
+                    if (data.dhiListMirroredRepositories.mirroredRepositories.length === 0) {
+                        logger.info(`No mirrored DHI images found for organization: ${namespace}`);
+                        return {
+                            content: [
+                                {
+                                    type: 'text',
+                                    text: `There are no mirrored DHI images for the organization '${namespace}'. Could you try again by providing a different organization entitled to DHIs?`,
+                                },
+                                {
+                                    type: 'text',
+                                    text: DHI_DISCLAIMER,
+                                },
+                            ],
+                        };
+                    }
+                    logger.info(
+                        `Found ${data.dhiListMirroredRepositories.mirroredRepositories.length} mirrored DHI images for organization: ${namespace}`
+                    );
                     return {
                         content: [
                             {
                                 type: 'text',
-                                text: JSON.stringify(data, null, 2),
+                                text: `Here are the mirrored DHI images for the organization '${namespace}':\n\n${JSON.stringify(
+                                    data.dhiListMirroredRepositories.mirroredRepositories,
+                                    null,
+                                    2
+                                )}`,
+                            },
+                            {
+                                type: 'text',
+                                text: DHI_DISCLAIMER,
                             },
                         ],
                     };
