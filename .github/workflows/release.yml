@@ -59,7 +59,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Setup
-        uses: docker/actions/setup-go@setup-go/v1
+        uses: docker/actions/setup-go@33488d0ac7cf5f3616b656b8f2bf28b45467976c #v1.17.0
         id: setup_go
         with:
           app_id: ${{ secrets.HUB_PLATFORM_APP_ID }}
@@ -75,27 +75,20 @@ jobs:
       - name: Bump Version
         id: bump_version
         if: github.event_name == 'push' && inputs.version == ''
-        uses: docker/actions/bump-version@bump-version/v1.1.0
+        uses: docker/actions/bump-version@132452b833c5fae71bc674fe54384c9242173f96 # v2.5.0
         with:
           name: ${{ env.NAME }}
 
-      - name: Get Latest Version
-        id: latest_version
-        if: github.event_name != 'push' && inputs.version == ''
-        uses: docker/actions/bump-version@bump-version/v1.1.0
-        with:
-          name: ${{ env.NAME }}
-          include_tag: false
 
       - name: Get Release Version
         id: release_version
         shell: bash
         run: |
           if [[ '${{ steps.bump_version.outcome }}' == 'success' ]]; then
-            echo "version=${{ steps.bump_version.outputs.next_version_number }}" >> $GITHUB_OUTPUT
-            echo "tag=${{ steps.bump_version.outputs.next_version }}" >> $GITHUB_OUTPUT
-          elif [[ '${{ steps.latest_version.outcome }}' == 'success' ]]; then
-            echo "version=${{ steps.latest_version.outputs.latest_version_number }}" >> $GITHUB_OUTPUT
+            echo "version=${{ steps.bump_version.outputs.new_version }}" >> $GITHUB_OUTPUT
+            echo "tag=${{ steps.bump_version.outputs.new_tag }}" >> $GITHUB_OUTPUT
+          elif [[ '${{ steps.bump_version.outcome }}' == 'success' ]]; then
+            echo "version=${{ steps.bump_version.outputs.new_version }}" >> $GITHUB_OUTPUT
           elif [[ '${{ inputs.version }}' != '' ]]; then
             echo "Using already provided version: ${{ inputs.version }}."
             echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
@@ -105,13 +98,13 @@ jobs:
           fi
 
       - name: Hub Login
-        uses: docker/login-action@v2
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc #v2
         with:
           username: dockerbuildbot
           password: ${{ secrets.DOCKERBUILDBOT_WRITE_PAT }}
 
       - name: Setup Hydrobuild
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 #v3
         if: ${{ ! inputs.build_local }}
         with:
           version: "lab:latest"
@@ -123,7 +116,7 @@ jobs:
         id: hub_image_exists
         shell: bash
         run: |
-          if docker manifest inspect docker/${{ env.NAME }}:${{ steps.latest_version.outputs.latest_version_number }}; then
+          if docker manifest inspect docker/${{ env.NAME }}:${{ steps.bump_version.outputs.new_version }}; then
             echo 'exists=true' >> $GITHUB_OUTPUT
           else
             echo 'exists=false' >> $GITHUB_OUTPUT
@@ -150,7 +143,7 @@ jobs:
   
       - name: Build and push service image
         if: steps.hub_image_exists.outputs.exists == 'false'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
           context: .
           file: Dockerfile
@@ -170,7 +163,7 @@ jobs:
   
       - name: Configure AWS Credentials
         if: inputs.mirror_ecr == 'true'
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
         with:
           role-session-name: gha-release-service-go-workflow
           role-to-assume: ${{ inputs.aws_role_to_assume_arn }}
@@ -179,35 +172,12 @@ jobs:
       - name: Log in to Amazon ECR
         if: inputs.mirror_ecr == 'true'
         id: login_ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
   
-      ## Note: We're disabling this for now so branch images can be overriden
-      ## on-demand. This is pending revisiting branch-based deployments.
-      # - name: Check image exists in AWS ECR
-      #   if: inputs.mirror_ecr == 'true'
-      #   id: ecr_image_exists
-      #   shell: bash
-      #   run: |
-      #     if docker manifest inspect ${{ steps.login_ecr.outputs.registry }}/${{ inputs.service_name }}:${{ steps.image_tag.outputs.tag }}; then
-      #       echo 'exists=true' >> $GITHUB_OUTPUT
-      #     else
-      #       echo 'exists=false' >> $GITHUB_OUTPUT
-      #     fi
-  
-      - name: Vendor modules
-        # Basically, if the Hub image exists, then we need to make sure to vendor
-        # for building the ECR image.
-        if: steps.hub_image_exists.outputs.exists == 'true'
-        working-directory: ${{ inputs.service_directory }}
-        shell: bash
-        run: |
-          if [[ -f "go.mod" ]]; then
-            go mod vendor
-          fi
   
       - name: Build and push Docker image to ECR
         if: inputs.mirror_ecr == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
           context: .
           file: Dockerfile
