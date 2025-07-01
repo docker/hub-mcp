@@ -206,8 +206,3 @@ jobs:
         if: inputs.mirror_ecr == true
         shell: bash
         run: docker logout ${{ steps.login_ecr.outputs.registry }}
-  
-  
-      - name: Restore repository to initial HEAD
-        shell: bash
-        run: git checkout "${{steps.base_branch.outputs.git_ref}}"
