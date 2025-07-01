@@ -67,11 +67,28 @@ jobs:
           app_private_key: ${{ secrets.HUB_PLATFORM_APP_PRIVATE_KEY }}
           go_version: '1.24'
 
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
-        with:
-          token: ${{ steps.setup_go.outputs.token }}
-          fetch-depth: 0
+      # - name: Checkout
+      #   uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      #   with:
+      #     token: ${{ steps.setup_go.outputs.token }}
+      #     fetch-depth: 0
+      
+      - name: Get current HEAD
+        id: base_branch
+        shell: bash
+        run: |
+          REF=$(git rev-parse HEAD)
+          echo "git_ref=$REF" >> $GITHUB_OUTPUT
+    
+      # this workflow can be invoked with a tag, a branch or a stripped
+      # down version number. Hence why we check all.
+      - name: Checkout code for desired version
+        shell: bash
+        run: |
+          REVISION=$(git rev-parse --verify ${{ inputs.version }} || git rev-parse --verify ${{ env.NAME }}/v${{ inputs.version }})
+          if [[ -n $REVISION ]]; then
+            git checkout $REVISION
+          fi      
 
       - name: Bump Version
         id: bump_version
