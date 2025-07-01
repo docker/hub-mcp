@@ -126,7 +126,7 @@ jobs:
         id: hub_image_exists
         shell: bash
         run: |
-          if docker manifest inspect registrymcp/${{ env.NAME }}:${{ steps.bump_version.outputs.new_version }}; then
+          if docker manifest inspect docker/${{ env.NAME }}:${{ steps.bump_version.outputs.new_version }}; then
             echo 'exists=true' >> $GITHUB_OUTPUT
           else
             echo 'exists=false' >> $GITHUB_OUTPUT
@@ -168,8 +168,8 @@ jobs:
             SERVICE_VERSION=${{ steps.release_version.outputs.version }}
           push: ${{ inputs.dry_run != 'true' }}
           tags: |
-            registrymcp/${{ env.NAME }}:${{ steps.release_version.outputs.version }}
-            registrymcp/${{ env.NAME }}:latest
+            docker/${{ env.NAME }}:${{ steps.release_version.outputs.version }}
+            docker/${{ env.NAME }}:latest
           labels: |
             org.opencontainers.image.revision=${{ github.event.pull_request.head.sha || github.event.after || github.event.release.tag_name }}
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
