@@ -4,3 +4,4 @@ dist/
 .env
 logs/
 gordon-mcp.yml
+/.idea/

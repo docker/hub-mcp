@@ -19,6 +19,10 @@ import { ScoutClient } from './scout/client';
 import fetch, { RequestInfo, RequestInit } from 'node-fetch';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
+import { logger } from './logger';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+const DHI_DISCLAIMER = `Docker Hardened Images are available for organizations entitled to DHIs. If you're interested in accessing Docker Hardened Images, please visit:
+https://www.docker.com/products/hardened-images/`;
 
 export class ScoutAPI extends Asset {
     private scoutClient: ScoutClient;
@@ -45,7 +49,7 @@ export class ScoutAPI extends Asset {
                 });
             },
             reportErrorFn: (error: Error, onErrorCallback?: () => void) => {
-                console.error(`❌ Scout API error: ${error.message}`);
+                logger.error(`❌ Scout API error: ${error.message}`);
                 if (onErrorCallback) {
                     onErrorCallback();
                 }
@@ -59,53 +63,100 @@ export class ScoutAPI extends Asset {
                 'docker-hardened-images',
                 {
                     description:
-                        'Docker Hardened Images (DHI) API. This API is used to query for mirrored DHIs in the namespace. It lists all the secure, minimal, production-ready images available to get near-zero CVEs and enterprise-grade SLA.',
+                        'This API is used to list Docker Hardened Images (DHIs) mirrored into one of the organisations of the user from the dhi organisation. Must be always prompted to input the organisation by the user. Docker Hardened Images are the most secure, minimal, production-ready images available, with near-zero CVEs and enterprise-grade SLA.',
                     inputSchema: z.object({
-                        namespace: z
+                        organisation: z
                             .string()
                             .describe(
-                                'The organisation for which a DHI is queried for. Required to be input by the user.'
+                                'The organisation for which the DHIs are listed for. Must be always prompted to input the organisation by the user.'
                             ),
                     }).shape,
                     annotations: {
                         title: 'List available Docker Hardened Images',
                     },
                 },
-                async ({ namespace }) => {
-                    const { data, errors } = await this.scoutClient.query({
-                        dhiListMirroredRepositories: {
-                            __args: {
-                                context: { organization: namespace },
-                            },
-                            mirroredRepositories: {
-                                destinationRepository: {
-                                    name: true,
-                                    namespace: true,
-                                },
-                                dhiSourceRepository: {
-                                    displayName: true,
-                                    namespace: true,
-                                    name: true,
-                                },
-                            },
-                        },
-                    });
-                    if (errors) {
-                        return {
-                            content: [{ type: 'text', text: JSON.stringify(errors, null, 2) }],
-                            isError: true,
-                        };
-                    }
-                    return {
-                        content: [
-                            {
-                                type: 'text',
-                                text: JSON.stringify(data, null, 2),
-                            },
-                        ],
-                    };
-                }
+                this.dhis.bind(this)
             )
         );
+    }
+    private async dhis({ organisation }: { organisation: string }): Promise<CallToolResult> {
+        logger.info(`Querying for mirrored DHI images for organization: ${organisation}`);
+        const { data, errors } = await this.scoutClient.query({
+            dhiListMirroredRepositories: {
+                __args: {
+                    context: { organization: organisation },
+                },
+                mirroredRepositories: {
+                    destinationRepository: {
+                        name: true,
+                        namespace: true,
+                    },
+                    dhiSourceRepository: {
+                        displayName: true,
+                        namespace: true,
+                        name: true,
+                    },
+                },
+            },
+        });
+        if (errors && errors.length > 0) {
+            const error = errors[0];
+            if (error.extensions?.status?.toString().includes('FORBIDDEN')) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `You are not authorised to fetch DHIs for the organisation: ${organisation}. Please provide another organisation name.`,
+                        },
+                    ],
+                    isError: true,
+                };
+            }
+            return {
+                content: [
+                    { type: 'text', text: JSON.stringify(errors, null, 2) },
+                    {
+                        type: 'text',
+                        text: DHI_DISCLAIMER,
+                    },
+                ],
+                isError: true,
+            };
+        }
+
+        if (data.dhiListMirroredRepositories?.mirroredRepositories?.length === 0) {
+            logger.info(`No mirrored DHI images found for organization: ${organisation}`);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `There are no mirrored DHI images for the organization '${organisation}'. Could you try again by providing a different organization entitled to DHIs?`,
+                    },
+                    {
+                        type: 'text',
+                        text: DHI_DISCLAIMER,
+                    },
+                ],
+            };
+        }
+        logger.info(
+            `Found ${data.dhiListMirroredRepositories?.mirroredRepositories?.length} mirrored DHI images for organization: ${organisation}`
+        );
+        return {
+            content: [
+                {
+                    type: 'text',
+                    text: `Here are the mirrored DHI images for the organization '${organisation}':\n\n${JSON.stringify(
+                        data.dhiListMirroredRepositories?.mirroredRepositories,
+                        null,
+                        2
+                    )}`,
+                },
+                {
+                    type: 'text',
+                    text: DHI_DISCLAIMER,
+                },
+            ],
+        };
     }
 }

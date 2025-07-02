@@ -261,14 +261,16 @@ export class Repos extends Asset {
                         media_types: z
                             .string()
                             .optional()
+                            .default('')
                             .describe(
-                                'Comma-delimited list of media types. Only repositories containing one or more artifacts with one of these media types will be returned. null should be added to the list to get repositories with image artifacts to handle legacy repositories.'
+                                'Comma-delimited list of media types. Only repositories containing one or more artifacts with one of these media types will be returned. Default is empty to get all repositories.'
                             ),
                         content_types: z
                             .string()
                             .optional()
+                            .default('')
                             .describe(
-                                'Comma-delimited list of content types. Only repositories containing one or more artifacts with one of these content types will be returned.'
+                                'Comma-delimited list of content types. Only repositories containing one or more artifacts with one of these content types will be returned. Default is empty to get all repositories.'
                             ),
                     },
                     outputSchema: repositoryPaginatedResponseSchema.shape,
