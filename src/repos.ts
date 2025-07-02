@@ -613,7 +613,7 @@ export class Repos extends Asset {
         full_description?: string;
         status?: string | null;
     }): Promise<CallToolResult> {
-        let extraContent: { type: 'text'; text: string }[] = [];
+        const extraContent: { type: 'text'; text: string }[] = [];
         if (!namespace || !repository) {
             throw new Error('Namespace and repository name are required');
         }
@@ -621,7 +621,7 @@ export class Repos extends Asset {
             `Updating repository ${repository} in ${namespace} with description: ${description}, full_description: ${full_description}, status: ${status}`
         );
         const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
-        let body: { description?: string; full_description?: string; status?: number } = {};
+        const body: { description?: string; full_description?: string; status?: number } = {};
         if (description && description !== '') {
             body.description = description;
         }

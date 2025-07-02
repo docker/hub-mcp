@@ -618,7 +618,7 @@
         },
         {
             "name": "createRepository",
-            "description": "Create a new repository in the given namespace. User must pass the repository name and if the repository has to be public or private. Can optionally pass a description.",
+            "description": "Create a new repository in the given namespace. You MUST ask the user for the repository name and if the repository has to be public or private. Can optionally pass a description.\nIMPORTANT: Before calling this tool, you must ensure you have:\n - The repository name (name).",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -628,7 +628,8 @@
                     },
                     "name": {
                         "type": "string",
-                        "description": "The name of the repository. Must contain a combination of alphanumeric characters and may contain the special characters ., _, or -. Letters must be lowercase. Required."
+                        "default": "",
+                        "description": "The name of the repository (required). Must contain a combination of alphanumeric characters and may contain the special characters ., _, or -. Letters must be lowercase."
                     },
                     "description": {
                         "type": "string",
@@ -648,7 +649,7 @@
                         "description": "The registry to create the repository in"
                     }
                 },
-                "required": ["namespace", "name"],
+                "required": ["namespace"],
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
@@ -1154,10 +1155,12 @@
                 "type": "object",
                 "properties": {
                     "namespace": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The namespace of the repository (required). If not provided the `library` namespace will be used for official images."
                     },
                     "repository": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The repository name (required)"
                     }
                 },
                 "required": ["namespace", "repository"],
@@ -1661,25 +1664,45 @@
         },
         {
             "name": "updateRepositoryInfo",
-            "description": "Update the details of a repository in the given namespace.",
+            "description": "Update the details of a repository in the given namespace. Description, overview and status are the only fields that can be updated. While description and overview changes are fine, a status change is a dangerous operation so the user must explicitly ask for it.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
                     "namespace": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The namespace of the repository (required)"
                     },
                     "repository": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The repository name (required)"
                     },
                     "description": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The description of the repository. If user asks for updating the description of the repository, this is the field that should be updated."
                     },
                     "full_description": {
                         "type": "string",
-                        "maxLength": 25000
+                        "maxLength": 25000,
+                        "description": "The full description (overview)of the repository. If user asks for updating the full description or the overview of the repository, this is the field that should be updated. "
                     },
                     "status": {
-                        "type": "number"
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": ["active", "inactive"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The status of the repository. If user asks for updating the status of the repository, this is the field that should be updated. This is a dangerous operation and should be done with caution so user must be prompted to confirm the operation. Valid status are `active` (1) and `inactive` (0). Normally do not update the status if it is not strictly required by the user. It is not possible to change an `inactive` repository to `active` if it has no images."
                     }
                 },
                 "required": ["namespace", "repository"],
