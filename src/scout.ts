@@ -16,7 +16,6 @@
 
 import { Asset, AssetConfig } from './asset';
 import { ScoutClient } from './scout/client';
-import fetch, { RequestInfo, RequestInit } from 'node-fetch';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 import { logger } from './logger';
@@ -36,7 +35,7 @@ export class ScoutAPI extends Asset {
             headers: {
                 'Content-Type': 'application/json',
             },
-            fetchFn: async (input: RequestInfo | URL, init?: RequestInit) => {
+            fetchFn: async (input: Request | URL, init?: RequestInit) => {
                 const headers = {
                     ...init?.headers,
                     'Content-Type': 'application/json',
