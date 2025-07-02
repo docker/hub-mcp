@@ -16,7 +16,6 @@
 
 import { createClient, GenqlError, Client, FieldsSelection } from './genql';
 import type { Mutation, MutationGenqlSelection, Query, QueryGenqlSelection } from './genql/schema';
-import type { HeadersInit } from '../types';
 
 /**
  * @see https://spec.graphql.org/October2021/#example-8b658
