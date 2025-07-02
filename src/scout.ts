@@ -20,7 +20,7 @@ import fetch, { RequestInfo, RequestInit } from 'node-fetch';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 import { logger } from './logger';
-import { CallToolResult } from '@modelcontextprotocol/sdk/types';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 const DHI_DISCLAIMER = `Docker Hardened Images are available for organizations entitled to DHIs. If you're interested in accessing Docker Hardened Images, please visit:
 https://www.docker.com/products/hardened-images/`;
 
