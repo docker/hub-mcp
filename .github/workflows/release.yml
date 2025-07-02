@@ -1,12 +1,11 @@
 name: Release Docker Image
 
-run-name: Release Docker Image ${{ github.event_name == 'workflow_dispatch' && inputs.service || '(auto-deploy)' }}
+run-name: Release Docker Image ${{ github.event_name == 'workflow_dispatch' || '(auto-deploy)' }}
 
 on:
-  # TODO: Uncomment this when wf is ready to be triggered by push
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
   workflow_dispatch:
     inputs:
@@ -32,17 +31,7 @@ on:
         description: If true, the workflow will not push the image to the registry.
         type: boolean
         default: false
-      mirror_ecr:
-        description: Push release image both to DockerHub and AWS ECR.
-        default: "false"
-      aws_role_to_assume_arn:
-        description: role to assume.
-        default: arn:aws:iam::710015040892:role/CiHubPlatformTerraform-20230302144600629400000001
-      aws_region:
-        description: The AWS region where we will mirror the image in.
-        default: us-east-1
-      aws_ecr_repository_name:
-        description: The ECR repository to mirror image in.
+
 
 env:
   GOPRIVATE: github.com/docker
@@ -178,41 +167,3 @@ jobs:
           sbom: true
           platforms: linux/amd64,linux/arm64
   
-      - name: Configure AWS Credentials
-        if: inputs.mirror_ecr == 'true'
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
-        with:
-          role-session-name: gha-release-service-go-workflow
-          role-to-assume: ${{ inputs.aws_role_to_assume_arn }}
-          aws-region: ${{ inputs.aws_region }}
-  
-      - name: Log in to Amazon ECR
-        if: inputs.mirror_ecr == 'true'
-        id: login_ecr
-        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
-  
-  
-      - name: Build and push Docker image to ECR
-        if: inputs.mirror_ecr == 'true'
-        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
-        with:
-          context: .
-          file: Dockerfile
-          build-args: |
-            SERVICE_NAME=${{ env.NAME }}
-            SERVICE_VERSION=${{ steps.release_version.outputs.version }}
-          push: ${{ inputs.dry_run != 'true' }}
-          tags: |
-            ${{ steps.login_ecr.outputs.registry }}/${{ inputs.aws_ecr_repository_name }}:${{ steps.release_version.outputs.version }}
-            ${{ steps.login_ecr.outputs.registry }}/${{ inputs.aws_ecr_repository_name }}:latest
-          labels: |
-            org.opencontainers.image.revision=${{ github.event.pull_request.head.sha || github.event.after || github.event.release.tag_name }}
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            com.docker.image.source.entrypoint=Dockerfile
-          provenance: mode=max
-          sbom: true
-  
-      - name: Log out of Amazon ECR
-        if: inputs.mirror_ecr == true
-        shell: bash
-        run: docker logout ${{ steps.login_ecr.outputs.registry }}
