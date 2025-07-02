@@ -27,3 +27,5 @@ export function createPaginatedResponseSchema<ItemType extends z.ZodTypeAny>(ite
         error: z.string().optional().nullable(),
     });
 }
+
+export type HeadersInit = [string, string][] | Record<string, string> | Headers;
