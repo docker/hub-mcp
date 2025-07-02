@@ -16,7 +16,6 @@
 
 import { createClient, GenqlError, Client, FieldsSelection } from './genql';
 import type { Mutation, MutationGenqlSelection, Query, QueryGenqlSelection } from './genql/schema';
-import { RequestInfo, RequestInit, Response, HeadersInit } from 'node-fetch';
 
 /**
  * @see https://spec.graphql.org/October2021/#example-8b658
@@ -77,7 +76,7 @@ export class ScoutClient {
     constructor(options: {
         url: string;
         headers?: HeadersInit;
-        fetchFn: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+        fetchFn: (input: Request | URL, init?: RequestInit) => Promise<Response>;
         reportErrorFn: (error: Error, onErrorCallback?: () => void) => void;
     }) {
         const { url, headers, fetchFn, reportErrorFn } = options;

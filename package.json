@@ -31,7 +31,6 @@
         "@modelcontextprotocol/specification": "github:modelcontextprotocol/specification",
         "express": "^5.1.0",
         "jwt-decode": "^4.0.0",
-        "node-fetch": "^3.3.2",
         "winston": "^3.17.0",
         "zod": "^3.25.67"
     },
