@@ -36,6 +36,7 @@ on:
 env:
   GOPRIVATE: github.com/docker
   NAME: dockerhub-mcp
+  VERSION_LEVEL: ${{ inputs.version_level || 'minor' }}
 
 jobs:
   release:
@@ -76,7 +77,7 @@ jobs:
         uses: docker/actions/bump-version@132452b833c5fae71bc674fe54384c9242173f96 # v2.5.0
         with:
           name: ${{ env.NAME }}
-          level: ${{ inputs.version_level }}
+          level: ${{ env.VERSION_LEVEL }}
 
 
       - name: Get Release Version
