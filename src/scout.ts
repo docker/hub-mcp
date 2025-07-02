@@ -62,7 +62,7 @@ export class ScoutAPI extends Asset {
                 'docker-hardened-images',
                 {
                     description:
-                        'This API is used to list Docker Hardened Images (DHIs) mirrored into one of the organisations of the user from the dhi organisation. Must be always prompted to input the organisation by the user. Docker Hardened Images are the most secure, minimal, production-ready images available, with near-zero CVEs and enterprise-grade SLA. Should be used to search for secure image in an organisation.',
+                        'This API is used to list Docker Hardened Images (DHIs) mirrored into one of the organisations of the user from the dhi organisation. Must be always prompted to input the organisation by the user. Docker Hardened Images are the most secure, minimal, production-ready images available, with near-zero CVEs and enterprise-grade SLA. Should be used to search for secure images in an organisation.',
                     inputSchema: z.object({
                         organisation: z
                             .string()
