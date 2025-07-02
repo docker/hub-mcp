@@ -91,6 +91,8 @@ services:
 
 ## Usage with Claude Desktop
 
+> NOTE: Make sure you have already built the application as mentioned in Step 1.
+
 1. Add the Docker Hub MCP Server configuration to your `claude_desktop_config.json`:
 
 > NOTE: if you are using [nvm](https://github.com/nvm-sh/nvm) to manage node versions, you should put the node binary path in the `command` property. This ensure MCP server runs with the right node version. You can find your binary path by running `which node` in your shell
