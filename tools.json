@@ -3564,7 +3564,8 @@
                                 },
                                 "type": {
                                     "type": "string",
-                                    "description": "The type of the repository"
+                                    "enum": ["image", "plugin", "extension"],
+                                    "description": "The type of the repository. Can be \"image\", \"plugin\" or \"extension\""
                                 },
                                 "publisher": {
                                     "type": "object",
