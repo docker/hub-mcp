@@ -1,6 +1,6 @@
 name: Release Docker Image
 
-run-name: Release Docker Image ${{ github.event_name == 'workflow_dispatch' || '(auto-deploy)' }}
+run-name: Release Docker Image ${{ github.event_name == 'workflow_dispatch' && '(manual)' || '(auto-deploy)' }}
 
 on:
   push:
@@ -18,7 +18,7 @@ on:
         description: The level of the version to bump.
         type: choice
         default: 'minor'
-        required: false
+        required: true
         options:
           - 'major'
           - 'minor'
