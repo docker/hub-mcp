@@ -2,14 +2,20 @@
     "name": "dockerhub-mcp-server",
     "version": "1.0.0",
     "description": "MCP Server that dynamically generates tools from OpenAPI specifications",
-    "type": "module",
     "main": "dist/index.js",
     "scripts": {
         "build": "tsc",
-        "dev": "tsc --watch",
         "start": "node dist/index.js",
         "clean": "rm -rf dist",
-        "inspect": "tsc -w & nodemon --watch dist --exec 'npx @modelcontextprotocol/inspector node dist/index.js'"
+        "lint": "eslint --ext .ts .",
+        "inspect": "tsc -w & nodemon --watch dist --exec 'npx @modelcontextprotocol/inspector node dist/index.js'",
+        "genql.scout": "genql --endpoint https://api.scout.docker.com/v1/graphql --output ./src/scout/genql",
+        "format:fix": "prettier --write \"**/*.+(ts|json)\"",
+        "format:check": "prettier --check \"**/*.+(ts|json)\"",
+        "format": "npm run format:fix",
+        "list-tools:check": "npm run build && node dist/scripts/toolsList.js check-tools-list",
+        "list-tools:update": "npm run build && node dist/scripts/toolsList.js update-tools-list",
+        "list-tools": "npm run list-tools:check && npm run list-tools:update"
     },
     "keywords": [
         "mcp",
@@ -20,15 +26,32 @@
     ],
     "dependencies": {
         "@apidevtools/swagger-parser": "^10.1.0",
-        "@modelcontextprotocol/sdk": "^0.5.0",
-        "node-fetch": "^3.3.2"
+        "@genql/cli": "^6.3.3",
+        "@modelcontextprotocol/sdk": "^1.13.0",
+        "@modelcontextprotocol/specification": "github:modelcontextprotocol/specification",
+        "express": "^5.1.0",
+        "jwt-decode": "^4.0.0",
+        "winston": "^3.17.0",
+        "zod": "^3.25.67"
     },
     "devDependencies": {
+        "@types/express": "^5.0.3",
+        "@types/lodash": "^4.17.19",
         "@types/node": "^20.10.0",
+        "commander": "^14.0.0",
+        "esbuild": "^0.25.5",
+        "eslint": "^9.29.0",
+        "glob": "^11.0.2",
+        "i": "^0.3.7",
+        "lodash": "^4.17.21",
         "nodemon": "^3.1.10",
-        "typescript": "^5.3.0"
+        "npm": "^11.4.2",
+        "prettier": "^3.6.1",
+        "tsx": "^4.20.1",
+        "typescript": "^5.3.0",
+        "typescript-eslint": "^8.35.0"
     },
     "engines": {
-        "node": ">=18"
+        "node": ">=22"
     }
 }

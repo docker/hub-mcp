@@ -1,0 +1,4896 @@
+type Query {
+  """Get images by their diff IDs."""
+  imagesByDiffIds(context: Context!, diffIds: [ID!]!): [IbMatchedImages!]!
+
+  """
+  Get the details for a single image digest. A null result means no image was found for the supplied digest.
+  """
+  imageDetailsByDigest(context: Context!, digest: String!, platform: ImagePlatform!, repository: String): ImageWithBaseImage
+
+  """
+  Get the list of possible image details for a digest.
+  If the digest matches an image, returns a list of a single image details.
+  If the digest matches a manifest list or image index, returns the list of all child image details.
+  """
+  imageDetailsListByDigest(context: Context!, digest: String!, repository: String): [ImageWithBaseImage!]!
+
+  """
+  Get the list of possible image details for a digest for images in DHI.
+  If the digest matches an image, returns a list of a single image details.
+  If the digest matches a manifest list or image index, returns the list of all child image details.
+  """
+  dhiImageDetailsListByDigest(context: Context, digest: String!, repository: String): [ImageWithBaseImage!]!
+
+  """
+  Deprecated: current clients no longer use this endpoint
+  Get vulnerabilities by image digests
+  """
+  imageVulnerabilitiesByDigest(context: Context!, digest: String!, query: ScImageVulnerabilitiesByDigestQuery): ScImageVulnerabilitiesByDigest! @deprecated
+
+  """
+  Get a summary of vulnerability information about a list of images. If a workspaceId is included in the context then this team
+  is searched. Otherwise searches the public database.
+  """
+  imageSummariesByDigest(context: Context!, digests: [String!]!, repository: ScRepositoryInput): [SdImageSummary!]!
+
+  """
+  Get packages and layers for an image digest. Returns empty if not found.
+  """
+  imagePackagesByDigest(context: Context!, digest: String!, query: IpImagePackagesByDigestQuery): IpImagePackagesByDigest
+
+  """
+  Get packages and layers for an image coordinates. Returns empty if not found.
+  """
+  imagePackagesForImageCoords(context: Context!, query: IpImagePackagesForImageCoordsQuery!): IpImagePackagesForImageCoords
+
+  """
+  Get packages and layers for an image coordinates for images in DHI. Returns empty if not found.
+  """
+  dhiImagePackagesForImageCoords(context: Context, query: IpImagePackagesForImageCoordsQuery!): IpImagePackagesForImageCoords
+
+  """Get base images by digest"""
+  baseImagesByDigest(context: Context!, digest: String!): [BiImageLayers!]!
+
+  """
+  Returns detected secrets in the image of supplied digest. Returns null if no image found.
+  """
+  imageDetectedSecretsByDigest(context: Context!, digest: String!): IdDetectedSecrets
+
+  """
+  Returns tag recommendations for all tags the digest was ever tagged as. Optionally
+  filtered by repo
+  """
+  tagRecommendationsByDigest(context: Context!, repository: String, digest: String!): TrRecommendedTags
+
+  """Returns tag recommendations for digests"""
+  tagRecommendationsByDigests(context: Context!, digests: [String!]!): TrTagRecommendationsByDigestsResult
+
+  """
+  Returns tag recommendations for a single repository and tag combination
+  """
+  tagRecommendationsByRepositoryAndTag(context: Context!, repository: String!, tag: String!): TrRecommendedTags
+
+  """Returns streams"""
+  streams(context: Context!, query: ScStreamsQuery): ScStreamsResult
+
+  """Returns vulnerability reports from a stream over time"""
+  streamVulnerabilityReports(context: Context!, query: StrVulnerabilityReportsQuery!): StrVulnerabilityReports
+
+  """Returns vulnerability reports from all streams over time"""
+  allStreamVulnerabilityReports(context: Context!, query: AllStrVulnerabilityReportsQuery!): AllStrVulnerabilityReportsResult
+
+  """Returns images for a stream"""
+  streamImages(context: Context!, query: ScStreamImagesQuery!): ScStreamImagesResult
+
+  """Returns packages for a stream"""
+  streamGroupedPackages(context: Context!, query: ScStreamGroupedPackagesQuery!): ScStreamGroupedPackagesResult
+
+  """Returns tagged images for a repository"""
+  taggedImagesByRepository(context: Context!, query: ScTaggedImagesQuery!): ScTaggedImagesResult
+
+  """Returns summary of base images for a stream"""
+  baseImagesSummaryByStream(context: Context!, query: ScStreamBaseImagesSummaryQuery!): ScStreamBaseImagesSummaryResult
+
+  """Returns a summary of cves present in a stream"""
+  cvesByStream(context: Context!, query: ScStreamCVEsQuery!): ScStreamCVEsResult
+
+  """Returns the vulnerability exceptions present in repo/repo+tag/digest"""
+  vulnerabilityDocuments(context: Context!, query: ScVEXsQuery!): ScVEXsResult
+
+  """Returns images used by base image for a stream"""
+  streamImagesByBaseImage(context: Context!, query: ScStreamImagesByBaseImageQuery!): ScStreamImagesByBaseImageResult
+
+  """Returns images which are affected by a given CVE"""
+  imagesAffectedByCVE(context: Context!, query: ScImagesAffectedByCVEQuery!): ScImagesAffectedByCVEResult
+
+  """Returns status of an organization"""
+  organizationStatus(context: Context!): ScOrganizationStatus!
+
+  """Returns repository details"""
+  repository(context: Context!, query: ScRepositoryQuery!): IbImageRepository
+
+  """Returns goals by digest"""
+  goalResultsByDigest(context: Context!, query: GoalResultsQuery!): ScPolicyImage
+
+  """Returns goals by digests"""
+  goalResultsByDigests(context: Context!, query: GoalResultsDigestsQuery!): [ScPolicyImage!]!
+
+  """Returns goals by initiative"""
+  goalResultsByInitiative(context: Context!, query: GoalResultsInitiativeQuery!): ScPolicyStreamResult
+
+  """Returns goals by policy"""
+  goalResults(context: Context!, query: GoalResultsPolicyQuery!): ScSinglePolicyResults
+
+  """Returns policy summaries"""
+  goalResultSummaries(context: Context!, query: PolicySummaryQuery!): ScPolicySummaryResult
+
+  """Return recently discovered vulnerabilities and affected image count"""
+  recentCves(context: Context!, query: ScRecentCVEsQuery!): ScRecentCVEsResult!
+
+  """Returns current user information"""
+  user: ScUserResult!
+
+  """Returns a single VEX statement by ID"""
+  vexStatement(context: Context!, id: ID!): ScVexStatement
+
+  """Returns VEX statements, optionally filtered by query"""
+  vexStatements(context: Context!, query: ScVexStatementsQuery!): ScVexStatementsQueryResult!
+
+  """Returns the filters available for the current organization"""
+  orgFilters(context: Context!): [ScOrganizationFilter!]!
+  serviceStatus: ServiceStatusResult!
+  namespaceEntitlements(context: Context!): NamespaceEntitlements!
+  repoFeatures(context: Context!, repoName: String!, hostName: String): RepositoryFeatures!
+  reposFeatures(context: Context!, repoNames: [String!]!, hostName: String): [RepositoryFeatureResult!]!
+  listEnabledRepos(context: Context!, integration: IntegrationConfigurationFilter): EnabledRepositoriesResult!
+  shouldEnableReposOnPush(context: Context!): ShouldEnableReposOnPushResult!
+  listBlockedRepos(context: Context!, integration: IntegrationConfigurationFilter): ListBlockedReposResult!
+
+  """Get the attestations for a given image digest"""
+  attestations(context: Context!, query: MgAttestationsQuery!): MgAttestationsResult
+
+  """
+  Get the attestations for a given image digest in the DHI organization. Allows public access to
+  attestations for DHI images.
+  """
+  dhiAttestations(context: Context, query: MgAttestationsQuery!): MgAttestationsResult
+
+  """Get the list of attestations for a given image digest"""
+  attestationsList(context: Context!, query: MgAttestationsListQuery!): MgAttestationsListResult
+
+  """
+  Get the lsit of attestations for a given image digest in the DHI organization. Allows public access to
+  the list of attestations for DHI images.
+  """
+  dhiAttestationsList(context: Context, query: MgAttestationsListQuery!): MgAttestationsListResult
+  imagesWithPackage(context: Context!, query: PkImagesWithPackageQuery!): PkImagesWithPackageResponse!
+
+  """
+  Return a summary report that includes all the images in the supplied stream
+  """
+  streamSummary(context: Context!, query: StreamSummaryQuery!): StreamSummaryResult!
+
+  """
+  With the optional digest, scopes vulnerabilities based on the image in question.
+  """
+  vulnerabilitiesByPackage(context: Context!, packageUrls: [String!]!, digest: String, includeExcepted: Boolean): [VpPackageVulnerability!]!
+
+  """Like vulnerabilitiesByPackage, but scoped to the image in question"""
+  vulnerabilitiesByPackageForImageCoords(context: Context!, query: VulnerabilitiesByPackageQuery!): VulnerabilitiesByPackageResponse!
+
+  """Returns all the sources for a cve, broken down by source"""
+  cveSources(context: Context!, query: ScCVESourcesQuery!): ScCVESourcesResult
+  vulnerabilityExceptions(context: Context!, query: VulnerabilityExceptionsQuery): VulnerabilityExceptionsResult!
+  vulnerabilityExceptionsApplicableToImage(context: Context!, query: VulnerabilityExceptionsApplicableToImageQuery!): VulnerabilityExceptionsResult!
+  vulnerabilityException(context: Context!, id: ID!): VulnerabilityException
+
+  """Get the list of DHI repositories, used on the cataglog page"""
+  dhiRepositories(context: Context, query: DhiRepositoriesQuery): DhiRepositoriesResult!
+
+  """
+  Get a DHI repository, used on the repo page. Contains all the information for the
+  various tabs on that page. e.g. the digest/tag lists. Returns null if the repository
+  does not exist.
+  """
+  dhiRepositoryDetails(context: Context, query: DhiRepositoryDetailsQuery!): DhiRepositoryDetailsResult
+
+  """
+  Powers the top of the tag detail page, whilst the SBOM etc are taken from other sources.
+  Returns a list of the manifest images
+  Returns null if the repository or tag does not exist.
+  """
+  dhiTagDetails(context: Context, query: DhiTagDetailsQuery!): DhiTagDetailsResult
+
+  """List all the mirrored repositories for an organization."""
+  dhiListMirroredRepositories(context: Context!): DhiListMirroredRepositoriesResponse!
+
+  """Get the details of a mirrored repository by id"""
+  dhiGetMirroredRepository(context: Context!, query: DhiGetMirroredRepositoryQuery!): DhiGetMirroredRepositoryResponse!
+
+  """
+  Get all the mirrored repositories for a given source repository on a team
+  """
+  dhiGetMirroredRepositoriesBySourceRepository(context: Context!, query: DhiGetMirroredRepositoriesBySourceRepositoryQuery!): DhiGetMirroredRepositoriesBySourceRepositoryResponse!
+
+  """List mirroring logs for a team"""
+  dhiListMirroringLogs(context: Context!, query: DhiListMirroringLogsQuery): DhiListMirroringLogsResult!
+
+  """List webhooks for a team"""
+  listWebhooks(context: Context!): ListWebhooksResult!
+
+  """Get a particular webhook for a team"""
+  getWebhook(context: Context!, id: String!): Webhook
+  notifications: [Notification!]!
+  notificationsFeed(context: Context!, team: TeamInput): [FeedNotification!]!
+  notificationsPusherChannels: [String!]!
+  userNotificationPreferences(context: Context!): UserNotificationPreferencesResult!
+  notificationWebhook(context: Context!, ID: String!): NotificationWebhookResult
+  notificationWebhooks(context: Context!, filter: NotificationWebhookFilterInput): [NotificationWebhookResult!]!
+  rsListRepositories(context: Context!, input: rsRepositoryListInput!): rsRepositoryListResult!
+  rsListRegistries(context: Context!): [rsRegistryResult!]!
+}
+
+type Mutation {
+  indexImage(context: Context!, image: IndexImageInput!): IndexImageResult!
+  addImageToStream(context: Context!, input: AddImageToStreamInput!): AddImageToStreamResult!
+  setStreamImages(context: Context!, input: SetStreamImagesInput!): SetStreamImagesResult!
+  addVulnerabilityException(context: Context!, input: AddVulnerabilityExceptionInput!): AddVulnerabilityExceptionResult!
+  updateVulnerabilityException(context: Context!, input: UpdateVulnerabilityExceptionInput!): UpdateVulnerabilityExceptionResult!
+  removeVulnerabilityException(context: Context!, input: RemoveVulnerabilityExceptionInput!): RemoveVulnerabilityExceptionResult!
+  enrollIntoScout(context: Context!): ScoutEnrollment!
+  setRepoVulnerabilityReporting(context: Context, reporting: RepoVulnerabilityReportingInput!, integration: IntegrationConfigurationInput): VulnerabilityReportingRepoFeature
+  setMultiRepoVulnerabilityReporting(context: Context, reporting: MultiRepoVulnerabilityReportingInput!, integration: IntegrationConfigurationInput): [VulnerabilityReportingResult!]!
+  setEnableReposOnPush(context: Context!, input: SetEnableReposOnPushInput!): SetEnableReposOnPushResult!
+  setReposBlocked(context: Context!, input: ReposBlockedInput!, integration: IntegrationConfigurationInput): [BlockedRepoResult!]!
+
+  """
+  Set the repository to be mirrored. This will also start the mirroring process.
+  Requires owner access to the destination organization.
+  Source repository must exist.
+  Destination repository name must start with dhi-
+  Destination repository namespace must match the organization in the context.
+  """
+  dhiSetMirroredRepository(context: Context!, input: DhiSetMirroredRepositoryInput!): DhiSetMirroredRepositoryResponse
+
+  """
+  Remove mirroring on a repository. This will stop new images being mirrored.
+  Requires owner access to the destination organization.
+  """
+  dhiRemoveMirroredRepository(context: Context!, input: DhiRemoveMirroredRepositoryInput!): MutationResponse!
+
+  """Create a webhook"""
+  createWebhook(context: Context!, input: CreateWebhookInput!): Webhook!
+
+  """Update a webhook"""
+  updateWebhook(context: Context!, input: UpdateWebhookInput!): Webhook!
+
+  """Delete a webhook"""
+  deleteWebhook(context: Context!, id: String!): DeleteWebhookResult!
+
+  """Test a webhook"""
+  testWebhook(context: Context!, id: String!): TestWebhookResult!
+  updateNotification(id: ID!, update: NotificationUpdateInput!): Notification!
+  dismissAllNotifications: Boolean!
+  setUserNotificationPreferences(context: Context!, input: UserNotificationPreferencesInput!): UserNotificationPreferencesResult!
+  addNotificationWebhook(context: Context!, input: AddNotificationWebhookInput!): NotificationWebhookResult!
+  updateNotificationWebhook(context: Context!, input: UpdateNotificationWebhookInput!): NotificationWebhookResult!
+  removeNotificationWebhook(context: Context!, ID: String!): Boolean!
+}
+
+input AddImageToStreamInput {
+  stream: String!
+  image: String!
+  appName: String
+  platform: ImagePlatform
+}
+
+type AddImageToStreamResult {
+  status: AddImageToStreamStatus!
+}
+
+enum AddImageToStreamStatus {
+  ACCEPTED
+}
+
+input AddVulnerabilityExceptionInput {
+  cveId: String!
+  type: ScVulnerabilityExceptionType!
+  justification: ScVexStatementJustification
+  additionalDetails: String!
+  imageScopes: [ScVexStatementImageScopeInput!]
+}
+
+type AddVulnerabilityExceptionResult {
+  exception: ScVulnerabilityException!
+}
+
+"""All stream vulnerability reports"""
+type AllStrVulnerabilityReports {
+  """The stream the vulnerability report belongs to"""
+  stream: String!
+
+  """The vulnerability reports over time"""
+  reports: [TimestampedVulnerabilityReport!]!
+}
+
+"""All stream vulnerability reports query"""
+input AllStrVulnerabilityReportsQuery {
+  """The list of streams to retrieve reports from"""
+  streams: [String!]
+
+  """
+  How to summarize the vulnerabilities for the report (defaults to CUMULATIVE)
+  """
+  summaryType: StrVulnerabilityReportsSummaryType
+
+  """The timescale over which to retrieve information (defaults to 7d)"""
+  timescale: StrVulnerabilityReportsQueryTimescale
+}
+
+"""All stream vulnerability reports response"""
+type AllStrVulnerabilityReportsResult {
+  """The vulnerability reports over time grouped by stream"""
+  items: [AllStrVulnerabilityReports!]!
+}
+
+interface BaseScPolicy {
+  """Name of the policy definition"""
+  definitionName: String!
+
+  """Name of the policy configuration"""
+  configurationName: String!
+
+  """Display name of the configured policy"""
+  displayName: String
+
+  """Human-readable description of the configured policy"""
+  description: String
+
+  """Whether policy has been evaluated"""
+  evaluated: Boolean!
+
+  """
+  The latest delta for the policy, regardless of reason (the change in policy results since the specified timestamp)
+  """
+  latestDelta: ScPolicyDelta
+
+  """The available remediations for this policy result"""
+  remediations(filter: ScRemediationFilter!): [ScRemediation!]!
+}
+
+interface BaseScVulnerabilityExceptionSource {
+  id: ID!
+}
+
+"""Returns layer ordinals and the base images that those ordinals are for"""
+type BiImageLayers {
+  """The list of layers that the base image matches"""
+  layerMatches: [BiLayerMatch!]!
+
+  """
+  A list of images which were matched. Can be multiple images if the image has been pushed to more than one repository.
+  """
+  images: [IbBaseImage!]!
+}
+
+type BiLayerMatch {
+  layerOrdinal: Int!
+  layerDigest: String!
+}
+
+interface CommonImage {
+  """The digest of this image."""
+  digest: ID!
+
+  """A list of tags associated with this image."""
+  tags: [IbTag!]!
+
+  """The creation date of this image represented as an ISO8601 string."""
+  createdAt: String!
+
+  """The number of packages present on this image (if known)."""
+  packageCount: Int
+
+  """The Dockerfile associated with this image (if known)."""
+  dockerFile: IbDockerFile
+
+  """A report of any vulnerabilities this image associated with this image."""
+  vulnerabilityReport: IbVulnerabilityReport
+
+  """The repository that this image belongs to."""
+  repository: IbImageRepository!
+
+  """The state of SBOM generation for this image"""
+  sbomState: SBOMState!
+
+  """The number of changesets (histories|layers) this image contains"""
+  layerCount: Int
+
+  """The image os and architecture"""
+  platform: IbImagePlatform
+
+  """The compressed size of the image"""
+  compressedSize: Float
+
+  """The labels for this image"""
+  labels: [IbLabel!]!
+
+  """The media type of the manifest"""
+  mediaType: String
+}
+
+"""Shared types."""
+input Context {
+  """
+  Deprecated: Use organization instead.
+  The repository org or namespace to run the query against. If provided you will need to have
+  passed a token that allows you access to read this Org. If not provided the query will run
+  against public data.
+  """
+  namespace: String
+
+  """
+  The repository organization to run the query against. If provided you will need to have
+  passed a token that allows you access to read this Org. If not provided the query will run
+  against public data.
+  """
+  organization: String
+
+  """
+  Optional: only required when you want non-public data and there is no namespace provided.
+  
+  The historical teamId that corresponds to the desired namespace. If provided you will need
+  to have passed a token that allows you access to read this team.
+  """
+  teamId: String
+}
+
+enum CVSSSeverity {
+  """Critical severity"""
+  CRITICAL
+
+  """High severity"""
+  HIGH
+
+  """Medium severity"""
+  MEDIUM
+
+  """Low severity"""
+  LOW
+
+  """Unspecified or not yet specified severity"""
+  UNSPECIFIED
+}
+
+enum CVSSVersion {
+  """Version 2 CVSS vulnerability data"""
+  CVSS_VERSION_2
+
+  """Version 3 CVSS vulnerability data"""
+  CVSS_VERSION_3
+
+  """Version 4 CVSS vulnerability data"""
+  CVSS_VERSION_4
+}
+
+"""Holds metadata of the detected secret."""
+type DetectedSecret {
+  """The source of the detected secret."""
+  source: DetectedSecretSource!
+
+  """The findings of the detected secret."""
+  findings: [SecretFinding!]!
+}
+
+"""The source of the detected secret."""
+type DetectedSecretSource {
+  """The type of the detected secret."""
+  type: DetectedSecretSourceType!
+
+  """The location of the detected secret."""
+  location: DetectedSecretSourceLocation
+}
+
+"""The location of where the secret was detected."""
+type DetectedSecretSourceLocation {
+  """
+  The path of where the secret was detected. Present if the secret was found in a FILE.
+  """
+  path: String
+
+  """The ordinal of the layer in which the secret was discovered."""
+  ordinal: Int
+
+  """The digest of the layer in which the secret was discovered."""
+  digest: String
+
+  """The diffId of the layer in which the secret was discovered."""
+  diffId: String
+}
+
+"""The type of the detected secret."""
+enum DetectedSecretSourceType {
+  """The secreted was detected in a file."""
+  FILE
+
+  """The secreted was detected in an environment variable."""
+  ENV
+
+  """The secreted was detected in a docker label."""
+  LABEL
+
+  """The secreted was detected in the history."""
+  HISTORY
+}
+
+type DockerfileLine {
+  number: Int!
+}
+
+type DockerOrg {
+  """The name of this organization"""
+  name: String!
+
+  """The role of the user in this organization"""
+  role: DockerRole
+
+  """The avatar url of this organization"""
+  avatarUrl: String
+}
+
+enum DockerRole {
+  editor
+  owner
+  member
+  user
+}
+
+type EPSS {
+  """the epss score"""
+  score: Float!
+
+  """the epss percentile"""
+  percentile: Float!
+
+  """
+  The priority of the EPSS entry based on percentile.
+  >=0.9: CRITICAL
+  >=0.4: HIGH
+  >=0.05: STANDARD
+  <0.05: LOWEST
+  """
+  priority: EPSSPriorityCategory!
+
+  """A description of the EPSS priority"""
+  priorityDescription: String!
+}
+
+"""
+Applies a category to EPSS percentiles
+>=0.9: CRITICAL
+>=0.4: HIGH
+>=0.05: STANDARD
+<0.05: LOWEST
+"""
+enum EPSSPriorityCategory {
+  LOWEST
+  STANDARD
+  HIGH
+  CRITICAL
+}
+
+enum ExceptionType {
+  ACCEPTED_RISK
+
+  """
+  VEX statements that result in suppression will always have a "false positive" type
+  """
+  FALSE_POSITIVE
+}
+
+input GoalResultsDigestsQuery {
+  digests: [String!]!
+}
+
+input GoalResultsInitiativeQuery {
+  """The initiative to query for"""
+  initiative: String!
+
+  """Specify the stream to filter by"""
+  stream: String
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: GoalResultsInitiativeQueryFilter
+
+  """Specify the point in time that deltas are calculated from"""
+  deltaTimestamp: String
+}
+
+input GoalResultsInitiativeQueryFilter {
+  """The repos to return images for"""
+  repos: [String!]
+}
+
+input GoalResultsPolicyQuery {
+  """Specify the policy definition to fetch results for"""
+  definitionName: String!
+
+  """Specify the policy configuration to fetch results for"""
+  configurationName: String!
+
+  """Specify the stream to filter by"""
+  stream: String!
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: GoalResultsQueryFilter
+
+  """Specify the point in time that deltas are calculated from"""
+  deltaTimestamp: String
+}
+
+input GoalResultsQuery {
+  digest: String!
+}
+
+input GoalResultsQueryFilter {
+  """Specify the policy state to fetch results for"""
+  policyState: ScPolicyState
+
+  """
+  If specified, only images for which the specified hub teams has access to will be matched.
+  """
+  hubTeams: [String!]
+
+  """
+  If specified, only images containing the specified label or annotation key-value pairs will be matched.
+  """
+  kvs: [KVFilterInput!]
+}
+
+interface IbAttestation {
+  """The predicate type of the attestation"""
+  predicateType: String!
+}
+
+"""
+Implementation for attestations that don't
+have specific fields or that we don't
+handle yet.
+"""
+type IbAttestationGeneric implements IbAttestation {
+  """The predicate type of the attestation"""
+  predicateType: String!
+}
+
+type IbAttestationProvenance implements IbAttestation {
+  """The predicate type of the attestation"""
+  predicateType: String!
+  base: IbBaseImageProvenance
+  dockerfile: IbDockerfileProvenance
+  git: IbGitProvenance
+  materials: [IbMaterialProvenance!]!
+
+  """The BuildKit provenance mode"""
+  mode: IbBuildKitProvenanceMode!
+}
+
+"""This type represents a base Docker image."""
+type IbBaseImage implements CommonImage {
+  """The digest of this image."""
+  digest: ID!
+
+  """A list of tags associated with this image."""
+  tags: [IbTag!]!
+
+  """The creation date of this image represented as an ISO8601 string."""
+  createdAt: String!
+
+  """The number of packages present on this image (if known)."""
+  packageCount: Int
+
+  """The Dockerfile associated with this image (if known)."""
+  dockerFile: IbDockerFile
+
+  """A report of any vulnerabilities this image associated with this image."""
+  vulnerabilityReport: IbVulnerabilityReport
+
+  """The repository that this image belongs to."""
+  repository: IbImageRepository!
+
+  """The state of SBOM generation for this image"""
+  sbomState: SBOMState!
+
+  """The number of changesets (histories|layers) this image contains"""
+  layerCount: Int
+
+  """The image os and architecture"""
+  platform: IbImagePlatform
+
+  """The compressed size of the image"""
+  compressedSize: Float
+
+  """The labels for this image"""
+  labels: [IbLabel!]!
+
+  """The media type of the manifest"""
+  mediaType: String
+
+  """
+  The provenance attestation containing the remaining information
+  which allows us to know exactly how this base was referenced
+  in the original image
+  """
+  provenanceAttestation: IbProvenanceAttestation
+}
+
+type IbBaseImageProvenance {
+  digest: String
+  platform: IbImagePlatform
+  repository: String
+  tag: String
+}
+
+enum IbBuildKitProvenanceMode {
+  MIN
+  MAX
+}
+
+"""This type represents the Dockerfile which was used to build an image."""
+type IbDockerFile {
+  """The path to the Dockerfile within a Git repo."""
+  path: String!
+
+  """
+  The commit at which this Dockerfile was used to build the image (if known).
+  """
+  commit: IbGitCommit
+}
+
+type IbDockerfileProvenance {
+  """The sha of the Dockerfile"""
+  sha: String!
+}
+
+"""This type represents a Git commit."""
+type IbGitCommit {
+  """The SHA of the commit."""
+  sha: String!
+
+  """The repository on which the commit was made (if known)."""
+  repository: IbGitRepository
+}
+
+type IbGithubPullRequest implements IbGitPullRequest {
+  providerUrl: String!
+  sourceId: String!
+  author: IbGitUser
+  createdAt: String
+  destinationRef: IbGitRef!
+  mergedBy: IbGitUser
+  requestedReviewers: [IbGitUser!]!
+  sourceRef: IbGitRef!
+  state: String
+  url: String
+}
+
+type IbGitOrg {
+  name: String!
+}
+
+type IbGitProvenance {
+  """The url for the git commit; only handles GitHub at the moment"""
+  commitUrl: String
+
+  """The sha of the git commit"""
+  sha: String!
+
+  """The source of the git commit"""
+  source: String!
+}
+
+interface IbGitPullRequest {
+  providerUrl: String!
+  author: IbGitUser
+  createdAt: String
+  destinationRef: IbGitRef!
+  mergedBy: IbGitUser
+  sourceRef: IbGitRef!
+  state: String
+}
+
+type IbGitRef {
+  name: String!
+  repo: IbGitRepo!
+  type: IbGitRefType!
+}
+
+enum IbGitRefType {
+  BRANCH
+  TAG
+}
+
+type IbGitRepo {
+  name: String!
+  org: IbGitOrg!
+}
+
+"""This type represents a Git repository."""
+type IbGitRepository {
+  """The name of the organization in which the Git repository belongs."""
+  orgName: String!
+
+  """The name of the repository."""
+  repoName: String!
+}
+
+type IbGitUser {
+  username: String
+}
+
+"""This type represents a Docker image."""
+type IbImage implements CommonImage {
+  """The digest of this image."""
+  digest: ID!
+
+  """A list of tags associated with this image."""
+  tags: [IbTag!]!
+
+  """The creation date of this image represented as an ISO8601 string."""
+  createdAt: String!
+
+  """The number of packages present on this image (if known)."""
+  packageCount: Int
+
+  """The Dockerfile associated with this image (if known)."""
+  dockerFile: IbDockerFile
+
+  """A report of any vulnerabilities this image associated with this image."""
+  vulnerabilityReport: IbVulnerabilityReport
+
+  """The repository that this image belongs to."""
+  repository: IbImageRepository!
+
+  """The state of SBOM generation for this image"""
+  sbomState: SBOMState!
+
+  """The number of changesets (histories|layers) this image contains"""
+  layerCount: Int
+
+  """The list of changesets (layer|history) of the image"""
+  changesets: [ScImageChangeset!]!
+
+  """The image os and architecture"""
+  platform: IbImagePlatform
+
+  """The compressed size of the image"""
+  compressedSize: Float
+
+  """The labels for this image"""
+  labels: [IbLabel!]!
+
+  """The media type of the manifest"""
+  mediaType: String
+}
+
+type IbImagePlatform {
+  """The OS (Operating System) of the image, eg. linux"""
+  os: String!
+
+  """The chip architecture of the image, eg. arm64"""
+  architecture: String!
+
+  """The OS variant of the image"""
+  variant: String
+}
+
+"""This type represents a Docker image repository."""
+type IbImageRepository {
+  """The hostname of the repository."""
+  hostName: String!
+
+  """The name of the repository."""
+  repoName: String!
+
+  """An optional badge describing the repository's status."""
+  badge: IbImageRepositoryBadge
+
+  """A list of the repository's supported tags"""
+  supportedTags: [String!]!
+
+  """A list of the repository's preferred tags"""
+  preferredTags: [String!]!
+
+  """The description of the repository"""
+  description: String
+
+  """Pull count if they are available"""
+  pullCount: Float
+
+  """Star count if available"""
+  starCount: Int
+
+  """List of platforms in the repository, if available"""
+  platforms: [String]
+
+  """The digest of the previously scanned image or index (if any)"""
+  previousScannedDigest: String
+}
+
+"""
+This enum represents badges which give additional information on the status of a repository.
+"""
+enum IbImageRepositoryBadge {
+  """
+  The repository is one of the curated Docker Official Image repositories hosted on Docker Hub.
+  """
+  OFFICIAL_IMAGE
+
+  """
+  The repository is a member of the Docker-Sponsored Open Source program.
+  """
+  OPEN_SOURCE
+
+  """The repository belongs to a verified publisher."""
+  VERIFIED_PUBLISHER
+}
+
+"""This type represents a label for an image"""
+type IbLabel {
+  """The key of the label"""
+  key: String!
+
+  """The value of the label"""
+  value: String!
+}
+
+"""
+This type lists the images which were matched against the input ID matches which were used to generate the chain ID which found them.
+"""
+type IbMatchedImages {
+  """
+  A list of input IDs (depending on the query used) which were used to generate the chain ID under which the images were found.
+  """
+  matches: [ID!]!
+
+  """A list of images which were matched."""
+  images: [IbImage!]!
+}
+
+type IbMaterialProvenance {
+  """The digest of the material"""
+  digest: String!
+
+  """The uri of the material"""
+  uri: String!
+}
+
+type IbProvenanceAttestation {
+  digest: String
+  tag: String
+  repository: String
+}
+
+"""
+This type represents a tag which is associated with an image, either directly
+or indirectly (via an image index).
+"""
+type IbTag {
+  """The name of the tag."""
+  name: String!
+
+  """A timestamp indicating when this tag was last updated (if available)"""
+  updatedAt: String
+
+  """Whether this tag currently points to this image."""
+  current: Boolean!
+
+  """Whether this tag appears in the list of supported tags."""
+  supported: Boolean!
+
+  """
+  The digest of the image, or image index, the tag is directly associated with (if current).
+  """
+  digest: String
+
+  """
+  The media type of the image, or image index, the tag is directly associated with (if current).
+  """
+  mediaType: String
+}
+
+"""This type represents a vulnerability report about an image."""
+type IbVulnerabilityReport {
+  """The number of critical severity vulnerabilities present in the image."""
+  critical: Int!
+
+  """The number of high severity vulnerabilities present in the image."""
+  high: Int!
+
+  """The number of medium severity vulnerabilities present in the image."""
+  medium: Int!
+
+  """The number of low severity vulnerabilities present in the image."""
+  low: Int!
+
+  """
+  The number of vulnerabilities with an unspecified severity present in the image.
+  """
+  unspecified: Int!
+
+  """The total number of vulnerabilities present in the image."""
+  total: Int!
+}
+
+"""The detected secrets for the supplied image digest"""
+type IdDetectedSecrets {
+  """Get base images by digest"""
+  digest: String!
+
+  """Any secrets found on the image. Empty if none found."""
+  secrets: [DetectedSecret!]!
+}
+
+type ImageHistory {
+  """
+  Indicate if this is an empty layer (without any attached blob) or not
+  If emptyLayer is true, layer will not be set
+  """
+  emptyLayer: Boolean!
+
+  """The layer details if not empty"""
+  layer: ImageLayer
+
+  """The history ordinal"""
+  ordinal: Int!
+
+  """
+  The creation date of this history entry represented as an ISO8601 string.
+  """
+  createdAt: String!
+
+  """Instruction to create this history entry"""
+  createdBy: String
+}
+
+type ImageLayer {
+  """The digest of the layer blob"""
+  digest: String!
+
+  """Media Type of the blob"""
+  mediaType: String!
+
+  """The diff-id of the image layer"""
+  diffId: String!
+
+  """The dockerfile lines which created this layer"""
+  fileLines: [DockerfileLine!]!
+
+  """Size of the layer blob"""
+  size: Float!
+}
+
+"""A type describing the platform attributes used to select an image"""
+input ImagePlatform {
+  os: String!
+  architecture: String!
+  variant: String
+}
+
+type ImageWithBaseImage implements CommonImage {
+  """The digest of this image."""
+  digest: ID!
+
+  """A list of tags associated with this image."""
+  tags: [IbTag!]!
+
+  """The creation date of this image represented as an ISO8601 string."""
+  createdAt: String!
+
+  """The number of packages present on this image (if known)."""
+  packageCount: Int
+
+  """The Dockerfile associated with this image (if known)."""
+  dockerFile: IbDockerFile
+
+  """A report of any vulnerabilities this image associated with this image."""
+  vulnerabilityReport: IbVulnerabilityReport
+
+  """The repository that this image belongs to."""
+  repository: IbImageRepository!
+
+  """The state of SBOM generation for this image"""
+  sbomState: SBOMState!
+
+  """The number of changesets (histories|layers) this image contains"""
+  layerCount: Int
+
+  """The image os and architecture"""
+  platform: IbImagePlatform
+
+  """The base image of this image"""
+  baseImage: IbImage
+
+  """The base image tag that was used"""
+  baseImageTag: IbTag
+
+  """The list of histories of the image"""
+  histories: [ImageHistory!]
+
+  """The list of changesets (layer|history) of the image"""
+  changesets: [ScImageChangeset!]!
+
+  """The list of streams this image is present in"""
+  streams: [ScStream!]
+
+  """The compressed size of the image"""
+  compressedSize: Float
+
+  """The labels for this image"""
+  labels: [IbLabel!]!
+
+  """The media type of the manifest"""
+  mediaType: String
+
+  """The attestations for this image"""
+  attestations: [IbAttestation!]!
+
+  """The user this image uses"""
+  user: String
+}
+
+input IndexImageInput {
+  digest: String!
+  repository: String!
+  tags: [String!]
+}
+
+type IndexImageResult {
+  digest: String!
+}
+
+"""An image layer"""
+type IpImageLayer {
+  """
+  For reasons that appear to be lost to time, this is actually the blob/digest, NOT the
+  blob/diffId. As far as I know the blob digest represents the digest of the compressed
+  change, whereas the diffId represents the digest of the uncompressed layer tar.
+  """
+  diffId: String!
+
+  """The layer ordinal"""
+  ordinal: Int!
+}
+
+"""Contains a list of image layers"""
+type IpImageLayers {
+  """The list of image layers"""
+  layers: [IpImageLayer!]!
+}
+
+"""An image package"""
+type IpImagePackage {
+  """The package details"""
+  package: Package!
+
+  """
+  The locations that the package appears in. A package is often found in multiple locations
+  in a docker image
+  """
+  locations: [PackageLocation!]!
+}
+
+"""Contains a list of image packages"""
+type IpImagePackages {
+  """The list of image packages"""
+  packages: [IpImagePackage!]!
+}
+
+"""Contains the packages and layers for an image"""
+type IpImagePackagesByDigest {
+  """The digest of the docker image"""
+  digest: String!
+
+  """The indexing state of the image with the supplied digest"""
+  sbomState: SBOMState!
+
+  """Holds the packages that the docker image contains"""
+  imagePackages: IpImagePackages!
+
+  """Holds the layers that make up the docker image"""
+  imageLayers: IpImageLayers!
+
+  """The list of histories of the image"""
+  imageHistories: [ImageHistory!]
+}
+
+input IpImagePackagesByDigestQuery {
+  """
+  TODO: This attribute is not yet implemented.
+  Include excepted vulnerabilities in the response (defaults to false)
+  """
+  includeExcepted: Boolean
+
+  """Include public images even if org/team context is provided"""
+  includePublic: Boolean
+}
+
+"""Contains the packages and layers for an image"""
+type IpImagePackagesForImageCoords {
+  """The digest of the docker image"""
+  digest: String!
+  hostName: String!
+  repoName: String!
+
+  """The indexing state of the image with the supplied digest"""
+  sbomState: SBOMState!
+
+  """Holds the packages that the docker image contains"""
+  imagePackages: IpImagePackages!
+
+  """Holds the layers that make up the docker image"""
+  imageLayers: IpImageLayers!
+
+  """The list of histories of the image"""
+  imageHistories: [ImageHistory!]
+}
+
+input IpImagePackagesForImageCoordsQuery {
+  digest: String!
+  hostName: String!
+  repoName: String!
+
+  """Include excepted vulnerabilities in the response (defaults to false)"""
+  includeExcepted: Boolean
+
+  """Include public images even if org/team context is provided"""
+  includePublic: Boolean
+}
+
+input KVFilterInput {
+  key: String!
+  values: [String!]!
+}
+
+"""The severity of a discovered secret."""
+enum MatchedSecretSeverity {
+  """The severity is low."""
+  LOW
+
+  """The severity is medium."""
+  MEDIUM
+
+  """The severity is high."""
+  HIGH
+
+  """The severity is critical."""
+  CRITICAL
+}
+
+"""A package"""
+type Package {
+  """The name of the package"""
+  name: String
+
+  """An optional description of a package"""
+  description: String
+
+  """The package url"""
+  purl: String!
+
+  """The package purl fields"""
+  purlFields: ScPurl!
+
+  """The type of the package"""
+  type: String!
+
+  """The namespace of the package"""
+  namespace: String
+
+  """The version of the package"""
+  version: String!
+
+  """The optional author of a package"""
+  author: String
+
+  """An optional list of package licenses"""
+  licenses: [String!]!
+
+  """A list of vulnerabilities that this package is vulnerable to"""
+  vulnerabilities: [VpVulnerability!]!
+}
+
+"""The location of a package"""
+type PackageLocation {
+  """The path of the package"""
+  path: String!
+
+  """The diffId of the layer that owns this location"""
+  diffId: String!
+}
+
+type Paging {
+  """The total number of items if available"""
+  totalCount: Int
+}
+
+input PagingInput {
+  """Desired page size (otherwise will use a default value)"""
+  pageSize: Int = 20
+
+  """Page index (defaults to first page)"""
+  page: Int = 1
+}
+
+type PkVexStatement {
+  """The author of the exception - present if MANUAL_EXCEPTION and was set"""
+  author: String
+
+  """The timestamp of the exception"""
+  timestamp: String!
+
+  """The source type of the exception, VEX_STATEMENT or MANUAL_EXCEPTION"""
+  sourceType: PkVulnerabilityExceptionSourceType!
+
+  """
+  The id of the exception, used with sourceType to identify and lookup the exception details
+  """
+  id: String!
+
+  """The type of the exception"""
+  type: ExceptionType!
+
+  """The justification for the exception"""
+  justification: VEXStatementJustification
+
+  """
+  The URL of the document that contains the exception if type is VEX_STATEMENT
+  """
+  documentUrl: String
+
+  """
+  The status of the exception, only present if sourceType is VEX_STATEMENT
+  """
+  status: VEXStatementStatus
+
+  """
+  Additional details about the exception, only present if sourceType is MANUAL_EXCEPTION
+  although is an optional field so may be null regardless
+  """
+  additionalDetails: String
+}
+
+type PkVulnerabilityException {
+  """The author of the exception - present if MANUAL_EXCEPTION and was set"""
+  author: String
+
+  """The timestamp of the exception"""
+  timestamp: String!
+
+  """The source type of the exception, VEX_STATEMENT or MANUAL_EXCEPTION"""
+  sourceType: PkVulnerabilityExceptionSourceType!
+
+  """
+  The id of the exception, used with sourceType to identify and lookup the exception details
+  """
+  id: String!
+
+  """The type of the exception"""
+  type: ExceptionType!
+
+  """The justification for the exception"""
+  justification: VEXStatementJustification
+
+  """
+  The URL of the document that contains the exception if type is VEX_STATEMENT
+  """
+  documentUrl: String
+
+  """
+  The status of the exception, only present if sourceType is VEX_STATEMENT
+  """
+  status: VEXStatementStatus
+
+  """
+  Additional details about the exception, only present if sourceType is MANUAL_EXCEPTION
+  although is an optional field so may be null regardless
+  """
+  additionalDetails: String
+}
+
+enum PkVulnerabilityExceptionSourceType {
+  VEX_STATEMENT
+  MANUAL_EXCEPTION
+}
+
+input PolicySummaryQuery {
+  """Specify the stream to filter by"""
+  stream: String
+
+  """Specify the point in time that deltas are calculated from"""
+  deltaTimestamp: String
+
+  """Specify the policy definition to fetch summary for"""
+  definitionName: String
+
+  """Specify the policy configuration to fetch summary for"""
+  configurationName: String
+
+  """Specify any filtering for the query"""
+  filter: PolicySummaryQueryFilter
+
+  """Org-specific filters to apply"""
+  orgFilters: [ScOrganizationFilterInput!]
+}
+
+input PolicySummaryQueryFilter {
+  """The repos to return results for"""
+  repos: [ScRepositoryInput!]
+
+  """
+  If specified, only images for which the specified hub teams has access to will be matched.
+  """
+  hubTeams: [String!]
+
+  """
+  If specified, only images containing the specified label or annotation key-value pairs will be matched.
+  """
+  kvs: [KVFilterInput!]
+}
+
+input RemoveVulnerabilityExceptionInput {
+  ids: [ID!]!
+}
+
+type RemoveVulnerabilityExceptionResult {
+  ids: [ID!]!
+}
+
+"""The state of the SBOM for a docker image."""
+enum SBOMState {
+  """The docker SBOM has been created. The docker image is indexed."""
+  INDEXED
+
+  """The SBOM is in progress. The docker image is currently being indexed."""
+  INDEXING
+
+  """The SBOM failed to be created."""
+  INDEXING_FAILED
+
+  """The SBOM could not be created."""
+  INDEXING_UNAVAILABLE
+
+  """No state has been set yet."""
+  NONE
+}
+
+type ScBaseImageSummary {
+  """The repository of these base images."""
+  repository: IbImageRepository!
+
+  """
+  The number of different images used as base images from this repository.
+  """
+  imageCount: Int!
+
+  """The number of images using one of those base images."""
+  childImageCount: Int!
+
+  """Range of packages across the base images."""
+  packages: ScPackageRange!
+}
+
+type ScBooleanPolicy implements BaseScPolicy {
+  """Name of the policy definition"""
+  definitionName: String!
+
+  """Name of the policy configuration"""
+  configurationName: String!
+
+  """Display name of the configured policy"""
+  displayName: String
+
+  """Human-readable description of the configured policy"""
+  description: String
+
+  """Whether policy has been evaluated"""
+  evaluated: Boolean!
+
+  """The latest result of evaluating the policy"""
+  currentResult: ScBooleanPolicyResult
+
+  """
+  The latest delta for the policy, regardless of reason (the change in policy results since the specified timestamp)
+  """
+  latestDelta: ScPolicyDelta
+
+  """
+  "
+  The available remediations for this policy result
+  """
+  remediations(filter: ScRemediationFilter!): [ScRemediation!]!
+}
+
+type ScBooleanPolicyResult {
+  statusLabel: String!
+  createdDateTime: String!
+  hasDeviation: Boolean!
+  deviation: ScPolicyResultGenericDeviation
+
+  """If changes have been made to the policy that haven't been evaluated"""
+  isStale: Boolean
+}
+
+type ScDockerRepository {
+  """Hostname of the Docker registry"""
+  hostName: String!
+
+  """Name of the Docker repository"""
+  repoName: String!
+}
+
+type ScGenericPolicy implements BaseScPolicy {
+  """Name of the policy definition"""
+  definitionName: String!
+
+  """Name of the policy configuration"""
+  configurationName: String!
+
+  """Display name of the configured policy"""
+  displayName: String
+
+  """Human-readable description of the configured policy"""
+  description: String
+
+  """Whether policy has been evaluated"""
+  evaluated: Boolean!
+
+  """The latest result of evaluating the policy"""
+  currentResult: ScGenericPolicyResult
+
+  """
+  The latest delta for the policy, regardless of reason (the change in policy results since the specified timestamp)
+  """
+  latestDelta: ScPolicyDelta
+
+  """
+  "
+  The available remediations for this policy result
+  """
+  remediations(filter: ScRemediationFilter!): [ScRemediation!]!
+
+  """Link to docs about remediating policy violations"""
+  remediationLink: String
+}
+
+type ScGenericPolicyResult {
+  statusLabel: String!
+  deviations: [ScPolicyResultGenericDeviation!]!
+  deviationCount: Int!
+  createdDateTime: String!
+
+  """If changes have been made to the policy that haven't been evaluated"""
+  isStale: Boolean
+}
+
+type ScGroupedPackage {
+  """The package root (without the version)"""
+  packageRoot: ScPackageRoot!
+
+  """Number of used package versions with this packageRoot"""
+  versionCount: Int!
+
+  """
+  Deprecated: Use imageCount instead and imagesWithPackage for more detail
+  This will return an empty list
+  """
+  repositories: [ScDockerRepository!]! @deprecated
+  uniqueVulnerabilityReport: VulnerabilityReport!
+
+  """
+  Deprecated: Use imageCount instead and imagesWithPackage for more detail
+  This will return an empty list
+  """
+  images: [ScImageRepository!]! @deprecated
+
+  """The number of images that use this package"""
+  imageCount: Int!
+}
+
+input ScGroupedPackagesFilter {
+  packageName: String
+  packageType: String
+}
+
+input ScGroupedPackagesOrdering {
+  field: ScGroupedPackagesOrderingField
+  sortOrder: SortOrder
+}
+
+enum ScGroupedPackagesOrderingField {
+  VERSIONS_USED
+  USED_BY
+  NAME
+  TYPE
+}
+
+type ScImageAffectedByCVE {
+  """The affected image"""
+  affectedImage: ImageWithBaseImage!
+
+  """The affected packages for the associated image"""
+  affectedPackages: [ScImageAffectedByCVEPackage!]!
+}
+
+type ScImageAffectedByCVEChangeset {
+  """The changeset ordinal"""
+  ordinal: Int!
+}
+
+type ScImageAffectedByCVEPackage {
+  """The version of the package"""
+  version: String!
+
+  """The namespace of the package"""
+  namespace: String
+
+  """The name of the package"""
+  name: String
+
+  """The operating system name of the package, if applicable"""
+  osName: String
+
+  """The operating system version of the package, if applicable"""
+  osVersion: String
+
+  """The type of the package"""
+  type: String!
+
+  """The packageUrl or purl"""
+  purl: String!
+
+  """The changeset that this package is included in"""
+  changesets: [ScImageAffectedByCVEChangeset!]!
+
+  """
+  Deprecated: This is no longer part of this api and will return an empty list for the sake of
+  not breaking any existing clients
+  """
+  locations: [String!]! @deprecated
+}
+
+"""
+This type represents an image changeset, which is one of the following
+* history with an empty layer
+* history with a layer
+* layer without a history
+"""
+type ScImageChangeset {
+  history: ScImageHistory
+  layer: ScImageLayer
+  ordinal: Int!
+}
+
+type ScImageHistory {
+  createdAt: String!
+  createdBy: String!
+}
+
+type ScImageLayer {
+  digest: String!
+  mediaType: String!
+  size: Float!
+}
+
+type ScImageRepository {
+  digest: String!
+  repository: ScDockerRepository!
+}
+
+input ScImagesAffectedByCVEFilter {
+  """Filter by the name of the image repository"""
+  repoName: String
+}
+
+input ScImagesAffectedByCVEOrdering {
+  """The field to order by (defaults to LAST_PUSHED)"""
+  field: ScImagesAffectedByCVEOrderingField
+
+  """The sort order (defaults based on field)"""
+  sortOrder: SortOrder
+}
+
+enum ScImagesAffectedByCVEOrderingField {
+  LAST_PUSHED
+  REPO_NAME
+}
+
+input ScImagesAffectedByCVEQuery {
+  """The ID of the CVE"""
+  cveId: String!
+
+  """The name of the stream"""
+  stream: String!
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: ScImagesAffectedByCVEFilter
+
+  """Specify any ordering for the query"""
+  ordering: ScImagesAffectedByCVEOrdering
+}
+
+type ScImagesAffectedByCVEResult {
+  """Paging of the images"""
+  paging: Paging!
+
+  """The images affected by the CVE"""
+  items: [ScImageAffectedByCVE!]!
+
+  """The total number of unique packages affected across the stream"""
+  packageCount: Int!
+}
+
+type ScImageVulnerabilitiesByDigest {
+  digest: String!
+  vulnerabilities: [VpPackageVulnerability!]!
+}
+
+input ScImageVulnerabilitiesByDigestQuery {
+  """
+  TODO: This attribute is not yet implemented.
+  Include excepted vulnerabilities in the response (defaults to false)
+  """
+  includeExcepted: Boolean
+}
+
+type ScInformationRemediation implements ScRemediation {
+  id: String!
+  acceptedBy: String
+  changesets: [ScRemediationChangeset!]!
+  createdAt: String!
+  details: [ScRemediationDetail!]!
+  errors: [ScRemediationError!]!
+  kind: String
+  score: Int
+  state: ScRemediationState!
+  updatedAt: String!
+}
+
+type ScLicencePolicy implements BaseScPolicy {
+  """Name of the policy definition"""
+  definitionName: String!
+
+  """Name of the policy configuration"""
+  configurationName: String!
+
+  """Display name of the configured policy"""
+  displayName: String
+
+  """Human-readable description of the configured policy"""
+  description: String
+
+  """Whether policy has been evaluated"""
+  evaluated: Boolean!
+
+  """The list of licenses that the configured policy checks for"""
+  licenses: [String!]!
+
+  """The latest result of evaluating the policy"""
+  currentResult: ScLicencePolicyResult
+
+  """
+  The latest delta for the policy, regardless of reason (the change in policy results since the specified timestamp)
+  """
+  latestDelta: ScPolicyDelta
+
+  """
+  "
+  The available remediations for this policy result
+  """
+  remediations(filter: ScRemediationFilter!): [ScRemediation!]!
+}
+
+type ScLicencePolicyResult {
+  statusLabel: String!
+  deviations: [ScPolicyResultLicenceDeviation!]!
+  deviationCount: Int!
+  createdDateTime: String!
+
+  """If changes have been made to the policy that haven't been evaluated"""
+  isStale: Boolean
+}
+
+type ScOrganizationFilter {
+  name: String!
+  values: [String!]!
+}
+
+input ScOrganizationFilterInput {
+  name: String!
+  value: String!
+}
+
+type ScOrganizationStatus {
+  """Whether the organization has any image analysis enabled"""
+  hasImageAnalysisEnabled: Boolean!
+
+  """Whether the organization has any images which have been analyzed"""
+  hasAnalyzedImages: Boolean!
+
+  """
+  Whether the organization has ever had any images which have been analyzed
+  """
+  hasEverAnalyzedImages: Boolean!
+
+  """
+  The timestamp at which the last repository enablement change happened for the organization (in ISO8601 format)
+  """
+  lastRepoEnablementChangeAt: String
+}
+
+type ScPackageRange {
+  """Min number of packages across a set of images."""
+  minCount: Int!
+
+  """Max number of packages across a set of images."""
+  maxCount: Int!
+}
+
+type ScPackageRoot {
+  """The name of the package"""
+  name: String
+
+  """The type of the package"""
+  type: String!
+
+  """The namespace of the package"""
+  namespace: String
+}
+
+type ScPolicyDelta {
+  deltaReason: ScPolicyDeltaReason!
+  deltaChange: Int!
+}
+
+enum ScPolicyDeltaReason {
+  """Delta is due to a change in external data"""
+  external
+
+  """Delta is due to a new image being pushed"""
+  image
+}
+
+type ScPolicyImage {
+  """The digest of the image"""
+  digest: String!
+
+  """The tags associated with the image"""
+  tags: [IbTag!]!
+
+  """The repo associated with the image"""
+  repository: ScPolicyRepo!
+
+  """The creation date of this image represented as an ISO8601 string."""
+  createdAt: String!
+
+  """The platform of the image"""
+  platform: IbImagePlatform
+
+  """The results of policy evaluation for this image"""
+  policies: [BaseScPolicy!]!
+}
+
+type ScPolicyInfo {
+  """Name of the policy definition"""
+  definitionName: String!
+
+  """Name of the policy configuration"""
+  configurationName: String!
+
+  """Display name of the configured policy"""
+  displayName: String
+
+  """Human-readable description of the configured policy"""
+  description: String
+
+  """
+  The type of deviations this policy tracks (vulnerabilities, licensed packages, boolean)
+  """
+  resultType: String!
+
+  """Who this policy is owned and configured by"""
+  owner: ScPolicyOwner!
+
+  """Is this policy currently enabled"""
+  enabled: Boolean!
+
+  """Link to docs about remediating policy violations"""
+  remediationLink: String
+}
+
+enum ScPolicyOwner {
+  DOCKER
+  USER
+}
+
+type ScPolicyPackageLocation {
+  layerOrdinal: Int!
+  path: String!
+}
+
+type ScPolicyRepo {
+  """The host name of the repo"""
+  hostName: String!
+
+  """The name of the repo"""
+  repoName: String!
+}
+
+type ScPolicyResultGenericDeviation {
+  id: String!
+  details: [ScPolicyResultGenericDeviationDetail!]!
+}
+
+type ScPolicyResultGenericDeviationDetail {
+  key: String!
+  value: String!
+  displayName: String!
+}
+
+type ScPolicyResultLicenceDeviation {
+  id: String!
+  purl: String!
+  license: String!
+  locations: [ScPolicyPackageLocation!]!
+}
+
+type ScPolicyResultVulnerabilityDeviation {
+  id: String!
+  vulnerability: String!
+  purl: String!
+  severity: CVSSSeverity!
+  cvssScore: String
+  fixedBy: String
+  locations: [ScPolicyPackageLocation!]!
+}
+
+enum ScPolicyState {
+  compliant
+  noncompliant
+  unknown
+}
+
+type ScPolicyStream {
+  """The latest image for this policy stream"""
+  latestImage: ScPolicyImage!
+
+  """The policies of this stream"""
+  policies: [BaseScPolicy!]!
+}
+
+type ScPolicyStreamResult {
+  """The paging of the policy stream result"""
+  paging: Paging!
+
+  """The matching results"""
+  items: [ScPolicyStream!]!
+}
+
+type ScPolicySummary {
+  """The policy that this summary is for"""
+  policy: ScPolicyInfo!
+
+  """The stream that this summary is for"""
+  stream: String!
+
+  """The total number of images that have results for this policy"""
+  totalImages: Int!
+
+  """The number of images that are compliant with this policy"""
+  compliantImages: Int!
+
+  """The sum of all deviations for all images for this policy"""
+  totalDeviations: Int!
+
+  """The number of images that have unknown compliance"""
+  unknownImages: Int!
+
+  """
+  The policy summary delta (the change in policy results since the specified timestamp)
+  """
+  delta: ScPolicySummaryDelta!
+}
+
+type ScPolicySummaryDelta {
+  """The change in number of compliant images"""
+  compliantImages: Int!
+
+  """The change in total number of deviations"""
+  totalDeviations: Int!
+
+  """The change in total number of images"""
+  totalImages: Int!
+
+  """The change in number of images that have unknown compliance"""
+  unknownImages: Int!
+
+  """The point in time that the delta is calculated from"""
+  timestamp: String!
+}
+
+type ScPolicySummaryResult {
+  """The matching results"""
+  items: [ScPolicySummary!]!
+}
+
+type ScPullRequestRemediation implements ScRemediation {
+  id: String!
+  acceptedBy: String
+  changesets: [ScRemediationChangeset!]!
+  createdAt: String!
+  details: [ScRemediationDetail!]!
+  errors: [ScRemediationError!]!
+  kind: String
+  score: Int
+  state: ScRemediationState!
+  updatedAt: String!
+  pullRequest: IbGitPullRequest
+}
+
+type ScPurl {
+  namespace: String
+  name: String!
+  type: String!
+  version: String
+  qualifiers: String
+  subpath: String
+}
+
+input ScPurlInput {
+  namespace: String
+  name: String!
+  type: String!
+  version: String
+  qualifiers: String
+  subpath: String
+}
+
+type ScRecentCVE {
+  cveId: String!
+  highestSeverity: CVSSSeverity!
+  highestCVSSScore: String
+  detectedInCount: Int!
+  publishedAt: String!
+}
+
+input ScRecentCVEsFilter {
+  severities: [CVSSSeverity!]
+}
+
+input ScRecentCVEsQuery {
+  stream: String!
+  filter: ScRecentCVEsFilter
+}
+
+type ScRecentCVEsResult {
+  items: [ScRecentCVE!]!
+}
+
+interface ScRemediation {
+  id: String!
+  acceptedBy: String
+  changesets: [ScRemediationChangeset!]!
+  createdAt: String!
+  details: [ScRemediationDetail]!
+  errors: [ScRemediationError!]!
+  kind: String
+  score: Int
+  state: ScRemediationState!
+  updatedAt: String!
+}
+
+type ScRemediationChangeset {
+  id: String!
+  message: String
+  patches: [ScRemediationChangesetPatches!]!
+}
+
+type ScRemediationChangesetPatches {
+  file: String!
+  patch: String!
+}
+
+type ScRemediationDetail {
+  key: String!
+  value: String!
+}
+
+type ScRemediationError {
+  kind: String!
+  details: [ScRemediationErrorDetail!]!
+}
+
+type ScRemediationErrorDetail {
+  key: String!
+  value: String!
+}
+
+input ScRemediationFilter {
+  """
+  Filter by remediation state.
+  If not set or `null`, then the data is returned unfiltered
+  """
+  states: [ScRemediationState!]
+}
+
+enum ScRemediationState {
+  PROPOSED
+  ACCEPTED
+  APPLIED
+  DISCARDED
+}
+
+input ScRepositoryInput {
+  hostName: String!
+  repoName: String!
+}
+
+input ScRepositoryQuery {
+  hostName: String!
+  repoName: String!
+}
+
+type ScSinglePolicyResult {
+  """The latest image for this policy stream"""
+  latestImage: ScPolicyImage!
+
+  """The policy"""
+  policy: BaseScPolicy!
+}
+
+type ScSinglePolicyResults {
+  """The paging of the policy result"""
+  paging: Paging!
+
+  """The matching results"""
+  items: [ScSinglePolicyResult!]!
+}
+
+type ScStream {
+  """The name of the stream"""
+  name: String!
+}
+
+input ScStreamBaseImagesSummaryFilter {
+  """Filter by the name of the repository"""
+  repoName: String
+}
+
+input ScStreamBaseImagesSummaryOrdering {
+  """The field to order by (defaults to CHILD_IMAGES_COUNT)"""
+  field: ScStreamBaseImagesSummaryOrderingField
+
+  """The sort order (defaults based on field)"""
+  sortOrder: SortOrder
+}
+
+enum ScStreamBaseImagesSummaryOrderingField {
+  BASE_IMAGES_COUNT
+  CHILD_IMAGES_COUNT
+  REPO_NAME
+}
+
+input ScStreamBaseImagesSummaryQuery {
+  """The stream we want to query for"""
+  stream: String!
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: ScStreamBaseImagesSummaryFilter
+
+  """Specify any ordering for the query"""
+  ordering: ScStreamBaseImagesSummaryOrdering
+}
+
+type ScStreamBaseImagesSummaryResult {
+  """Paging of the base images"""
+  paging: Paging!
+
+  """The matching base images"""
+  items: [ScBaseImageSummary!]!
+}
+
+type ScStreamCVE {
+  cveId: String!
+  highestSeverity: CVSSSeverity!
+  highestCVSSScore: String
+  detectedInCount: Int!
+  fixable: Boolean!
+  packages: [StreamCVEPackage!]!
+}
+
+input ScStreamCVEsFilter {
+  """Filter by the identity of the cve e.g. CVE-2021-44228"""
+  cveId: String
+
+  """Filter by the highestSeverity of results e.g. HIGH"""
+  severity: CVSSSeverity
+
+  """Filter results to only the supplied repos"""
+  repos: [ScRepositoryInput!]
+
+  """Filter by the highestSeverity of the results, allowing mulitple values"""
+  severities: [CVSSSeverity!]
+}
+
+input ScStreamCVEsOrdering {
+  """The field to order by (defaults to SEVERITY)"""
+  field: ScStreamCVEsOrderingField
+
+  """The sort order (defaults based on field)"""
+  sortOrder: SortOrder
+}
+
+enum ScStreamCVEsOrderingField {
+  SEVERITY
+  DETECTED_IN_COUNT
+  CVSS_SCORE
+}
+
+input ScStreamCVEsQuery {
+  """The stream we want to query for"""
+  stream: String!
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: ScStreamCVEsFilter
+
+  """Specify any ordering for the query"""
+  ordering: ScStreamCVEsOrdering
+
+  """Org-specific filters to apply"""
+  orgFilters: [ScOrganizationFilterInput!]
+}
+
+type ScStreamCVEsResult {
+  """Paging of the base images"""
+  paging: Paging!
+
+  """The matching base images"""
+  items: [ScStreamCVE!]!
+}
+
+input ScStreamGroupedPackagesQuery {
+  """The stream we want to query for"""
+  stream: String!
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Used to reduce the set of packages returned by applying filters"""
+  filter: ScGroupedPackagesFilter
+
+  """Used to determine the order of results returned"""
+  ordering: ScGroupedPackagesOrdering
+}
+
+type ScStreamGroupedPackagesResult {
+  """Paging of the packages"""
+  paging: Paging!
+
+  """The matching packages"""
+  items: [ScGroupedPackage!]!
+
+  """The list of all available package types, ignoring any filters applied"""
+  packageTypes: [String!]!
+}
+
+input ScStreamImagesByBaseImageFilter {
+  """Filter by the name of the child image repository"""
+  repoName: String
+}
+
+input ScStreamImagesByBaseImageOrdering {
+  """The field to order by (defaults to LAST_PUSHED)"""
+  field: ScStreamImagesByBaseImageOrderingField
+
+  """The sort order (defaults based on field)"""
+  sortOrder: SortOrder
+}
+
+enum ScStreamImagesByBaseImageOrderingField {
+  LAST_PUSHED
+  REPO_NAME
+}
+
+input ScStreamImagesByBaseImageQuery {
+  """The stream we want to query for"""
+  stream: String!
+
+  """The repository of the base images"""
+  repository: ScRepositoryInput!
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: ScStreamImagesByBaseImageFilter
+
+  """Specify any ordering for the query"""
+  ordering: ScStreamImagesByBaseImageOrdering
+}
+
+type ScStreamImagesByBaseImageResult {
+  """Paging of the base images"""
+  paging: Paging!
+
+  """The matching images and their base image"""
+  items: [ImageWithBaseImage!]!
+}
+
+input ScStreamImagesFilter {
+  """Filter by the name of the repository"""
+  repoName: String
+}
+
+input ScStreamImagesOrdering {
+  """The field to order by (defaults to LAST_PUSHED)"""
+  field: ScStreamImagesOrderingField
+
+  """The sort order (defaults based on field)"""
+  sortOrder: SortOrder
+}
+
+enum ScStreamImagesOrderingField {
+  LAST_PUSHED
+  TAG_UPDATED_AT
+}
+
+input ScStreamImagesQuery {
+  """The stream we want to query for"""
+  stream: String!
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: ScStreamImagesFilter
+
+  """Specify any ordering for the query"""
+  ordering: ScStreamImagesOrdering
+
+  """Org-specific filters to apply"""
+  orgFilters: [ScOrganizationFilterInput!]
+}
+
+type ScStreamImagesResult {
+  """Paging of the images"""
+  paging: Paging!
+
+  """The matching images"""
+  items: [ImageWithBaseImage!]!
+}
+
+input ScStreamsQuery {
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: ScStreamsQueryFilter
+}
+
+"""Filtering options for the streams query"""
+input ScStreamsQueryFilter {
+  """
+  Filter the streams down to those whose name matches the given prefix (case-sensitive)
+  """
+  namePrefix: String
+}
+
+type ScStreamsResult {
+  """Paging of the streams"""
+  paging: Paging!
+
+  """The matching streams"""
+  items: [ScStream!]!
+}
+
+input ScTaggedImagesFilter {
+  """Filter by the name of the tag"""
+  tagName: String
+}
+
+input ScTaggedImagesOrdering {
+  """The field to order by (defaults to LAST_PUSHED)"""
+  field: ScTaggedImagesOrderingField
+
+  """The sort order (defaults based on field)"""
+  sortOrder: SortOrder
+}
+
+enum ScTaggedImagesOrderingField {
+  LAST_PUSHED
+  TAG_NAME
+}
+
+input ScTaggedImagesQuery {
+  """The hostname of the Docker registry. Defaults to Docker Hub."""
+  hostName: String
+
+  """The name of the Docker repository"""
+  repoName: String!
+
+  """Specify the paging parameters for the query"""
+  paging: PagingInput
+
+  """Specify any filtering for the query"""
+  filter: ScTaggedImagesFilter
+
+  """Specify any ordering for the query"""
+  ordering: ScTaggedImagesOrdering
+}
+
+type ScTaggedImagesResult {
+  """The hostname of the Docker registry"""
+  hostName: String!
+
+  """The name of the Docker repository"""
+  repoName: String!
+
+  """Paging of the images"""
+  paging: Paging!
+
+  """The matching tags"""
+  tags: [ScTagWithDigest!]!
+
+  """The images associated to the different tags"""
+  images: [ImageWithBaseImage!]!
+}
+
+"""This type represents a tag with the associated current digest"""
+type ScTagWithDigest {
+  """The name of the tag."""
+  name: String!
+
+  """The digest of the current image associated to this tag"""
+  digest: ID!
+
+  """The last update date of this tag represented as an ISO8601 string."""
+  updatedAt: String!
+}
+
+type ScUserResult {
+  """The id of the user"""
+  id: ID!
+
+  """The email of the user"""
+  email: String
+
+  """The name of the user"""
+  name: String
+
+  """The username of the user"""
+  username: String
+
+  """The avatar url of the user"""
+  avatarUrl: String
+
+  """The organizations the user is part of"""
+  orgs: [DockerOrg!]!
+}
+
+type ScVEX {
+  id: String
+  author: String
+  role: String
+  timestamp: String
+  version: String
+  statements: [ScVEXStatement]
+}
+
+type ScVexDocument {
+  id: String!
+  documentUrl: String
+  timestamp: String!
+  author: String!
+  version: String!
+}
+
+input ScVEXsQuery {
+  """The repository we want to query for"""
+  repoName: String!
+
+  """The tag we want to query for"""
+  tag: String
+
+  """The digest we want to query for"""
+  digest: String
+
+  """The hostName we want to query for"""
+  hostName: String
+}
+
+type ScVEXsResult {
+  documents: [ScVEX]!
+}
+
+type ScVexStatement {
+  id: ID!
+  document: ScVexDocument!
+  timestamp: String!
+  cveId: String!
+  status: ScVexStatementStatus!
+  justification: ScVexStatementJustification
+  impactStatement: String
+  imageScopes: [ScVexStatementImageScope!]!
+  packageScopes: [ScVexStatementPackageScope!]!
+  errors: [ScVexStatementError!]!
+}
+
+type ScVEXStatement {
+  sourceId: String
+  status: String
+  statusNotes: String
+  justification: String
+  actionStatement: String
+  impactStatement: String
+  products: [String]
+  subcomponents: [String]
+}
+
+type ScVexStatementError {
+  message: String!
+}
+
+type ScVexStatementImageScope {
+  hostName: String
+  repoName: String
+  digest: String
+}
+
+input ScVexStatementImageScopeInput {
+  hostName: String
+  repoName: String
+  digest: String
+  packageScopes: [ScVexStatementPackageScopeInput!]
+}
+
+enum ScVexStatementJustification {
+  COMPONENT_NOT_PRESENT
+  VULNERABLE_CODE_NOT_PRESENT
+  VULNERABLE_CODE_NOT_IN_EXECUTE_PATH
+  VULNERABLE_CODE_CANNOT_BE_CONTROLLED_BY_ADVERSARY
+  INLINE_MITIGATIONS_ALREADY_EXIST
+}
+
+type ScVexStatementPackageScope {
+  namespace: String
+  name: String!
+  purl: String!
+  type: String!
+  version: String
+  qualifiers: String
+  subpath: String
+}
+
+input ScVexStatementPackageScopeInput {
+  purlFields: ScPurlInput!
+}
+
+input ScVexStatementsQuery {
+  filter: ScVexStatementsQueryFilter
+  paging: PagingInput
+}
+
+input ScVexStatementsQueryFilter {
+  stream: String
+
+  """
+  Substring match, not exact. Case insensitive. Eg. "cve-2019-1" matches "CVE-2019-1234"
+  """
+  cveIdQuery: String
+  digest: String
+  status: ScVexStatementStatus
+  justification: ScVexStatementJustification
+  hasError: Boolean
+}
+
+type ScVexStatementsQueryResult {
+  items: [ScVexStatement!]!
+  itemsWithErrorsCount: Int!
+  paging: Paging!
+}
+
+enum ScVexStatementStatus {
+  NOT_AFFECTED
+  AFFECTED
+  FIXED
+  UNDER_INVESTIGATION
+}
+
+type ScVulnerabilityException {
+  id: ID!
+  author: String!
+  timestamp: String!
+  errors: [ScVulnerabilityExceptionError!]!
+  vulnerability: ScVulnerabilityExceptionVulnerability!
+  type: ScVulnerabilityExceptionType!
+
+  """
+  The image scopes of the vulnerability exception.
+  - null means "apply to all images in the org" of this exception.
+  - an empty array should be considered as an error.
+  """
+  imageScopes: [ScVulnerabilityExceptionImageScope!]
+  reason: ScVulnerabilityExceptionReason
+}
+
+type ScVulnerabilityExceptionError {
+  message: String!
+}
+
+type ScVulnerabilityExceptionImageScope {
+  hostName: String
+  repoName: String
+  digest: String
+
+  """
+  The package scopes of the vulnerability exception. null means "all packages in the image"
+  """
+  packageScopes: [ScVulnerabilityExceptionPackageScope!]
+}
+
+type ScVulnerabilityExceptionPackageScope {
+  purl: String!
+  purlFields: ScPurl!
+}
+
+type ScVulnerabilityExceptionReason {
+  justification: ScVexStatementJustification
+  additionalDetails: String
+  source: BaseScVulnerabilityExceptionSource!
+}
+
+type ScVulnerabilityExceptionScoutSource implements BaseScVulnerabilityExceptionSource {
+  id: ID!
+}
+
+enum ScVulnerabilityExceptionType {
+  ACCEPTED_RISK
+  FALSE_POSITIVE
+}
+
+type ScVulnerabilityExceptionVEXSource implements BaseScVulnerabilityExceptionSource {
+  id: ID!
+  document: ScVexDocument!
+}
+
+type ScVulnerabilityExceptionVulnerability {
+  cveId: String!
+  highestSeverity: CVSSSeverity
+  highestCVSSScore: String
+}
+
+type ScVulnerabilityPolicy implements BaseScPolicy {
+  """Name of the policy definition"""
+  definitionName: String!
+
+  """Name of the policy configuration"""
+  configurationName: String!
+
+  """Display name of the configured policy"""
+  displayName: String
+
+  """Human-readable description of the configured policy"""
+  description: String
+
+  """Whether policy has been evaluated"""
+  evaluated: Boolean!
+
+  """The latest result of evaluating the policy"""
+  currentResult: ScVulnerabilityPolicyResult
+
+  """
+  The latest delta for the policy, regardless of reason (the change in policy results since the specified timestamp)
+  """
+  latestDelta: ScPolicyDelta
+
+  """The available remediations for this policy result"""
+  remediations(filter: ScRemediationFilter!): [ScRemediation!]!
+}
+
+type ScVulnerabilityPolicyResult {
+  statusLabel: String!
+  deviations: [ScPolicyResultVulnerabilityDeviation!]!
+  deviationCount: Int!
+  createdDateTime: String!
+
+  """If changes have been made to the policy that haven't been evaluated"""
+  isStale: Boolean
+}
+
+"""A summary of vulnerability information about an image."""
+type SdImageSummary {
+  """The image digest that we are returning the summary for"""
+  digest: String!
+
+  """
+  The indexing state of the SBOM for the image whose report we are returning
+  """
+  sbomState: SBOMState!
+
+  """
+  A report on this image's vulnerabilities. Report will be null if the image
+  exists but no scan has occurred.
+  """
+  vulnerabilityReport: VulnerabilityReport
+}
+
+"""The metadata of the matched secret."""
+type SecretFinding {
+  """The identifier for the rule which found the secret."""
+  ruleId: String!
+
+  """The category of the secret, e.g. GitHub."""
+  category: String!
+
+  """The title of the discovery."""
+  title: String!
+
+  """The severity of the discovered secet"""
+  severity: MatchedSecretSeverity!
+
+  """The line or code where the secret was found, with the secret redacted."""
+  match: String!
+
+  """The startLine of the matched secret."""
+  startLine: Int
+
+  """The endLine of the matched secret."""
+  endLine: Int
+}
+
+input SetStreamImagesImage {
+  image: String!
+  appName: String!
+  platform: ImagePlatform
+}
+
+input SetStreamImagesInput {
+  stream: String!
+  images: [SetStreamImagesImage!]!
+}
+
+type SetStreamImagesResult {
+  status: SetStreamImagesStatus!
+}
+
+enum SetStreamImagesStatus {
+  ACCEPTED
+}
+
+enum SortOrder {
+  ASCENDING
+  DESCENDING
+}
+
+type StreamCVEPackage {
+  purl: String!
+  severity: CVSSSeverity!
+  cvssScore: String
+  fixedBy: [String!]!
+}
+
+"""Stream vulnerability reports response"""
+type StrVulnerabilityReports {
+  """The vulnerability reports over time"""
+  items: [TimestampedVulnerabilityReport!]!
+}
+
+"""Stream vulnerability reports query"""
+input StrVulnerabilityReportsQuery {
+  """The stream to retrieve reports from"""
+  stream: String!
+
+  """
+  How to summarize the vulnerabilities for the report (defaults to CUMULATIVE)
+  """
+  summaryType: StrVulnerabilityReportsSummaryType
+
+  """The timescale over which to retrieve information (defaults to 7d)"""
+  timescale: StrVulnerabilityReportsQueryTimescale
+}
+
+enum StrVulnerabilityReportsQueryTimescale {
+  DAYS_7
+  DAYS_14
+  DAYS_30
+  DAYS_90
+  DAYS_180
+  DAYS_365
+}
+
+enum StrVulnerabilityReportsSummaryType {
+  CUMULATIVE
+  UNIQUE
+}
+
+"""A vulnerability report from a specific timestamp"""
+type TimestampedVulnerabilityReport {
+  """
+  The timestamp at which the vulnerability report was taken (in ISO8601 format)
+  """
+  timestamp: String!
+
+  """A report of the vulnerability counts at the given time"""
+  vulnerabilityReport: VulnerabilityReport!
+}
+
+"""The repository we are returning recommendations for"""
+type TrDockerRepository {
+  """The docker repository name"""
+  name: String!
+
+  """The number of times this repository has been docker pulled"""
+  pullCount: Float
+
+  """The number of times this repository has been starred"""
+  starCount: Int
+
+  """The docker repository description"""
+  description: String
+}
+
+"""The Docker Tag information"""
+type TrDockerTag {
+  """The image digest"""
+  digest: String!
+
+  """The index digest"""
+  indexDigest: String
+
+  """When this tag was created"""
+  createdAt: String!
+
+  """The number of packages in this tag"""
+  packageCount: Int!
+
+  """The image size"""
+  imageSize: Float!
+
+  """The image size"""
+  size: Int! @deprecated
+
+  """The tags"""
+  tags: [String!]!
+
+  """The aliases"""
+  aliases: [String!]!
+
+  """The vulnerabilities associated with this tag"""
+  vulnerabilityReport: VulnerabilityReport
+
+  """The vulnerabilities associated with this tag"""
+  vulnerabilities: VulnerabilityReport! @deprecated
+
+  """The parsed tag data"""
+  tag: TrTagData!
+
+  """The scores for our recommendations"""
+  scoring: TrScoring
+}
+
+"""A tag recommendation"""
+type TrRecommendations {
+  """The current tag"""
+  currentTag: TrDockerTag!
+
+  """The recommended tags"""
+  recommendedTags: [TrDockerTag!]!
+}
+
+"""Recommended tag response"""
+type TrRecommendedTags {
+  """The docker repository we are returning for"""
+  repository: TrDockerRepository!
+
+  """The tag recommendations for this repository"""
+  recommendations: [TrRecommendations!]!
+}
+
+"""Tag scoring data"""
+type TrScoring {
+  """Total score of the recommended tag"""
+  total: Int!
+
+  """Summary of the tag recommendation"""
+  summary: String!
+
+  """Details of the scoring calculation"""
+  details: [TrScoringDetails!]!
+}
+
+"""Scoring criteria for recommendations"""
+type TrScoringDetails {
+  """The name of the scoring criteria"""
+  name: String!
+
+  """The Reason for the score"""
+  reason: String!
+
+  """The score"""
+  score: Int!
+}
+
+"""Tag metadata"""
+type TrTagData {
+  """Name of the tag"""
+  name: String!
+
+  """os of the tag"""
+  os: String
+
+  """framework of the tag"""
+  framework: String
+
+  """runtime of the tag"""
+  runtime: String
+
+  """flavour of the tag"""
+  flavor: String
+
+  """is it slim?"""
+  slim: Boolean
+}
+
+"""An individual tag recommendation for a digest"""
+type TrTagRecommendationResult {
+  """The digest the result corresponds to"""
+  digest: String!
+
+  """The recommended tags for this digest or null if nothing could be found"""
+  recommendedTags: TrRecommendedTags
+}
+
+"""The result of a tagRecommendationsByDigest query"""
+type TrTagRecommendationsByDigestsResult {
+  """The tag recommendations for each digest requested"""
+  items: [TrTagRecommendationResult!]
+}
+
+input UpdateVulnerabilityExceptionInput {
+  id: ID!
+  cveId: String
+  type: ScVulnerabilityExceptionType
+  justification: ScVexStatementJustification
+  additionalDetails: String
+  imageScopes: [ScVexStatementImageScopeInput!]
+}
+
+type UpdateVulnerabilityExceptionResult {
+  exception: ScVulnerabilityException!
+}
+
+enum VEXStatementJustification {
+  COMPONENT_NOT_PRESENT
+  VULNERABLE_CODE_NOT_PRESENT
+  VULNERABLE_CODE_NOT_IN_EXECUTE_PATH
+  VULNERABLE_CODE_CANNOT_BE_CONTROLLED_BY_ADVERSARY
+  INLINE_MITIGATIONS_ALREADY_EXIST
+}
+
+enum VEXStatementStatus {
+  NOT_AFFECTED
+  AFFECTED
+  FIXED
+  UNDER_INVESTIGATION
+}
+
+type VpCVSS {
+  """the CVSS severity of the vulnerability"""
+  severity: CVSSSeverity
+
+  """the CVSSVersion used to source the vulnerability data"""
+  version: CVSSVersion
+
+  """the CVSS score of the vulnerability"""
+  score: Float
+
+  """the CVSS vector of the vulnerability"""
+  vector: String
+}
+
+type VpCWE {
+  """The id of the CWE"""
+  cweId: String!
+
+  """A description of the CWE"""
+  description: String
+
+  """The CWE http url"""
+  url: String!
+}
+
+"""
+Contains the packageUrl that matched vulnerabilities and an array of vulnerabilites that matched
+"""
+type VpPackageVulnerability {
+  purl: String!
+  vulnerabilities: [VpVulnerability!]!
+}
+
+"""Describes the vulnerability that the package is vulnerable to"""
+type VpVulnerability {
+  """the source id or cve id of the vulnerability"""
+  sourceId: String!
+
+  """the source of the vulnerability data e.g. NIST, docker etc"""
+  source: String!
+
+  """
+  a textual description of the vulnerability, can contain markdown depending on the source
+  """
+  description: String
+
+  """a list of CWEs that the vulnerability contains"""
+  cwes: [VpCWE!]!
+
+  """the CVSS score object for this vulnerability"""
+  cvss: VpCVSS!
+
+  """the version that this vulnerability is fixed by if available"""
+  fixedBy: String
+
+  """the version range that this vulnerability applies to"""
+  vulnerableRange: String!
+
+  """an HTML link to more information on the vulnerability"""
+  url: String!
+
+  """The date/time when this vulnerability was first published"""
+  publishedAt: String
+
+  """The date/time when this vulnerability was last updated"""
+  updatedAt: String
+
+  """EPSS data for the vulnerability if present"""
+  epss: EPSS
+
+  """
+  Is this vulnerability in the CISA list of known exploited vulnerabilities?
+  """
+  cisaExploited: Boolean!
+
+  """
+  Is this vulnerability excepted (suppressed) in the context of the queried image?
+  """
+  isExcepted: Boolean!
+
+  """
+  The details of the excepted vulnerability, only populated if isExcepted is true
+  """
+  vulnerabilityExceptions: [PkVulnerabilityException!]!
+
+  """
+  The VEX statements that apply to the package, this differs to vulnerabilityExceptions in that it includes
+  VEX statements that are not exceptions, e.g. under_investigation, affected etc. 
+  """
+  vexStatements: [PkVexStatement!]!
+}
+
+"""This type represents a vulnerability report about an image."""
+type VulnerabilityReport {
+  """The number of critical severity vulnerabilities present in the image."""
+  critical: Int!
+
+  """The number of high severity vulnerabilities present in the image."""
+  high: Int!
+
+  """The number of medium severity vulnerabilities present in the image."""
+  medium: Int!
+
+  """The number of low severity vulnerabilities present in the image."""
+  low: Int!
+
+  """
+  The number of vulnerabilities with an unspecified severity present in the image.
+  """
+  unspecified: Int!
+
+  """The total number of vulnerabilities present in the image."""
+  total: Int!
+}
+
+type ArtifactoryAgentEntitlement implements FeatureEntitlement {
+  enabled: Boolean!
+
+  """If the feature is not enabled, what plan is required?"""
+  planRequirement: PlanRequirement
+}
+
+enum BillingCycle {
+  annual
+  monthly
+}
+
+enum BillingOrigin {
+  inside_sales
+  self_serve
+  unknown
+}
+
+type BlockedRepoResult {
+  hostName: String!
+  namespace: String!
+  repoName: String!
+  blocked: Boolean!
+}
+
+type ConfigurablePolicyEntitlement implements FeatureEntitlement {
+  enabled: Boolean!
+
+  """If the feature is not enabled, what product tier is required?"""
+  planRequirement: PlanRequirement
+}
+
+type DhiEntitlement {
+  """
+  Is dhi fully enabled for this namespace, either via a plan or a free trial
+  """
+  dhiEnabled: Boolean!
+
+  """Can this namespace mirror more repos?"""
+  canMirrorMoreRepositories: Boolean!
+
+  """Can this namespace view the dhi catalog?"""
+  canViewCatalog: Boolean!
+
+  """The number of repos this namespace can mirror"""
+  repositoriesLimit: Int!
+
+  """The number of repos this namespace has mirrored"""
+  mirroredRepositoriesCount: Int!
+
+  """Is this namespace in a free trial?"""
+  freeTrial: Boolean!
+
+  """The end date of the free trial if applicable"""
+  freeTrialEndDate: String
+}
+
+type DhiRepoFeature {
+  isDhiRepo: Boolean!
+
+  """The dhi mirrored repository, null if not a DHI repo."""
+  dhiMirroredRepository: EntitlementsDhiMirroredRepository
+}
+
+type EnabledRepositoriesResult {
+  repos: [RepositoryResult!]!
+  count: Int!
+  entitlementUsed: Int!
+}
+
+type EntitlementsDhiMirroredRepository {
+  id: String!
+  dhiSourceRepository: EntitlementsDhiSourceRepository!
+}
+
+type EntitlementsDhiSourceRepository {
+  name: String!
+  namespace: String!
+  displayName: String!
+}
+
+interface FeatureEntitlement {
+  enabled: Boolean!
+
+  """If the feature is not enabled, what product tier is required?"""
+  planRequirement: PlanRequirement
+}
+
+type FeatureEntitlements {
+  artifactoryAgent: ArtifactoryAgentEntitlement!
+  configurablePolicy: ConfigurablePolicyEntitlement!
+  localRepository: LocalRepositoryEntitlement!
+  remoteRepository: RemoteRepositoryEntitlement!
+  scoutAPI: ScoutAPIEntitlement!
+  vulnerabilityReporting: VulnerabilityReportingEntitlement!
+  scoutEverywhere: ScoutEverywhereEntitlement!
+  dhi: DhiEntitlement!
+  enableOnPush: Boolean!
+}
+
+type Integration {
+  skill: Skill!
+  configurationName: String!
+}
+
+input IntegrationConfigurationFilter {
+  skill: SkillInput!
+  configurationName: String
+}
+
+input IntegrationConfigurationInput {
+  skill: SkillInput!
+  configurationName: String!
+}
+
+type ListBlockedReposResult {
+  repos: [RepositoryResult!]!
+  count: Int!
+}
+
+type LocalRepositoryEntitlement implements FeatureEntitlement {
+  enabled: Boolean!
+
+  """If enabled and limit = nil, then unliminted"""
+  accountLimit: Int
+
+  """True if unlimited"""
+  isUnlimited: Boolean!
+
+  """Currently not defined. Always nil"""
+  planLimit: Int @deprecated
+
+  """If the feature is not enabled, what product tier is required?"""
+  planRequirement: PlanRequirement
+}
+
+type Maintenance {
+  severity: MaintenanceSeverity!
+  title: String!
+  message: String!
+}
+
+enum MaintenanceSeverity {
+  info
+  warning
+  error
+}
+
+input MultiRepoVulnerabilityReportingInput {
+  repoNames: [String!]!
+  hostName: String
+  enabled: Boolean!
+}
+
+type NamespaceEntitlements {
+  namespace: String!
+  plan: ScEntitlementsPlan!
+  isEnrolled: Boolean!
+
+  """Null == Scout not enrolled"""
+  scoutEnrollment: ScoutEnrollment
+  featureEntitlements: FeatureEntitlements
+}
+
+type PlanRequirement {
+  plan: ProductPlan!
+  tier: ProductTier!
+}
+
+enum ProductPlan {
+  SCOUT_0
+  SCOUT_1
+  SCOUT_2
+}
+
+type ProductSubscription {
+  tier: ProductTier! @deprecated
+  billingCycle: BillingCycle
+  quantity: ProductSubscriptionQuantity
+  renewalEnabled: Boolean
+  renewalDate: String
+  endDate: String
+  status: ProductSubscriptionStatus
+  graceDays: Int
+  renewalAmount: Int
+  totalAmount: Int
+  origin: BillingOrigin
+  pendingChanges: [ProductSubscriptionPendingChange!]
+}
+
+type ProductSubscriptionPendingChange {
+  type: ProductSubscriptionPendingChangeType
+  date: String
+  tier: ProductTier
+  billingCycle: String
+  quantity: ProductSubscriptionQuantity
+}
+
+enum ProductSubscriptionPendingChangeType {
+  quantity_decrease
+  quantity_increase
+  tier_change
+  cycle_change
+}
+
+type ProductSubscriptionQuantity {
+  value: Int
+  unit: String
+}
+
+enum ProductSubscriptionStatus {
+  active
+  inactive
+  past_due
+}
+
+enum ProductTier {
+  free
+  freeteam
+  team
+  business
+  dsos
+  pro
+  captain
+}
+
+type RemoteRepositoryEntitlement implements FeatureEntitlement {
+  enabled: Boolean!
+
+  """If enabled and limit = nil, then unliminted"""
+  accountLimit: Int
+
+  """True if unlimited"""
+  isUnlimited: Boolean!
+
+  """Currently not defined, always nil"""
+  planLimit: Int @deprecated
+
+  """If the feature is not enabled, what product tier is required?"""
+  planRequirement: PlanRequirement
+
+  """Count of the number of repos currently enabled"""
+  enabledRepoCount: Int!
+
+  """
+  Count of the number of enabled repos which count towards their repository entitlement
+  """
+  entitlementUsed: Int!
+
+  """Is this namespace exceeding their remote repository entitlement?"""
+  repoEntitlementExceeded: Boolean!
+}
+
+input ReposBlockedInput {
+  hostName: String
+  repoNames: [String!]!
+  blocked: Boolean!
+}
+
+type RepositoryFeatureResult {
+  namespace: String!
+  repoName: String!
+  hostName: String!
+  features: RepositoryFeatures
+}
+
+type RepositoryFeatures {
+  vulnerabilityReporting: VulnerabilityReportingRepoFeature
+  dhi: DhiRepoFeature!
+}
+
+type RepositoryProperties {
+  preventDisable: Boolean!
+}
+
+type RepositoryResult {
+  hostName: String!
+  repoName: String!
+  integration: Integration
+  type: RepositoryType!
+  properties: RepositoryProperties!
+}
+
+enum RepositoryType {
+  standard
+  dhi_mirror
+}
+
+input RepoVulnerabilityReportingInput {
+  repoName: String!
+  hostName: String
+  enabled: Boolean!
+}
+
+type ScEntitlementsPlan {
+  displayName: String!
+  isLegacy: Boolean!
+  isFree: Boolean!
+}
+
+type ScoutAPIEntitlement {
+  """Is scoutAPI enabled for this namespace"""
+  enabled: Boolean!
+
+  """Is api access blocked due to the namespace exceeding repo limits?"""
+  accessRestrictedDueToRepoLimits: Boolean!
+}
+
+type ScoutEnrollment {
+  plan: ProductPlan @deprecated
+
+  """
+  Refer to https://api.docker.team/api/billing_api#tag/products/paths/~1api~1billing~1v5~1accounts~1%7Baccount_name%7D~1products~1%7Bproduct_name%7D/get
+  """
+  activeSubscription: ProductSubscription
+
+  """Deprecated: use NamespaceEntitlements/featureEntitlements instead."""
+  features: ScoutEnrollmentFeatures! @deprecated
+}
+
+type ScoutEnrollmentFeatures {
+  repository: ScoutEnrollmentFeaturesRepo!
+}
+
+type ScoutEnrollmentFeaturesRepo {
+  local: Int!
+  remote: Int!
+}
+
+type ScoutEverywhereEntitlement {
+  """Is scout everywhere scanning enabled on this namespace?"""
+  scanningEnabled: Boolean!
+}
+
+type ServiceStatusResult {
+  maintenance: Maintenance
+}
+
+input SetEnableReposOnPushInput {
+  enabled: Boolean!
+}
+
+type SetEnableReposOnPushResult {
+  """
+  Whether the organization is set to enable repos which aren't blocked on push, can only be used by organizations in the 'business' tier.
+  """
+  enabled: Boolean!
+}
+
+type ShouldEnableReposOnPushResult {
+  enabled: Boolean!
+}
+
+type Skill {
+  namespace: String!
+  name: String!
+}
+
+input SkillInput {
+  namespace: String!
+  name: String!
+}
+
+type VulnerabilityReportingEntitlement implements FeatureEntitlement {
+  enabled: Boolean!
+
+  """If enabled and limit = nil, then unliminted"""
+  accountLimit: Int
+
+  """If enabled and limit = nil, then unliminted"""
+  planLimit: Int
+
+  """If the feature is not enabled, what plan is required?"""
+  planRequirement: PlanRequirement
+
+  """
+  Deprecated: use accountLimit instead
+  If enabled and limit = negative, then unliminted
+  """
+  limit: Int
+}
+
+type VulnerabilityReportingRepoFeature {
+  enabled: Boolean!
+}
+
+type VulnerabilityReportingResult {
+  namespace: String!
+  repoName: String!
+  hostName: String!
+  vulnerabilityReporting: VulnerabilityReportingRepoFeature
+}
+
+type MgAttestation {
+  digest: String!
+  predicateType: String!
+  reference: String!
+}
+
+type MgAttestationBuildArg {
+  key: String!
+  value: String!
+}
+
+type MgAttestationBuildParameters {
+  args: [MgAttestationBuildArg!]!
+}
+
+type MgAttestationDockerfile {
+  rawContent: String!
+  sourceMap: [MgAttestationDockerfileSourceMap!]!
+}
+
+type MgAttestationDockerfileSourceMap {
+  digests: [String!]!
+  endColumn: Int!
+  endLine: Int!
+  instruction: String!
+  source: String!
+  startColumn: Int!
+  startLine: Int!
+}
+
+"""
+This type represents the OCI Image Configuration for an image.
+Documentation can be found here: https://github.com/opencontainers/image-spec/blob/main/config.md
+"""
+type MgAttestationOCIConfig {
+  config: MgAttestationOCIConfigConfig!
+}
+
+type MgAttestationOCIConfigConfig {
+  user: String
+
+  """
+  The exposed ports for the image. This is represented here as a list of strings, but it is actually
+  a map in the format of `{ "80/tcp": {} }` in the oci image spec, where the value is always an empty 
+  """
+  exposedPorts: [String!]!
+  env: [String!]!
+  entrypoint: [String!]!
+  cmd: [String!]!
+
+  """
+  The volumes for the image. This is represented here as a list of strings, but it is actually
+  a map in the format of `{ "/var/lib/something": {} }` in the oci image spec, where the value is always an empty 
+  """
+  volumes: [String!]!
+  workingDir: String
+  labels: [MgAttestationOCIConfigConfigLabel!]!
+  stopSignal: String
+  argsEscaped: Boolean
+  memory: Int
+  memorySwap: Int
+  cpuShares: Int
+  healthcheck: MgAttestationOCIConfigConfigHealthcheck
+}
+
+type MgAttestationOCIConfigConfigHealthcheck {
+  test: [String!]!
+  interval: Int
+  timeout: Int
+  retries: Int
+}
+
+type MgAttestationOCIConfigConfigLabel {
+  key: String!
+  value: String!
+}
+
+input MgAttestationsListQuery {
+  digest: String!
+  hostName: String!
+  repoName: String!
+}
+
+type MgAttestationsListResult {
+  """Paging of the attestations"""
+  paging: Paging!
+
+  """The image's attestations"""
+  items: [MgAttestation!]!
+}
+
+type MgAttestationSource {
+  commitUrl: String
+  commitSha: String!
+  dockerfileUrl: String
+}
+
+input MgAttestationsQuery {
+  digest: String!
+  hostName: String!
+  repoName: String!
+}
+
+type MgAttestationsResult {
+  buildParameters: MgAttestationBuildParameters
+  dockerfile: MgAttestationDockerfile
+  ociConfig: MgAttestationOCIConfig
+  source: MgAttestationSource
+}
+
+interface BasePurlFields {
+  namespace: String
+  name: String!
+  type: String!
+  version: String
+  qualifiers: String
+  subpath: String
+}
+
+input CreateWebhookInput {
+  payloadUrl: String!
+  events: [WebhookEvent!]!
+  signingKey: String
+  active: Boolean!
+}
+
+type DeleteWebhookResult {
+  success: Boolean!
+}
+
+type DhiDestinationRepository {
+  name: String!
+  namespace: String!
+  hostname: String!
+}
+
+input DhiDestinationRepositoryFilter {
+  hostname: String!
+  namespace: String!
+  name: String!
+}
+
+input DhiDestinationRepositoryInput {
+  name: String!
+  namespace: String!
+}
+
+input DhiGetMirroredRepositoriesBySourceRepositoryQuery {
+  dhiSourceRepository: DhiSourceRepositoryInput!
+}
+
+type DhiGetMirroredRepositoriesBySourceRepositoryResponse {
+  """The list of mirrored repositories"""
+  mirroredRepositories: [DhiMirroredRepository!]!
+}
+
+input DhiGetMirroredRepositoryQuery {
+  mirroredRepositoryId: String!
+}
+
+type DhiGetMirroredRepositoryResponse {
+  """The mirrored repository, null if it doesn't exist"""
+  mirroredRepository: DhiMirroredRepository
+}
+
+"""Details for a DHI image manifest"""
+type DhiImageManifest {
+  manifestDigest: String!
+  platform: String!
+  distribution: String!
+  compressedSize: Float!
+  packageManager: String
+  shell: String
+  user: String!
+  workingDirectory: String!
+  fipsCompliant: Boolean!
+  stigCertified: Boolean!
+  lastPushed: String!
+  vulnerabilities: VulnerabilityReport
+  scoutHealthScore: ScoutHealthScore
+}
+
+type DhiImageTag {
+  name: String!
+  lastUpdated: String!
+}
+
+"""
+An index digest for a DHI image. Contains an aggregate of all the tags
+that apply to this image. Also contains all the manifests that make up this
+index.
+"""
+type DhiIndexImage {
+  indexDigest: String!
+  tags: [DhiImageTag!]!
+  imageManifests: [DhiImageManifest!]!
+}
+
+type DhiListMirroredRepositoriesResponse {
+  """The list of mirrored repositories"""
+  mirroredRepositories: [DhiMirroredRepository!]!
+
+  """The total number of mirrored repositories"""
+  totalCount: Int!
+
+  """Whether the organization can mirror more repositories"""
+  canMirrorMoreRepositories: Boolean!
+}
+
+input DhiListMirroringLogsPagingInput {
+  pageSize: Int = 100
+  page: Int = 1
+}
+
+input DhiListMirroringLogsQuery {
+  destinationRepositories: [DhiDestinationRepositoryFilter!]
+  includedStatuses: [DhiMirroringLogStatus!]
+  excludedStatuses: [DhiMirroringLogStatus!]
+  triggeredSince: String
+  paging: DhiListMirroringLogsPagingInput
+}
+
+type DhiListMirroringLogsResult {
+  items: [DhiMirroringLog!]!
+}
+
+type DhiMirroredRepository {
+  id: String!
+  destinationRepository: DhiDestinationRepository!
+  dhiSourceRepository: DhiSourceRepository!
+}
+
+type DhiMirroringLog {
+  id: String!
+  reason: DhiMirroringLogReason!
+  status: DhiMirroringLogStatus!
+  sourceRepository: DhiSourceRepository!
+  destinationRepository: DhiDestinationRepository!
+  tag: String!
+  digest: String!
+  triggeredAt: String!
+  pushedAt: String
+  startedAt: String
+  completedAt: String
+}
+
+enum DhiMirroringLogReason {
+  ONBOARDING
+  PUSH
+}
+
+enum DhiMirroringLogStatus {
+  REQUESTED
+  STARTED
+  FAILED
+  SUCCEEDED
+}
+
+input DhiRemoveMirroredRepositoryInput {
+  mirroredRepositoryId: String!
+}
+
+input DhiRepositoriesQuery {
+  filter: DhiRepositoriesQueryFilter
+}
+
+input DhiRepositoriesQueryFilter {
+  """Filter results to just this category by id"""
+  categoryId: String
+}
+
+"""The result of a query for a DHI repositories"""
+type DhiRepositoriesResult {
+  items: [DhiRepositorySummary!]!
+
+  """All the categories for the repositories, ignoring filters"""
+  categories: [DhiRepositoryCategory!]!
+}
+
+"""A category for a DHI repository"""
+type DhiRepositoryCategory {
+  id: String!
+  name: String!
+}
+
+input DhiRepositoryDetailsQuery {
+  repoName: String!
+}
+
+"""
+Details for a DHI repository, used on the repo page. Contains all the information for the
+various tabs on that page. e.g. the digest/tag lists
+"""
+type DhiRepositoryDetailsResult {
+  name: String!
+  namespace: String!
+  displayName: String!
+  shortDescription: String!
+  featured: Boolean!
+  fipsCompliant: Boolean!
+  stigCertified: Boolean!
+  homeUrl: String
+  categories: [DhiRepositoryCategory!]!
+  distributions: [String!]!
+  platforms: [String!]!
+  overview: String!
+  guides: String!
+  images: [DhiIndexImage!]!
+}
+
+"""A summary of a DHI repository"""
+type DhiRepositorySummary {
+  name: String!
+  namespace: String!
+  displayName: String!
+  shortDescription: String!
+  featured: Boolean!
+  fipsCompliant: Boolean!
+  stigCertified: Boolean!
+  homeUrl: String
+  categories: [DhiRepositoryCategory!]!
+  distributions: [String!]!
+  platforms: [String!]!
+}
+
+input DhiSetMirroredRepositoryInput {
+  dhiSourceRepository: DhiSourceRepositoryInput!
+  destinationRepository: DhiDestinationRepositoryInput!
+}
+
+type DhiSetMirroredRepositoryResponse {
+  """The mirrored repository, null if it doesn't exist"""
+  mirroredRepository: DhiMirroredRepository
+}
+
+type DhiSourceRepository {
+  name: String!
+  namespace: String!
+  hostname: String!
+  displayName: String!
+}
+
+input DhiSourceRepositoryInput {
+  name: String!
+  namespace: String!
+}
+
+input DhiTagDetailsQuery {
+  repoName: String!
+  tag: String!
+}
+
+"""The result of a query for a DHI tag details"""
+type DhiTagDetailsResult {
+  indexDigest: String!
+  repo: String!
+  tag: DhiImageTag!
+  allTags: [DhiImageTag!]!
+  imageManifests: [DhiImageManifest!]!
+}
+
+union ExceptionSource = VEXStatement | ManualException
+
+type ExceptionVulnerability {
+  cveId: String!
+  highestSeverity: CVSSSeverity
+  highestCVSSScore: String
+}
+
+input FullImageCoordInput {
+  digest: String!
+  hostname: String!
+  repository: String!
+}
+
+input ImageCoordInput {
+  digest: String!
+  hostname: String
+  repository: String
+}
+
+type ImageRepositoryResult {
+  hostname: String!
+  repository: String!
+}
+
+input ImagesWithPackageOrdering {
+  field: ImagesWithPackageOrderingField = LAST_PUSHED
+  sortOrder: SortOrder = DESCENDING
+}
+
+enum ImagesWithPackageOrderingField {
+  LAST_PUSHED
+  NAME
+}
+
+type ListWebhooksResult {
+  items: [Webhook!]!
+}
+
+type ManualException {
+  exceptionId: ID!
+  type: ExceptionType!
+  author: String
+  created: String!
+  cveId: String!
+  scopes: [VEXStatementScope!]
+
+  """Present only when type is FALSE_POSITIVE"""
+  justification: VEXStatementJustification
+  additionalDetails: String
+}
+
+type MutationResponse {
+  status: MutationResponseStatus!
+  message: String
+}
+
+enum MutationResponseStatus {
+  ACCEPTED
+  BAD_REQUEST
+  ERROR
+  NOT_FOUND
+}
+
+type PkImagePlatform {
+  """The OS (Operating System) of the image, eg. linux"""
+  os: String!
+
+  """The chip architecture of the image, eg. arm64"""
+  architecture: String!
+
+  """The OS variant of the image"""
+  variant: String
+}
+
+input PkImagesWithPackageFilter {
+  packageVersion: String
+  repoName: String
+  kvs: [KVFilterInput!]
+}
+
+input PkImagesWithPackageQuery {
+  name: String!
+  type: String!
+  namespace: String
+  stream: String!
+  paging: PagingInput
+  filter: PkImagesWithPackageFilter
+  ordering: ImagesWithPackageOrdering
+}
+
+type PkImagesWithPackageResponse {
+  items: [PkImageWithPackage!]!
+  paging: Paging!
+  versions: [String!]!
+}
+
+type PkImageWithPackage {
+  repository: PkRepository!
+  digest: String!
+  name: String
+  lastPushed: String
+  packageVersions: [String!]!
+  platform: PkImagePlatform
+}
+
+type PkRepository {
+  hostName: String!
+  repoName: String!
+}
+
+input PkRepositoryInput {
+  """e.g. hub.docker.com"""
+  hostName: String!
+
+  """e.g. your-org/your-repo"""
+  repoName: String!
+}
+
+input PkStreamSummaryFilter {
+  """Filter the results to only include the supplied repos"""
+  repos: [PkRepositoryInput!]
+}
+
+type PurlFields implements BasePurlFields {
+  namespace: String
+  name: String!
+  type: String!
+  version: String
+  qualifiers: String
+  subpath: String
+}
+
+type ScCVEPackageVulnerability {
+  """The name of the package"""
+  name: String
+
+  """The type of the package"""
+  type: String!
+
+  """The namespace of the package"""
+  namespace: String
+
+  """The name of the operating system if applicable"""
+  osName: String
+
+  """The version of the operating system if applicable"""
+  osVersion: String
+
+  """The version ranges of this vulnerability"""
+  versions: [ScCVEPackageVulnerabilityVersion!]!
+}
+
+type ScCVEPackageVulnerabilityVersion {
+  """The vulnerable version range of this package"""
+  vulnerableRange: String
+
+  """
+  The version of this package that fixes the vulnerability (if applicable)
+  """
+  fixedBy: String
+}
+
+type ScCVESource {
+  """The name/id of the source"""
+  source: String!
+
+  """The formatted name of the source"""
+  sourceName: String!
+
+  """The id of the cve at the source"""
+  sourceId: String!
+
+  """The url of the cve at the sources database"""
+  url: String
+
+  """Description of the cve from this source"""
+  description: String
+
+  """When this cve was created for this source"""
+  createdAt: String!
+
+  """When this cve was last updated for this source"""
+  updatedAt: String!
+
+  """When this source withdrew the cve (if applicable)"""
+  withdrawnAt: String
+
+  """The state of this cve (e.g. disputed)."""
+  state: String
+
+  """How exploitable is this cve"""
+  exploitabilityScore: String
+
+  """The severity, score and cvss for this cve"""
+  cvss: VpCVSS!
+
+  """The packages from this source that are vulnerable to the cve"""
+  packages: [ScCVEPackageVulnerability!]!
+
+  """The CWEs that apply to this source of the cve"""
+  cwes: [VpCWE!]!
+
+  """A list of exploit urls"""
+  exploits: [String!]!
+
+  """A list of advisory urls"""
+  advisories: [String!]!
+
+  """A list of patch urls"""
+  patches: [String!]!
+
+  """A list of commit urls"""
+  commits: [String!]!
+
+  """A list of info urls"""
+  info: [String!]!
+}
+
+input ScCVESourcesQuery {
+  cveId: String!
+}
+
+type ScCVESourcesResult {
+  """The id of the cve we are returning sources for"""
+  cveId: String!
+
+  """The default source for this cve"""
+  defaultSource: String!
+
+  """A list of all sources of information for this cve"""
+  sources: [ScCVESource!]!
+
+  """The EPSS data for the cve if available"""
+  epss: EPSS
+}
+
+"""The health score for the image"""
+type ScoutHealthScore {
+  score: String!
+  policies: [ScoutHealthScorePolicy!]!
+}
+
+"""A health score policy for an image"""
+type ScoutHealthScorePolicy {
+  name: String!
+  label: String!
+  status: ScoutHealthScorePolicyStatus!
+  description: String!
+  violationCount: Int!
+}
+
+"""The status of a health score policy"""
+enum ScoutHealthScorePolicyStatus {
+  PASS
+  FAIL
+  UNKNOWN
+}
+
+enum SourceType {
+  VEX
+  SCOUT
+}
+
+enum StreamSummaryMode {
+  """
+  Sum where the same cve is included multiple times if it appears on multiple images. However each CVE is only counted once
+  per image, even if it appears in multiple purls. This summary report should equal the result of adding together the summary
+  reports for every image it includes.
+  """
+  CUMULATIVE_BY_PURL
+
+  """
+  Sum to only include each distinct purl once in the summary report even if it appears in multiple images. The same
+  CVE can be included multiple times if it appears in different purls.
+  """
+  UNIQUE_BY_PURL
+
+  """
+  Sum to only include each cve once in the summary report even if it appears in multiple images.
+  """
+  UNIQUE_BY_CVE
+}
+
+input StreamSummaryQuery {
+  """
+  The mode we use to sum the vulnerabilies - see StreamSummaryMode for detaisl
+  """
+  summaryMode: StreamSummaryMode!
+
+  """The stream we are querying"""
+  stream: String!
+
+  """Filter the results"""
+  filter: PkStreamSummaryFilter
+}
+
+type StreamSummaryResult {
+  vulnerabilityReport: VulnerabilityReport!
+}
+
+type TestWebhookResult {
+  success: Boolean!
+}
+
+input UpdateWebhookInput {
+  id: String!
+  payloadUrl: String!
+  events: [WebhookEvent!]!
+  signingKey: String
+  active: Boolean!
+}
+
+type VEXDocument {
+  documentId: ID!
+  documentUrl: String!
+  timestamp: String!
+  author: String
+  version: String
+  source: String
+}
+
+type VEXPackageScope implements BasePurlFields {
+  purl: String!
+  type: String!
+  namespace: String
+  name: String!
+  qualifiers: String
+  version: String
+  subpath: String
+}
+
+type VEXStatement {
+  statementId: ID
+  timestamp: String!
+  document: VEXDocument!
+  cveId: String!
+  scopes: [VEXStatementScope!]!
+  status: VEXStatementStatus!
+  justification: VEXStatementJustification
+  statusStatement: String
+}
+
+type VEXStatementImage {
+  digest: String!
+}
+
+type VEXStatementScope {
+  repository: ImageRepositoryResult
+  image: VEXStatementImage
+  packages: [VEXPackageScope!]
+}
+
+input VulnerabilitiesByPackageQuery {
+  packageUrls: [String!]!
+  imageCoords: ImageCoordInput!
+  includeExcepted: Boolean
+}
+
+type VulnerabilitiesByPackageResponse {
+  items: [VpPackageVulnerability!]!
+}
+
+"""An Exception, backed by either a manual exeption or a VEX statement"""
+type VulnerabilityException {
+  id: ID!
+  author: String
+  timestamp: String!
+  vulnerability: ExceptionVulnerability!
+  type: ExceptionType!
+  imageScopes: [VulnerabilityExceptionImageScope!]
+  reason: VulnerabilityExceptionReason
+}
+
+type VulnerabilityExceptionImageScope {
+  hostName: String
+  repoName: String
+  digest: String
+
+  """
+  The package scopes of the vulnerability exception. null means "all packages in the image"
+  """
+  packageScopes: [VulnerabilityExceptionPackageScope!]
+}
+
+type VulnerabilityExceptionPackageScope {
+  purl: String!
+  purlFields: PurlFields!
+}
+
+type VulnerabilityExceptionReason {
+  justification: VEXStatementJustification
+  additionalDetails: String
+  source: ExceptionSource!
+}
+
+input VulnerabilityExceptionsApplicableToImageQuery {
+  image: FullImageCoordInput!
+  filter: VulnerabilityExceptionsApplicableToImageQueryFilter
+  paging: PagingInput!
+}
+
+input VulnerabilityExceptionsApplicableToImageQueryFilter {
+  orgExceptionsOnly: Boolean
+
+  """Case insensitive. Eg. "cve-2019-1" matches "CVE-2019-1234"."""
+  cveIdPrefix: String
+  type: ExceptionType
+  justification: VEXStatementJustification
+  sourceType: SourceType
+}
+
+input VulnerabilityExceptionsQuery {
+  filter: VulnerabilityExceptionsQueryFilter
+  paging: PagingInput!
+}
+
+input VulnerabilityExceptionsQueryFilter {
+  hostname: String
+  repository: String
+  digest: String
+  orgExceptionsOnly: Boolean
+
+  """
+  The exact CVE ID to filter vulnerability exceptions, e.g. "CVE-2019-1234"
+  """
+  cveId: String
+
+  """
+  Include this field only if the 'cveId' field is not specified, as they are mutually exclusive. Case insensitive. Eg. "cve-2019-1" matches "CVE-2019-1234".
+  """
+  cveIdPrefix: String
+  type: ExceptionType
+  justification: VEXStatementJustification
+  sourceType: SourceType
+}
+
+type VulnerabilityExceptionsResult {
+  items: [VulnerabilityException!]!
+  paging: Paging!
+}
+
+type Webhook {
+  id: String!
+  payloadUrl: String!
+  events: [WebhookEvent!]!
+  signingKey: String
+  active: Boolean!
+  updatedAt: String!
+}
+
+enum WebhookEvent {
+  EVERYTHING
+  DHI_MIRROR_COMPLETED
+}
+
+input AddNotificationWebhookInput {
+  """ID of the configuration. If not provided, one will be autogenerated."""
+  ID: String
+
+  """Name of the notification. Required for adding new configurations."""
+  name: String!
+
+  """Type of webhook. Required for adding new configurations."""
+  webhookType: WebhookType!
+
+  """Webhook URL. Required for adding new configurations."""
+  url: String!
+
+  """List of repositories to consider in the filter."""
+  repositories: [String]
+
+  """
+  Type of filter to apply to the repositories:
+  - Allow: Will send notifications just for the listed repositories.
+  - Block: Will send notifications for the repositories not listed.
+  
+  Default: Allow
+  """
+  filterType: RepositoryFilterType
+
+  """Weekly report settings. If not provided, the defaults will be applied."""
+  weeklyReportSettings: WeeklyReportSettingsInput
+
+  """
+  List of streams to filter the notifications. If not provided, latest-indexed will be used.
+  """
+  streams: [String]
+}
+
+type CVEVulnerabilityState {
+  """CVSS Score of the vulnerability"""
+  CVSSScore: String!
+
+  """CVE Severity"""
+  severity: String!
+
+  """Whether this CVE has a fix"""
+  fixable: Boolean!
+}
+
+union FeedNotification = NotificationNewCVE | NotificationUpdateCVE
+
+type GenericWebhook implements NotificationWebhookResult {
+  """ID of the configuration."""
+  ID: String!
+
+  """Name of the webhook configuration."""
+  name: String!
+
+  """Author of the webhook configuration."""
+  author: NotificationWebhookAuthor!
+
+  """When it was last updated, in RFC3339."""
+  updatedAt: String!
+
+  """
+  Webhook URL. As this is considered a secret, when set, the value will be redacted.
+  """
+  url: String!
+
+  """List of repositories to consider in the filter."""
+  repositories: [String!]!
+
+  """
+  Type of filter to apply to the repositories:
+  - Allow: Will send notifications just for the listed repositories.
+  - Block: Will send notifications for the repositories not listed.
+  """
+  filterType: RepositoryFilterType!
+
+  """
+  List of streams to filter the notifications. If empty, latest-indexed will be used.
+  """
+  streams: [String!]!
+}
+
+type ImageReference {
+  """Repository of the image"""
+  repository: String!
+
+  """Package impacted by the CVE"""
+  impactedPackage: String!
+}
+
+type Notification {
+  id: ID!
+  organization: String!
+  title: String!
+  body: String!
+  url: String!
+  isRead: Boolean!
+  isDismissed: Boolean!
+  createdAt: String!
+}
+
+type NotificationNewCVE {
+  """Event name. `new_cve`"""
+  event: String!
+
+  """Organization"""
+  organization: String!
+
+  """CVE that triggered the notification"""
+  cve: String!
+
+  """Vulnerability state of the CVE"""
+  afterState: CVEVulnerabilityState!
+
+  """Number of images impacted in this event"""
+  numImpactedImages: Int!
+
+  """Some images impacted by this event"""
+  sampleImages: [ImageReference]!
+
+  """Created at in RFC3339"""
+  createdAt: String!
+}
+
+type NotificationUpdateCVE {
+  """Event name. `update_cve`"""
+  event: String!
+
+  """Organization"""
+  organization: String!
+
+  """CVE that triggered the notification"""
+  cve: String!
+
+  """Vulnerability state of before this CVE event"""
+  beforeState: CVEVulnerabilityState!
+
+  """Vulnerability state of the CVE after this event"""
+  afterState: CVEVulnerabilityState!
+
+  """Number of images impacted in this event"""
+  numImpactedImages: Int!
+
+  """Some images impacted by this event"""
+  sampleImages: [ImageReference]!
+
+  """Created at in RFC3339"""
+  createdAt: String!
+}
+
+input NotificationUpdateInput {
+  isRead: Boolean
+  isDismissed: Boolean
+}
+
+type NotificationWebhookAuthor {
+  """Name of the author."""
+  name: String!
+
+  """Email of the author."""
+  email: String!
+}
+
+input NotificationWebhookFilterInput {
+  """Type of webhook."""
+  webhookType: WebhookType
+}
+
+interface NotificationWebhookResult {
+  """ID of the configuration."""
+  ID: String!
+
+  """Name of the webhook configuration."""
+  name: String!
+
+  """Author of the webhook configuration."""
+  author: NotificationWebhookAuthor!
+
+  """When it was last updated, in RFC3339."""
+  updatedAt: String!
+
+  """
+  Webhook URL. As this is considered a secret, when set, the value will be redacted.
+  """
+  url: String!
+
+  """List of repositories to consider in the filter."""
+  repositories: [String!]!
+
+  """
+  Type of filter to apply to the repositories:
+  - Allow: Will send notifications just for the listed repositories.
+  - Block: Will send notifications for the repositories not listed.
+  """
+  filterType: RepositoryFilterType!
+
+  """
+  List of streams to filter the notifications. If empty, latest-indexed will be used.
+  """
+  streams: [String!]!
+}
+
+type Repository {
+  hostName: String!
+  repositoryName: String!
+}
+
+enum RepositoryFilterType {
+  ALLOW
+  BLOCK
+}
+
+input RepositoryInput {
+  hostName: String!
+  repositoryName: String!
+}
+
+type SlackWebhook implements NotificationWebhookResult {
+  """ID of the configuration."""
+  ID: String!
+
+  """Name of the webhook configuration."""
+  name: String!
+
+  """Author of the webhook configuration."""
+  author: NotificationWebhookAuthor!
+
+  """When it was last updated, in RFC3339."""
+  updatedAt: String!
+
+  """
+  Webhook URL. As this is considered a secret, when set, the value will be redacted.
+  """
+  url: String!
+
+  """List of repositories to consider in the filter."""
+  repositories: [String!]!
+
+  """
+  Type of filter to apply to the repositories:
+  - Allow: Will send notifications just for the listed repositories.
+  - Block: Will send notifications for the repositories not listed.
+  """
+  filterType: RepositoryFilterType!
+
+  """
+  DEPRECATED: Use weeklyReportSettings instead
+  Send weekly reports (only applies to Slack Webhook Type)
+  """
+  weeklyReportEnabled: Boolean! @deprecated(reason: "Use `weeklyReportSettings`.")
+
+  """Weekly report settings"""
+  weeklyReportSettings: WeeklyReportSettings!
+
+  """
+  List of streams to filter the notifications. If empty, latest-indexed will be used.
+  """
+  streams: [String!]!
+}
+
+input TeamInput {
+  """If provided, the feed will be filtered by Hub team"""
+  team: String!
+}
+
+input UpdateNotificationWebhookInput {
+  """ID of the configuration."""
+  ID: String!
+
+  """Name of the notification."""
+  name: String
+
+  """Type of webhook."""
+  webhookType: WebhookType
+
+  """Webhook URL."""
+  url: String
+
+  """List of repositories to consider in the filter."""
+  repositories: [String]
+
+  """
+  Type of filter to apply to the repositories:
+  - Allow: Will send notifications just for the listed repositories.
+  - Block: Will send notifications for the repositories not listed.
+  
+  Default: Allow
+  """
+  filterType: RepositoryFilterType
+
+  """Weekly report settings."""
+  weeklyReportSettings: WeeklyReportSettingsInput
+
+  """
+  List of streams to filter the notifications. If not provided, latest-indexed will be used.
+  """
+  streams: [String]
+}
+
+input UserNotificationPreferencesInput {
+  """
+  If true, the user will receive notifications for all repositories they have access to.
+  """
+  allRepositories: Boolean
+
+  """
+  List of repositories the user wants to receive notifications for.
+  If allRepositories is true, this field is ignored.
+  """
+  repositories: [RepositoryInput!]
+}
+
+type UserNotificationPreferencesResult {
+  """
+  If true, the user will receive notifications for all repositories they have access to.
+  """
+  allRepositories: Boolean!
+
+  """
+  List of repositories the user wants to receive notifications for is allRepositories is false.
+  """
+  repositories: [Repository!]
+}
+
+enum WebhookType {
+  GENERIC
+  SLACK
+}
+
+type WeeklyReportSettings {
+  """Send weekly reports."""
+  enabled: Boolean!
+
+  """Exclude top fixable vulnerabilities section from the report."""
+  excludeTopVulnerabilities: Boolean!
+
+  """Exclude policy section from the report."""
+  excludePolicies: Boolean!
+}
+
+input WeeklyReportSettingsInput {
+  """
+  Send weekly reports.
+  
+  Default: true
+  """
+  enabled: Boolean
+
+  """
+  Exclude top fixable vulnerabilities section from the report.
+  
+  Default: false
+  """
+  excludeTopVulnerabilities: Boolean
+
+  """
+  Exclude policy section from the report.
+  
+  Default: false
+  """
+  excludePolicies: Boolean
+}
+
+type rsAcrResult implements rsRegistryResult {
+  """Total count of repositories."""
+  repositoryCount: Int!
+
+  """Registry hostname of the registry."""
+  hostName: String!
+
+  """Registry status."""
+  status: rsRegistryStatus!
+}
+
+type rsDockerHubResult implements rsRegistryResult {
+  """Total count of repositories."""
+  repositoryCount: Int!
+
+  """Registry hostname of the registry."""
+  hostName: String!
+
+  """Registry status."""
+  status: rsRegistryStatus!
+}
+
+type rsEcrResult implements rsRegistryResult {
+  """Total count of repositories."""
+  repositoryCount: Int!
+
+  """Registry hostname of the registry."""
+  hostName: String!
+
+  """Registry status."""
+  status: rsRegistryStatus!
+}
+
+type rsPageInfo {
+  """Current page number. Starts at 1."""
+  page: Int!
+
+  """Total number of pages."""
+  total: Int!
+
+  """Number of items per page."""
+  pageSize: Int!
+
+  """Next page number. Null if the current page is the last one."""
+  nextPage: Int
+
+  """Previous page number. Null if the current page is the first one."""
+  previousPage: Int
+}
+
+interface rsRegistryResult {
+  """Total count of repositories."""
+  repositoryCount: Int!
+
+  """Registry hostname of the registry."""
+  hostName: String!
+
+  """Registry status."""
+  status: rsRegistryStatus!
+}
+
+enum rsRegistryStatus {
+  CONNECTED
+  PENDING
+  FAILED
+}
+
+type rsRepository {
+  """Full name of the repository, including any namespace."""
+  name: String!
+
+  """Registry hostname of the repository."""
+  registry: String!
+
+  """Description of the repository."""
+  description: String!
+
+  """Date of creation of the repository."""
+  createdAt: String!
+
+  """Date of latest update of the repository."""
+  updatedAt: String
+
+  """Indicate if the repository contains images or not."""
+  isEmpty: Boolean!
+
+  """Indicate if the repository is enabled or not on Docker Scout."""
+  enabled: Boolean!
+
+  """Indicate the type of repository"""
+  type: rsRepositoryType!
+
+  """Properties associated with this repository"""
+  properties: rsRepositoryProperties!
+}
+
+input rsRepositoryListFilter {
+  """Filter on repository name."""
+  repository: String
+}
+
+"""End of shared types."""
+input rsRepositoryListInput {
+  """
+  Optional: if not provided, Docker Hub registry will be used.
+  
+  The skill configuration to select the right registry.
+  """
+  skill: rsSkillInput
+
+  """Filter on repository name."""
+  filter: rsRepositoryListFilter
+
+  """
+  Order of the repositories.
+  If none provided, the default order is by repository name asc.
+  """
+  ordering: rsRepositoryOrdering
+
+  """Page info"""
+  page: PagingInput
+}
+
+type rsRepositoryListResult {
+  """Total count of repositories."""
+  count: Int!
+
+  """Information about the page."""
+  pageInfo: rsPageInfo!
+
+  """Registry hostname of the repositories (if at least one repository)."""
+  registry: String!
+
+  """The skill configuration to select the right registry."""
+  skill: rsSkill!
+
+  """List of repositories."""
+  repositories: [rsRepository!]
+}
+
+enum rsRepositoryListSortField {
+  """Order by repository name."""
+  NAME
+
+  """Order by creation date."""
+  CREATED_AT
+
+  """Order by update date."""
+  UPDATED_AT
+
+  """Order by empty repositories."""
+  EMPTY
+
+  """Order by enabled repositories."""
+  ENABLED
+}
+
+input rsRepositoryOrdering {
+  """
+  Field to order repositories by.
+  If none provided, the default order is by repository name.
+  """
+  field: rsRepositoryListSortField
+
+  """
+  Order of the repositories.
+  If none provided, the default order is ascending.
+  """
+  order: SortOrder = ASCENDING
+}
+
+type rsRepositoryProperties {
+  preventDisable: Boolean!
+}
+
+enum rsRepositoryType {
+  STANDARD
+  DHI_MIRROR
+}
+
+type rsSkill {
+  """The namespace of the skill."""
+  namespace: String!
+
+  """The name of the skill."""
+  name: String!
+
+  """
+  Optional: not needed for Docker Hub.
+  
+  The configuration name of the skill.
+  """
+  configurationName: String
+}
+
+input rsSkillInput {
+  """The namespace of the skill."""
+  namespace: String!
+
+  """The name of the skill."""
+  name: String!
+
+  """
+  Optional: not needed for Docker Hub.
+  
+  The configuration name of the skill.
+  """
+  configurationName: String
+}

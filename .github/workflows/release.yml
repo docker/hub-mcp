@@ -1,0 +1,178 @@
+name: Release Docker Image
+
+run-name: Release Docker Image ${{ github.event_name == 'workflow_dispatch' && '(manual)' || '(auto-deploy)' }}
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: |
+          Version (of the form "1.2.3") or Branch (of the form "origin/branch-name").
+          Leave empty to bump the latest version.
+        type: string
+      version_level:
+        description: The level of the version to bump.
+        type: choice
+        default: 'minor'
+        required: true
+        options:
+          - 'major'
+          - 'minor'
+          - 'patch' 
+      build_local:
+        type: boolean
+        default: false
+        description: Uses build-cloud by default. If Build Cloud is down, set this to true to build locally.
+      dry_run:
+        description: If true, the workflow will not push the image to the registry.
+        type: boolean
+        default: false
+
+
+env:
+  GOPRIVATE: github.com/docker
+  NAME: dockerhub-mcp
+  VERSION_LEVEL: ${{ inputs.version_level || 'minor' }}
+
+jobs:
+  release:
+    name: Release Service
+    permissions:
+      pull-requests: write
+      # This permission is required to update the PR body content
+      repository-projects: write
+      # These permissions are needed to interact with GitHub's OIDC Token
+      # endpoint. We need it in order to make requests to AWS ECR for image
+      # mirroring.
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    # Internally the create-release action attempts to push a commit to
+    # cloud-manifests in a loop to avoid race-conditions. However, this could
+    # have the side-effect of making the action hang for ever if we come across
+    # a scenario that we haven't thought of. This timeout makes sure to fail the
+    # workflow if that happens.
+    timeout-minutes: 10
+    steps:
+      - name: Setup
+        uses: docker/actions/setup-go@33488d0ac7cf5f3616b656b8f2bf28b45467976c #v1.17.0
+        id: setup_go
+        with:
+          app_id: ${{ secrets.HUB_PLATFORM_APP_ID }}
+          app_private_key: ${{ secrets.HUB_PLATFORM_APP_PRIVATE_KEY }}
+          go_version: '1.24'
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+        with:
+          token: ${{ steps.setup_go.outputs.token }}
+          fetch-depth: 0 
+
+      - name: Bump Version
+        id: bump_version
+        uses: docker/actions/bump-version@132452b833c5fae71bc674fe54384c9242173f96 # v2.5.0
+        with:
+          name: ${{ env.NAME }}
+          level: ${{ env.VERSION_LEVEL }}
+
+
+      - name: Get Release Version
+        id: release_version
+        shell: bash
+        run: |
+          if [[ '${{ steps.bump_version.outcome }}' == 'success' ]]; then
+            echo "version=${{ steps.bump_version.outputs.new_version }}" >> $GITHUB_OUTPUT
+            echo "tag=${{ steps.bump_version.outputs.new_tag }}" >> $GITHUB_OUTPUT
+          elif [[ '${{ steps.bump_version.outcome }}' == 'success' ]]; then
+            echo "version=${{ steps.bump_version.outputs.new_version }}" >> $GITHUB_OUTPUT
+          elif [[ '${{ inputs.version }}' != '' ]]; then
+            echo "Using already provided version: ${{ inputs.version }}."
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "Unable to compute version for staging environment."
+            exit 42
+          fi
+
+      - name: Hub Login
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc #v2
+        with:
+          username: dockerbuildbot
+          password: ${{ secrets.DOCKERBUILDBOT_WRITE_PAT }}
+
+      - name: Setup Hydrobuild
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 #v3
+        if: ${{ ! inputs.build_local }}
+        with:
+          version: "lab:latest"
+          driver: cloud
+          endpoint: docker/platform-experience
+          install: true
+
+      - name: Check Docker image exists
+        id: hub_image_exists
+        shell: bash
+        run: |
+          if docker manifest inspect docker/${{ env.NAME }}:${{ steps.bump_version.outputs.new_version }}; then
+            echo 'exists=true' >> $GITHUB_OUTPUT
+          else
+            echo 'exists=false' >> $GITHUB_OUTPUT
+          fi
+
+      - name: Ensure attestations are supported
+        shell: bash
+        # docker buildx inspect | grep Driver
+        # Driver:        docker
+        # indicates that we need to enable containerd so
+        # we can compute sboms.
+        run: |
+          driver=$(docker buildx inspect | grep "Driver:")
+          if [[ "$driver" == *"docker"* ]]; then
+            echo "detected driver, needs containerd snapshotter enabled: $driver"
+            sudo mkdir -p /etc/docker
+            if [ -f /etc/docker/daemon.json ]; then
+              cat /etc/docker/daemon.json | jq '. + {"features": {"containerd-snapshotter": true}}' | sudo tee /etc/docker/daemon.json
+            else
+              echo '{"features": {"containerd-snapshotter": true}}' | sudo tee /etc/docker/daemon.json
+            fi
+            sudo systemctl restart docker
+          fi
+  
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3
+  
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 #v3
+      - name: Build and push service image
+        id: build_and_push
+        if: steps.hub_image_exists.outputs.exists == 'false'
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            SERVICE_NAME=${{ env.NAME }}
+            SERVICE_VERSION=${{ steps.release_version.outputs.version }}
+          push: ${{ inputs.dry_run != 'true' }}
+          tags: |
+            docker/${{ env.NAME }}:${{ steps.release_version.outputs.version }}
+            docker/${{ env.NAME }}:latest
+          labels: |
+            org.opencontainers.image.revision=${{ github.event.pull_request.head.sha || github.event.after || github.event.release.tag_name }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            com.docker.image.source.entrypoint=Dockerfile
+          provenance: mode=max
+          sbom: true
+          platforms: linux/amd64,linux/arm64
+
+      - name: Delete git tag created by this workflow
+        if: failure() && steps.bump_version.outputs.new_tag != ''
+        shell: bash
+        run: |
+          git push --delete origin ${{ steps.bump_version.outputs.new_tag }}
+        
+  

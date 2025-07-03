@@ -1,0 +1,3800 @@
+{
+    "tools": [
+        {
+            "name": "listRepositoriesByNamespace",
+            "description": "List Repositories by Organisation (namespace)",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace to list repositories from"
+                    },
+                    "page": {
+                        "type": "number",
+                        "description": "The page number to list repositories from"
+                    },
+                    "page_size": {
+                        "type": "number",
+                        "description": "The page size to list repositories from"
+                    },
+                    "ordering": {
+                        "type": "string",
+                        "enum": [
+                            "last_updated",
+                            "-last_updated",
+                            "name",
+                            "-name",
+                            "pull_count",
+                            "-pull_count"
+                        ],
+                        "description": "The ordering of the repositories. Use \"-\" to reverse the ordering. For example, \"last_updated\" will order the repositories by last updated in descending order while \"-last_updated\" will order the repositories by last updated in ascending order."
+                    },
+                    "media_types": {
+                        "type": "string",
+                        "default": "",
+                        "description": "Comma-delimited list of media types. Only repositories containing one or more artifacts with one of these media types will be returned. Default is empty to get all repositories."
+                    },
+                    "content_types": {
+                        "type": "string",
+                        "default": "",
+                        "description": "Comma-delimited list of content types. Only repositories containing one or more artifacts with one of these content types will be returned. Default is empty to get all repositories."
+                    }
+                },
+                "required": ["namespace"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "List Repositories by Namespace"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "next": {
+                        "type": ["string", "null"]
+                    },
+                    "previous": {
+                        "type": ["string", "null"]
+                    },
+                    "results": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The name of the repository"
+                                                },
+                                                "namespace": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The namespace of the repository"
+                                                },
+                                                "repository_type": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "image",
+                                                                "docker engine plugin"
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The type of the repository"
+                                                },
+                                                "full_description": {
+                                                    "type": ["string", "null"],
+                                                    "description": "The full description of the repository"
+                                                },
+                                                "immutable_tags_settings": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "enabled": {
+                                                                            "type": "boolean",
+                                                                            "description": "Whether the repository has immutable tags"
+                                                                        },
+                                                                        "rules": {
+                                                                            "type": "array",
+                                                                            "items": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "description": "The rules of the immutable tags"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "enabled",
+                                                                        "rules"
+                                                                    ],
+                                                                    "additionalProperties": false
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The immutable tags settings of the repository"
+                                                },
+                                                "is_private": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "boolean"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Whether the repository is private"
+                                                },
+                                                "status": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The status of the repository"
+                                                },
+                                                "status_description": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The status description of the repository"
+                                                },
+                                                "description": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The description of the repository"
+                                                },
+                                                "star_count": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The number of stars the repository has"
+                                                },
+                                                "pull_count": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The number of pulls the repository has"
+                                                },
+                                                "last_updated": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The last updated date of the repository"
+                                                },
+                                                "last_modified": {
+                                                    "type": ["string", "null"],
+                                                    "description": "The last modified date of the repository"
+                                                },
+                                                "date_registered": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The date the repository was registered"
+                                                },
+                                                "affiliation": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The affiliation of the repository"
+                                                },
+                                                "media_types": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The media types of the repository"
+                                                },
+                                                "content_types": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The content types of the repository"
+                                                },
+                                                "categories": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "name": {
+                                                                                "type": "string",
+                                                                                "description": "The name of the category"
+                                                                            },
+                                                                            "slug": {
+                                                                                "type": "string",
+                                                                                "description": "The slug of the category in search engine"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "name",
+                                                                            "slug"
+                                                                        ],
+                                                                        "additionalProperties": false
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The categories of the repository"
+                                                },
+                                                "storage_size": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": ["number", "null"]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The storage size of the repository"
+                                                },
+                                                "user": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The user of the repository"
+                                                },
+                                                "hub_user": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The repository username on hub"
+                                                },
+                                                "has_starred": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "boolean"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Whether the user has starred the repository"
+                                                },
+                                                "is_automated": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "boolean"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Whether the repository is automated"
+                                                },
+                                                "collaborator_count": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The number of collaborators on the repository. Only valid when repository_type is 'User'"
+                                                },
+                                                "permissions": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "read": {
+                                                                            "type": "boolean",
+                                                                            "description": "if user can read and pull from repository"
+                                                                        },
+                                                                        "write": {
+                                                                            "type": "boolean",
+                                                                            "description": "if user can update and push to repository"
+                                                                        },
+                                                                        "admin": {
+                                                                            "type": "boolean",
+                                                                            "description": "if user is an admin of the repository"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "read",
+                                                                        "write",
+                                                                        "admin"
+                                                                    ],
+                                                                    "additionalProperties": false
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "error": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            }
+        },
+        {
+            "name": "createRepository",
+            "description": "Create a repository in organisation (namespace) or personal namespace",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace of the repository. Required."
+                    },
+                    "name": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The name of the repository (required). Must contain a combination of alphanumeric characters and may contain the special characters ., _, or -. Letters must be lowercase."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the repository"
+                    },
+                    "is_private": {
+                        "type": "boolean",
+                        "description": "Whether the repository is private"
+                    },
+                    "full_description": {
+                        "type": "string",
+                        "maxLength": 25000,
+                        "description": "A detailed description of the repository"
+                    },
+                    "registry": {
+                        "type": "string",
+                        "description": "The registry to create the repository in"
+                    }
+                },
+                "required": ["namespace"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Create Repository in namespace"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The name of the repository"
+                    },
+                    "namespace": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The namespace of the repository"
+                    },
+                    "repository_type": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "enum": ["image", "docker engine plugin"]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The type of the repository"
+                    },
+                    "full_description": {
+                        "type": ["string", "null"],
+                        "description": "The full description of the repository"
+                    },
+                    "immutable_tags_settings": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "enabled": {
+                                                "type": "boolean",
+                                                "description": "Whether the repository has immutable tags"
+                                            },
+                                            "rules": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "description": "The rules of the immutable tags"
+                                            }
+                                        },
+                                        "required": ["enabled", "rules"],
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The immutable tags settings of the repository"
+                    },
+                    "is_private": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the repository is private"
+                    },
+                    "status": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The status of the repository"
+                    },
+                    "status_description": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The status description of the repository"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The description of the repository"
+                    },
+                    "star_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of stars the repository has"
+                    },
+                    "pull_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of pulls the repository has"
+                    },
+                    "last_updated": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The last updated date of the repository"
+                    },
+                    "last_modified": {
+                        "type": ["string", "null"],
+                        "description": "The last modified date of the repository"
+                    },
+                    "date_registered": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The date the repository was registered"
+                    },
+                    "affiliation": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The affiliation of the repository"
+                    },
+                    "media_types": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The media types of the repository"
+                    },
+                    "content_types": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The content types of the repository"
+                    },
+                    "categories": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "The name of the category"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "description": "The slug of the category in search engine"
+                                                }
+                                            },
+                                            "required": ["name", "slug"],
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The categories of the repository"
+                    },
+                    "storage_size": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": ["number", "null"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The storage size of the repository"
+                    },
+                    "user": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The user of the repository"
+                    },
+                    "hub_user": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The repository username on hub"
+                    },
+                    "has_starred": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the user has starred the repository"
+                    },
+                    "is_automated": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the repository is automated"
+                    },
+                    "collaborator_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of collaborators on the repository. Only valid when repository_type is 'User'"
+                    },
+                    "permissions": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "read": {
+                                                "type": "boolean",
+                                                "description": "if user can read and pull from repository"
+                                            },
+                                            "write": {
+                                                "type": "boolean",
+                                                "description": "if user can update and push to repository"
+                                            },
+                                            "admin": {
+                                                "type": "boolean",
+                                                "description": "if user is an admin of the repository"
+                                            }
+                                        },
+                                        "required": ["read", "write", "admin"],
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            }
+        },
+        {
+            "name": "getRepositoryInfo",
+            "description": "Get Repository Details",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace of the repository (required). If not provided the `library` namespace will be used for official images."
+                    },
+                    "repository": {
+                        "type": "string",
+                        "description": "The repository name (required)"
+                    }
+                },
+                "required": ["namespace", "repository"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Get Repository Info"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The name of the repository"
+                    },
+                    "namespace": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The namespace of the repository"
+                    },
+                    "repository_type": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "enum": ["image", "docker engine plugin"]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The type of the repository"
+                    },
+                    "full_description": {
+                        "type": ["string", "null"],
+                        "description": "The full description of the repository"
+                    },
+                    "immutable_tags_settings": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "enabled": {
+                                                "type": "boolean",
+                                                "description": "Whether the repository has immutable tags"
+                                            },
+                                            "rules": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "description": "The rules of the immutable tags"
+                                            }
+                                        },
+                                        "required": ["enabled", "rules"],
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The immutable tags settings of the repository"
+                    },
+                    "is_private": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the repository is private"
+                    },
+                    "status": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The status of the repository"
+                    },
+                    "status_description": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The status description of the repository"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The description of the repository"
+                    },
+                    "star_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of stars the repository has"
+                    },
+                    "pull_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of pulls the repository has"
+                    },
+                    "last_updated": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The last updated date of the repository"
+                    },
+                    "last_modified": {
+                        "type": ["string", "null"],
+                        "description": "The last modified date of the repository"
+                    },
+                    "date_registered": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The date the repository was registered"
+                    },
+                    "affiliation": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The affiliation of the repository"
+                    },
+                    "media_types": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The media types of the repository"
+                    },
+                    "content_types": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The content types of the repository"
+                    },
+                    "categories": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "The name of the category"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "description": "The slug of the category in search engine"
+                                                }
+                                            },
+                                            "required": ["name", "slug"],
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The categories of the repository"
+                    },
+                    "storage_size": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": ["number", "null"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The storage size of the repository"
+                    },
+                    "user": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The user of the repository"
+                    },
+                    "hub_user": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The repository username on hub"
+                    },
+                    "has_starred": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the user has starred the repository"
+                    },
+                    "is_automated": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the repository is automated"
+                    },
+                    "collaborator_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of collaborators on the repository. Only valid when repository_type is 'User'"
+                    },
+                    "permissions": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "read": {
+                                                "type": "boolean",
+                                                "description": "if user can read and pull from repository"
+                                            },
+                                            "write": {
+                                                "type": "boolean",
+                                                "description": "if user can update and push to repository"
+                                            },
+                                            "admin": {
+                                                "type": "boolean",
+                                                "description": "if user is an admin of the repository"
+                                            }
+                                        },
+                                        "required": ["read", "write", "admin"],
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            }
+        },
+        {
+            "name": "updateRepositoryInfo",
+            "description": "Update Repository Details",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace of the repository (required)"
+                    },
+                    "repository": {
+                        "type": "string",
+                        "description": "The repository name (required)"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the repository. If user asks for updating the description of the repository, this is the field that should be updated."
+                    },
+                    "full_description": {
+                        "type": "string",
+                        "maxLength": 25000,
+                        "description": "The full description (overview)of the repository. If user asks for updating the full description or the overview of the repository, this is the field that should be updated. "
+                    },
+                    "status": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": ["active", "inactive"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The status of the repository. If user asks for updating the status of the repository, this is the field that should be updated. This is a dangerous operation and should be done with caution so user must be prompted to confirm the operation. Valid status are `active` (1) and `inactive` (0). Normally do not update the status if it is not strictly required by the user. It is not possible to change an `inactive` repository to `active` if it has no images."
+                    }
+                },
+                "required": ["namespace", "repository"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Get Repository Info"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The name of the repository"
+                    },
+                    "namespace": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The namespace of the repository"
+                    },
+                    "repository_type": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "enum": ["image", "docker engine plugin"]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The type of the repository"
+                    },
+                    "full_description": {
+                        "type": ["string", "null"],
+                        "description": "The full description of the repository"
+                    },
+                    "immutable_tags_settings": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "enabled": {
+                                                "type": "boolean",
+                                                "description": "Whether the repository has immutable tags"
+                                            },
+                                            "rules": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "description": "The rules of the immutable tags"
+                                            }
+                                        },
+                                        "required": ["enabled", "rules"],
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The immutable tags settings of the repository"
+                    },
+                    "is_private": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the repository is private"
+                    },
+                    "status": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The status of the repository"
+                    },
+                    "status_description": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The status description of the repository"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The description of the repository"
+                    },
+                    "star_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of stars the repository has"
+                    },
+                    "pull_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of pulls the repository has"
+                    },
+                    "last_updated": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The last updated date of the repository"
+                    },
+                    "last_modified": {
+                        "type": ["string", "null"],
+                        "description": "The last modified date of the repository"
+                    },
+                    "date_registered": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The date the repository was registered"
+                    },
+                    "affiliation": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The affiliation of the repository"
+                    },
+                    "media_types": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The media types of the repository"
+                    },
+                    "content_types": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The content types of the repository"
+                    },
+                    "categories": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "The name of the category"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "description": "The slug of the category in search engine"
+                                                }
+                                            },
+                                            "required": ["name", "slug"],
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The categories of the repository"
+                    },
+                    "storage_size": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": ["number", "null"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The storage size of the repository"
+                    },
+                    "user": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The user of the repository"
+                    },
+                    "hub_user": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The repository username on hub"
+                    },
+                    "has_starred": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the user has starred the repository"
+                    },
+                    "is_automated": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Whether the repository is automated"
+                    },
+                    "collaborator_count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The number of collaborators on the repository. Only valid when repository_type is 'User'"
+                    },
+                    "permissions": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "read": {
+                                                "type": "boolean",
+                                                "description": "if user can read and pull from repository"
+                                            },
+                                            "write": {
+                                                "type": "boolean",
+                                                "description": "if user can update and push to repository"
+                                            },
+                                            "admin": {
+                                                "type": "boolean",
+                                                "description": "if user is an admin of the repository"
+                                            }
+                                        },
+                                        "required": ["read", "write", "admin"],
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            }
+        },
+        {
+            "name": "checkRepository",
+            "description": "Check Repository Exists",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string"
+                    },
+                    "repository": {
+                        "type": "string"
+                    }
+                },
+                "required": ["namespace", "repository"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Check Repository Exists"
+            }
+        },
+        {
+            "name": "listRepositoryTags",
+            "description": "List tags by repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace of the repository. If not provided the 'library' namespace will be used for official images."
+                    },
+                    "repository": {
+                        "type": "string",
+                        "description": "The repository to list tags from"
+                    },
+                    "page": {
+                        "type": "number",
+                        "description": "The page number to list tags from"
+                    },
+                    "page_size": {
+                        "type": "number",
+                        "description": "The page size to list tags from"
+                    },
+                    "architecture": {
+                        "type": "string",
+                        "description": "The architecture to list tags from. If not provided, all architectures will be listed."
+                    },
+                    "os": {
+                        "type": "string",
+                        "description": "The operating system to list tags from. If not provided, all operating systems will be listed."
+                    }
+                },
+                "required": ["repository"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "List Repository Tags"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "next": {
+                        "type": ["string", "null"]
+                    },
+                    "previous": {
+                        "type": ["string", "null"]
+                    },
+                    "results": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The tag ID"
+                                                },
+                                                "images": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "architecture": {
+                                                                                "type": "string",
+                                                                                "description": "The architecture of the tag"
+                                                                            },
+                                                                            "features": {
+                                                                                "type": "string",
+                                                                                "description": "The features of the tag"
+                                                                            },
+                                                                            "variant": {
+                                                                                "anyOf": [
+                                                                                    {
+                                                                                        "anyOf": [
+                                                                                            {
+                                                                                                "not": {}
+                                                                                            },
+                                                                                            {
+                                                                                                "type": "string"
+                                                                                            }
+                                                                                        ]
+                                                                                    },
+                                                                                    {
+                                                                                        "type": "null"
+                                                                                    }
+                                                                                ],
+                                                                                "description": "The variant of the tag"
+                                                                            },
+                                                                            "digest": {
+                                                                                "type": [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
+                                                                                "description": "image layer digest"
+                                                                            },
+                                                                            "layers": {
+                                                                                "type": "array",
+                                                                                "items": {
+                                                                                    "type": "object",
+                                                                                    "properties": {
+                                                                                        "digest": {
+                                                                                            "type": "string",
+                                                                                            "description": "The digest of the layer"
+                                                                                        },
+                                                                                        "size": {
+                                                                                            "type": "number",
+                                                                                            "description": "The size of the layer"
+                                                                                        },
+                                                                                        "instruction": {
+                                                                                            "type": "string",
+                                                                                            "description": "Dockerfile instruction"
+                                                                                        }
+                                                                                    },
+                                                                                    "required": [
+                                                                                        "digest",
+                                                                                        "size",
+                                                                                        "instruction"
+                                                                                    ],
+                                                                                    "additionalProperties": false
+                                                                                }
+                                                                            },
+                                                                            "os": {
+                                                                                "type": [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
+                                                                                "description": "operating system of the tagged image"
+                                                                            },
+                                                                            "os_features": {
+                                                                                "type": [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
+                                                                                "description": "features of the operating system of the tagged image"
+                                                                            },
+                                                                            "os_version": {
+                                                                                "type": [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
+                                                                                "description": "version of the operating system of the tagged image"
+                                                                            },
+                                                                            "size": {
+                                                                                "type": "number",
+                                                                                "description": "size of the image"
+                                                                            },
+                                                                            "status": {
+                                                                                "type": "string",
+                                                                                "enum": [
+                                                                                    "active",
+                                                                                    "inactive"
+                                                                                ],
+                                                                                "description": "status of the image"
+                                                                            },
+                                                                            "last_pulled": {
+                                                                                "type": [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
+                                                                                "description": "datetime of last pull"
+                                                                            },
+                                                                            "last_pushed": {
+                                                                                "type": [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
+                                                                                "description": "datetime of last push"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "architecture",
+                                                                            "features",
+                                                                            "digest",
+                                                                            "os",
+                                                                            "os_features",
+                                                                            "os_version",
+                                                                            "size",
+                                                                            "status",
+                                                                            "last_pulled",
+                                                                            "last_pushed"
+                                                                        ],
+                                                                        "additionalProperties": false
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "creator": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "ID of the user that pushed the tag"
+                                                },
+                                                "last_updated": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The last updated date of the tag"
+                                                },
+                                                "last_updater": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "ID of the last user that updated the tag"
+                                                },
+                                                "last_updater_username": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Hub username of the user that updated the tag"
+                                                },
+                                                "name": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The name of the tag"
+                                                },
+                                                "repository": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The repository ID"
+                                                },
+                                                "full_size": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "compressed size (sum of all layers) of the tagged image"
+                                                },
+                                                "v2": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "boolean"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Repository API version"
+                                                },
+                                                "tag_status": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string",
+                                                                    "enum": ["active", "inactive"]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "whether a tag has been pushed to or pulled in the past month"
+                                                },
+                                                "tag_last_pulled": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "datetime of last pull"
+                                                },
+                                                "tag_last_pushed": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "datetime of last push"
+                                                },
+                                                "media_type": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "media type of this tagged artifact"
+                                                },
+                                                "content_type": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "image",
+                                                                        "plugin",
+                                                                        "helm",
+                                                                        "volume",
+                                                                        "wasm",
+                                                                        "compose",
+                                                                        "unrecognized",
+                                                                        "model"
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Content type of a tagged artifact based on it's media type. unrecognized means the media type is unrecognized by Docker Hub."
+                                                },
+                                                "digest": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The digest of the tag"
+                                                },
+                                                "error": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            }
+        },
+        {
+            "name": "getRepositoryTag",
+            "description": "Get Repository Tag Details",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string"
+                    },
+                    "repository": {
+                        "type": "string"
+                    },
+                    "tag": {
+                        "type": "string"
+                    }
+                },
+                "required": ["namespace", "repository", "tag"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Get Repository Tag"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The tag ID"
+                    },
+                    "images": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "architecture": {
+                                                    "type": "string",
+                                                    "description": "The architecture of the tag"
+                                                },
+                                                "features": {
+                                                    "type": "string",
+                                                    "description": "The features of the tag"
+                                                },
+                                                "variant": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The variant of the tag"
+                                                },
+                                                "digest": {
+                                                    "type": ["string", "null"],
+                                                    "description": "image layer digest"
+                                                },
+                                                "layers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "digest": {
+                                                                "type": "string",
+                                                                "description": "The digest of the layer"
+                                                            },
+                                                            "size": {
+                                                                "type": "number",
+                                                                "description": "The size of the layer"
+                                                            },
+                                                            "instruction": {
+                                                                "type": "string",
+                                                                "description": "Dockerfile instruction"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "digest",
+                                                            "size",
+                                                            "instruction"
+                                                        ],
+                                                        "additionalProperties": false
+                                                    }
+                                                },
+                                                "os": {
+                                                    "type": ["string", "null"],
+                                                    "description": "operating system of the tagged image"
+                                                },
+                                                "os_features": {
+                                                    "type": ["string", "null"],
+                                                    "description": "features of the operating system of the tagged image"
+                                                },
+                                                "os_version": {
+                                                    "type": ["string", "null"],
+                                                    "description": "version of the operating system of the tagged image"
+                                                },
+                                                "size": {
+                                                    "type": "number",
+                                                    "description": "size of the image"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": ["active", "inactive"],
+                                                    "description": "status of the image"
+                                                },
+                                                "last_pulled": {
+                                                    "type": ["string", "null"],
+                                                    "description": "datetime of last pull"
+                                                },
+                                                "last_pushed": {
+                                                    "type": ["string", "null"],
+                                                    "description": "datetime of last push"
+                                                }
+                                            },
+                                            "required": [
+                                                "architecture",
+                                                "features",
+                                                "digest",
+                                                "os",
+                                                "os_features",
+                                                "os_version",
+                                                "size",
+                                                "status",
+                                                "last_pulled",
+                                                "last_pushed"
+                                            ],
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "creator": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "ID of the user that pushed the tag"
+                    },
+                    "last_updated": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The last updated date of the tag"
+                    },
+                    "last_updater": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "ID of the last user that updated the tag"
+                    },
+                    "last_updater_username": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Hub username of the user that updated the tag"
+                    },
+                    "name": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The name of the tag"
+                    },
+                    "repository": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The repository ID"
+                    },
+                    "full_size": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "compressed size (sum of all layers) of the tagged image"
+                    },
+                    "v2": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Repository API version"
+                    },
+                    "tag_status": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": ["active", "inactive"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "whether a tag has been pushed to or pulled in the past month"
+                    },
+                    "tag_last_pulled": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "datetime of last pull"
+                    },
+                    "tag_last_pushed": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "datetime of last push"
+                    },
+                    "media_type": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "media type of this tagged artifact"
+                    },
+                    "content_type": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "image",
+                                            "plugin",
+                                            "helm",
+                                            "volume",
+                                            "wasm",
+                                            "compose",
+                                            "unrecognized",
+                                            "model"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Content type of a tagged artifact based on it's media type. unrecognized means the media type is unrecognized by Docker Hub."
+                    },
+                    "digest": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The digest of the tag"
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            }
+        },
+        {
+            "name": "checkRepositoryTag",
+            "description": "Check Repository Tag Exists",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string"
+                    },
+                    "repository": {
+                        "type": "string"
+                    },
+                    "tag": {
+                        "type": "string"
+                    }
+                },
+                "required": ["namespace", "repository", "tag"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Check Repository Tag"
+            }
+        },
+        {
+            "name": "listNamespaces",
+            "description": "List organisations (namespaces) the user has access to",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "page": {
+                        "type": "number",
+                        "description": "The page number to list repositories from"
+                    },
+                    "page_size": {
+                        "type": "number",
+                        "description": "The page size to list repositories from"
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "List Namespaces"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "next": {
+                        "type": ["string", "null"]
+                    },
+                    "previous": {
+                        "type": ["string", "null"]
+                    },
+                    "results": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "description": "The ID of the namespace"
+                                                },
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "description": "The UUID of the namespace"
+                                                },
+                                                "orgname": {
+                                                    "type": "string",
+                                                    "description": "The name of the org which is also the namespace name"
+                                                },
+                                                "full_name": {
+                                                    "type": "string",
+                                                    "description": "The full name of the org"
+                                                },
+                                                "location": {
+                                                    "type": "string",
+                                                    "description": "The location of the org"
+                                                },
+                                                "company": {
+                                                    "type": "string",
+                                                    "description": "The company of the org"
+                                                },
+                                                "profile_url": {
+                                                    "type": "string",
+                                                    "description": "The profile URL of the org"
+                                                },
+                                                "date_joined": {
+                                                    "type": "string",
+                                                    "description": "The date joined of the namespace"
+                                                },
+                                                "gravatar_email": {
+                                                    "type": "string",
+                                                    "description": "The gravatar email of the namespace"
+                                                },
+                                                "gravatar_url": {
+                                                    "type": "string",
+                                                    "description": "The gravatar URL of the namespace"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "description": "The type of the namespace"
+                                                },
+                                                "badge": {
+                                                    "type": "string",
+                                                    "description": "The badge of the namespace"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "description": "Whether the namespace is active"
+                                                },
+                                                "user_role": {
+                                                    "type": "string",
+                                                    "description": "The user role of the namespace"
+                                                },
+                                                "user_groups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": "The user groups of the namespace"
+                                                },
+                                                "org_groups_count": {
+                                                    "type": "number",
+                                                    "description": "The number of org groups of the namespace"
+                                                },
+                                                "plan_name": {
+                                                    "type": ["string", "null"],
+                                                    "description": "The plan name of the namespace"
+                                                },
+                                                "parent_name": {
+                                                    "type": ["string", "null"],
+                                                    "description": "The parent name of the namespace"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "uuid",
+                                                "orgname",
+                                                "full_name",
+                                                "location",
+                                                "company",
+                                                "profile_url",
+                                                "date_joined",
+                                                "gravatar_email",
+                                                "gravatar_url",
+                                                "type",
+                                                "badge",
+                                                "is_active",
+                                                "user_role",
+                                                "user_groups",
+                                                "org_groups_count",
+                                                "plan_name",
+                                                "parent_name"
+                                            ],
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            }
+        },
+        {
+            "name": "getPersonalNamespace",
+            "description": "Get user personal namespace",
+            "inputSchema": {
+                "type": "object"
+            },
+            "annotations": {
+                "title": "Get Personal Namespace"
+            }
+        },
+        {
+            "name": "listAllNamespacesMemberOf",
+            "description": "List all organisations (namespaces) the user is a member of including personal namespace",
+            "inputSchema": {
+                "type": "object"
+            },
+            "annotations": {
+                "title": "List All Namespaces user is a member of"
+            }
+        },
+        {
+            "name": "search",
+            "description": "Search Repositories",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The query to search for"
+                    },
+                    "badges": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["official", "verified_publisher", "open_source"]
+                        },
+                        "description": "The trusted content to search for"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "The type of the repository to search for"
+                    },
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "The categories names to filter search results"
+                    },
+                    "architectures": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "The architectures to filter search results"
+                    },
+                    "operating_systems": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "The operating systems to filter search results"
+                    },
+                    "extension_reviewed": {
+                        "type": "boolean",
+                        "description": "Whether to filter search results to only include reviewed extensions"
+                    },
+                    "from": {
+                        "type": "number",
+                        "description": "The number of repositories to skip"
+                    },
+                    "size": {
+                        "type": "number",
+                        "description": "The number of repositories to return"
+                    },
+                    "sort": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": ["pull_count", "updated_at"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The criteria to sort the search results by. If the `sort` field is not set, the best match is used by default. When search extensions, documents are sort alphabetically if none is provided. Do not use it unless user explicitly asks for it."
+                    },
+                    "order": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": ["asc", "desc"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The order to sort the search results by"
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "The images to filter search results"
+                    }
+                },
+                "required": ["query"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Search Repositories"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "total": {
+                        "type": "number",
+                        "description": "The total number of repositories found"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "description": "The id of the repository"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "The name of the repository in the format of namespace/repository"
+                                },
+                                "slug": {
+                                    "type": "string",
+                                    "description": "The slug of the repository"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": ["image", "plugin", "extension"],
+                                    "description": "The type of the repository. Can be \"image\", \"plugin\" or \"extension\""
+                                },
+                                "publisher": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "description": "The id of the publisher"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "The name of the publisher"
+                                        }
+                                    },
+                                    "required": ["id", "name"],
+                                    "additionalProperties": false
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "description": "The date and time the repository was created"
+                                },
+                                "updated_at": {
+                                    "type": "string",
+                                    "description": "The date and time the repository was last updated"
+                                },
+                                "short_description": {
+                                    "type": "string",
+                                    "description": "The short description of the repository"
+                                },
+                                "badge": {
+                                    "anyOf": [
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "official",
+                                                "verified_publisher",
+                                                "open_source",
+                                                "none"
+                                            ]
+                                        },
+                                        {
+                                            "type": "null"
+                                        }
+                                    ],
+                                    "description": "The badge of the repository. If the repository is from community publisher, the badge is either 'none' or null."
+                                },
+                                "star_count": {
+                                    "type": "number",
+                                    "description": "The number of stars the repository has"
+                                },
+                                "pull_count": {
+                                    "type": "string",
+                                    "description": "The number of pulls the repository has"
+                                },
+                                "operating_systems": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "description": "The name of the operating system"
+                                            },
+                                            "label": {
+                                                "type": "string",
+                                                "description": "The label of the operating system"
+                                            }
+                                        },
+                                        "required": ["name", "label"],
+                                        "additionalProperties": false
+                                    }
+                                },
+                                "architectures": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "description": "The name of the architecture"
+                                            },
+                                            "label": {
+                                                "type": "string",
+                                                "description": "The label of the architecture"
+                                            }
+                                        },
+                                        "required": ["name", "label"],
+                                        "additionalProperties": false
+                                    }
+                                },
+                                "logo_url": {
+                                    "anyOf": [
+                                        {
+                                            "anyOf": [
+                                                {
+                                                    "not": {}
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "large": {
+                                                            "type": ["string", "null"],
+                                                            "description": "The URL of the large logo"
+                                                        },
+                                                        "small": {
+                                                            "type": ["string", "null"],
+                                                            "description": "The URL of the small logo"
+                                                        }
+                                                    },
+                                                    "additionalProperties": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "null"
+                                        }
+                                    ]
+                                },
+                                "extension_reviewed": {
+                                    "type": "boolean",
+                                    "description": "Whether the repository is reviewed"
+                                },
+                                "categories": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "slug": {
+                                                "type": "string",
+                                                "description": "The slug of the category"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "description": "The name of the category"
+                                            }
+                                        },
+                                        "required": ["slug", "name"],
+                                        "additionalProperties": false
+                                    }
+                                },
+                                "archived": {
+                                    "type": "boolean",
+                                    "description": "Whether the repository is archived"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "name",
+                                "slug",
+                                "type",
+                                "publisher",
+                                "created_at",
+                                "updated_at",
+                                "short_description",
+                                "badge",
+                                "star_count",
+                                "pull_count",
+                                "operating_systems",
+                                "architectures",
+                                "extension_reviewed",
+                                "categories",
+                                "archived"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "description": "The repositories found"
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            }
+        },
+        {
+            "name": "dockerHardenedImages",
+            "description": "List available Docker Hardened Images in user organisations",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "organisation": {
+                        "type": "string",
+                        "description": "The organisation for which the DHIs are listed for. If user does not explicitly ask for a specific organisation, the \"listNamespaces\" tool should be called first to get the list of organisations the user has access to."
+                    }
+                },
+                "required": ["organisation"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "List available Docker Hardened Images"
+            }
+        }
+    ]
+}

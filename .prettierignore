@@ -1,0 +1,13 @@
+dist
+node_modules
+src/scout/genql
+.gitignore
+.prettierrc.json
+.prettierignore
+.gitignore
+.github
+.vscode
+package-lock.json
+package.json
+tsconfig.json
+Dockerfile
