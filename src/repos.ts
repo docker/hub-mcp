@@ -659,6 +659,9 @@ export class Repos extends Asset {
                                 text: `Repository ${repository} in ${namespace} is currently inactive. It is not possible to change an inactive repository to active if it has no images. If you did not ask for updating the status of the repository, please call this tool again and specifically ask for updating only the description or the overview of the repository.`,
                             },
                         ],
+                        structuredContent: {
+                            error: `Repository ${repository} in ${namespace} is currently inactive. It is not possible to change an inactive repository to active if it has no images. If you did not ask for updating the status of the repository, please call this tool again and specifically ask for updating only the description or the overview of the repository.`,
+                        },
                     };
                 }
                 body.status = status === 'active' ? 1 : 0;
