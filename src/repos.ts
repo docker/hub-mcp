@@ -279,6 +279,7 @@ export class Repos extends Asset {
                     annotations: {
                         title: 'List Repositories by Namespace',
                     },
+                    title: 'List Repositories by Organisation (namespace)',
                 },
                 this.listRepositoriesByNamespace.bind(this)
             )
@@ -296,6 +297,7 @@ export class Repos extends Asset {
                     annotations: {
                         title: 'Create Repository in namespace',
                     },
+                    title: 'Create a repository in organisation (namespace) or personal namespace',
                 },
                 this.createRepository.bind(this)
             )
@@ -319,6 +321,7 @@ export class Repos extends Asset {
                     annotations: {
                         title: 'Get Repository Info',
                     },
+                    title: 'Get Repository Details',
                 },
                 this.getRepositoryInfo.bind(this)
             )
@@ -362,6 +365,7 @@ export class Repos extends Asset {
                     annotations: {
                         title: 'Get Repository Info',
                     },
+                    title: 'Update Repository Details',
                 },
                 this.updateRepositoryInfo.bind(this)
             )
@@ -378,6 +382,7 @@ export class Repos extends Asset {
                     annotations: {
                         title: 'Check Repository Exists',
                     },
+                    title: 'Check Repository Exists',
                 },
                 this.checkRepository.bind(this)
             )
@@ -420,6 +425,7 @@ export class Repos extends Asset {
                     annotations: {
                         title: 'List Repository Tags',
                     },
+                    title: 'List tags by repository',
                 },
                 this.listRepositoryTags.bind(this)
             )
@@ -442,6 +448,7 @@ export class Repos extends Asset {
                     annotations: {
                         title: 'Get Repository Tag',
                     },
+                    title: 'Get Repository Tag Details',
                 },
                 this.getRepositoryTag.bind(this)
             )
@@ -461,6 +468,7 @@ export class Repos extends Asset {
                     annotations: {
                         title: 'Check Repository Tag',
                     },
+                    title: 'Check Repository Tag Exists',
                 },
                 this.checkRepositoryTag.bind(this)
             )

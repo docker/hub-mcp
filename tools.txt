@@ -10,4 +10,4 @@
 - name: getPersonalNamespace
 - name: listAllNamespacesMemberOf
 - name: search
-- name: docker-hardened-images
+- name: dockerHardenedImages
