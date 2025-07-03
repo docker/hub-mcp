@@ -19,6 +19,7 @@ import { Asset, AssetConfig } from './asset';
 import { z } from 'zod';
 import { createPaginatedResponseSchema } from './types';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
+import { logger } from './logger';
 
 //#region  Types
 // all items in the types are optional and nullable because structured content is always evaluated even when an error occurs.
@@ -126,8 +127,9 @@ const CreateRepositoryRequest = z.object({
     namespace: z.string().describe('The namespace of the repository. Required.'),
     name: z
         .string()
+        .default('')
         .describe(
-            'The name of the repository. Must contain a combination of alphanumeric characters and may contain the special characters ., _, or -. Letters must be lowercase. Required.'
+            'The name of the repository (required). Must contain a combination of alphanumeric characters and may contain the special characters ., _, or -. Letters must be lowercase.'
         ),
     description: z.string().optional().describe('The description of the repository'),
     is_private: z.boolean().optional().describe('Whether the repository is private'),
@@ -288,7 +290,7 @@ export class Repos extends Asset {
                 'createRepository',
                 {
                     description:
-                        'Create a new repository in the given namespace. User must pass the repository name and if the repository has to be public or private. Can optionally pass a description.',
+                        'Create a new repository in the given namespace. You MUST ask the user for the repository name and if the repository has to be public or private. Can optionally pass a description.\nIMPORTANT: Before calling this tool, you must ensure you have:\n - The repository name (name).',
                     inputSchema: CreateRepositoryRequest.shape,
                     outputSchema: Repository.shape,
                     annotations: {
@@ -305,7 +307,14 @@ export class Repos extends Asset {
                 'getRepositoryInfo',
                 {
                     description: 'Get the details of a repository in the given namespace.',
-                    inputSchema: z.object({ namespace: z.string(), repository: z.string() }).shape,
+                    inputSchema: z.object({
+                        namespace: z
+                            .string()
+                            .describe(
+                                'The namespace of the repository (required). If not provided the `library` namespace will be used for official images.'
+                            ),
+                        repository: z.string().describe('The repository name (required)'),
+                    }).shape,
                     outputSchema: Repository.shape,
                     annotations: {
                         title: 'Get Repository Info',
@@ -321,13 +330,33 @@ export class Repos extends Asset {
             this.server.registerTool(
                 'updateRepositoryInfo',
                 {
-                    description: 'Update the details of a repository in the given namespace.',
+                    description:
+                        'Update the details of a repository in the given namespace. Description, overview and status are the only fields that can be updated. While description and overview changes are fine, a status change is a dangerous operation so the user must explicitly ask for it.',
                     inputSchema: z.object({
-                        namespace: z.string(),
-                        repository: z.string(),
-                        description: z.string().optional(),
-                        full_description: z.string().max(25000).optional(),
-                        status: z.number().optional(),
+                        namespace: z
+                            .string()
+                            .describe('The namespace of the repository (required)'),
+                        repository: z.string().describe('The repository name (required)'),
+                        description: z
+                            .string()
+                            .optional()
+                            .describe(
+                                'The description of the repository. If user asks for updating the description of the repository, this is the field that should be updated.'
+                            ),
+                        full_description: z
+                            .string()
+                            .max(25000)
+                            .optional()
+                            .describe(
+                                'The full description (overview)of the repository. If user asks for updating the full description or the overview of the repository, this is the field that should be updated. '
+                            ),
+                        status: z
+                            .enum(['active', 'inactive'])
+                            .optional()
+                            .nullable()
+                            .describe(
+                                'The status of the repository. If user asks for updating the status of the repository, this is the field that should be updated. This is a dangerous operation and should be done with caution so user must be prompted to confirm the operation. Valid status are `active` (1) and `inactive` (0). Normally do not update the status if it is not strictly required by the user. It is not possible to change an `inactive` repository to `active` if it has no images.'
+                            ),
                     }).shape,
                     outputSchema: Repository.shape,
                     annotations: {
@@ -530,6 +559,7 @@ export class Repos extends Asset {
     ): Promise<CallToolResult> {
         // sometimes the mcp client tries to pass a default repository name. Fail in this case.
         if (!request.name || request.name === 'new-repository') {
+            logger.error('Repository name is required.');
             throw new Error('Repository name is required.');
         }
         const url = `${this.config.host}/namespaces/${request.namespace}/repositories`;
@@ -549,16 +579,25 @@ export class Repos extends Asset {
         repository: string;
     }): Promise<CallToolResult> {
         if (!namespace || !repository) {
+            logger.error('Namespace and repository name are required');
             throw new Error('Namespace and repository name are required');
         }
+        logger.info(`Getting info for repository ${repository} in ${namespace}`);
         const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
 
-        return this.callAPI<z.infer<typeof Repository>>(
+        const response = await this.callAPI<z.infer<typeof Repository>>(
             url,
             { method: 'GET' },
             `Here are the details of the repository :${repository} in ${namespace}. :response`,
             `Error getting repository info for ${repository} in ${namespace}`
         );
+        if (namespace === 'library') {
+            response.content.push({
+                type: 'text',
+                text: `This is an official image from Docker Hub. You can access it at https://hub.docker.com/_/${repository}.\nIf you did not ask for an official image, please call this tool again and clearly specify a namespace.`,
+            });
+        }
+        return response;
     }
 
     private async updateRepositoryInfo({
@@ -572,23 +611,73 @@ export class Repos extends Asset {
         repository: string;
         description?: string;
         full_description?: string;
-        status?: number;
+        status?: string | null;
     }): Promise<CallToolResult> {
+        const extraContent: { type: 'text'; text: string }[] = [];
         if (!namespace || !repository) {
             throw new Error('Namespace and repository name are required');
         }
+        logger.info(
+            `Updating repository ${repository} in ${namespace} with description: ${description}, full_description: ${full_description}, status: ${status}`
+        );
         const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
-        const body = {
-            description,
-            full_description,
-            status,
-        };
-        return this.callAPI<z.infer<typeof Repository>>(
+        const body: { description?: string; full_description?: string; status?: number } = {};
+        if (description && description !== '') {
+            body.description = description;
+        }
+        if (full_description && full_description !== '') {
+            body.full_description = full_description;
+        }
+        if (status !== undefined) {
+            // get current repository info to check if a status change is needed
+            const currentRepository = await this.getRepositoryInfo({ namespace, repository });
+            if (currentRepository.isError) {
+                logger.error(`Error getting repository info for ${repository} in ${namespace}`);
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: 'text',
+                            text: `Error getting repository info for ${repository} in ${namespace}`,
+                        },
+                    ],
+                };
+            }
+            const currentStatus = (
+                currentRepository.structuredContent as z.infer<typeof Repository>
+            ).status;
+            if (currentStatus !== status) {
+                logger.info(
+                    `Repository ${repository} in ${namespace} is currently in status ${currentStatus}. Updating to ${status}.`
+                );
+                if (status === 'active') {
+                    return {
+                        isError: true,
+                        content: [
+                            {
+                                type: 'text',
+                                text: `Repository ${repository} in ${namespace} is currently inactive. It is not possible to change an inactive repository to active if it has no images. If you did not ask for updating the status of the repository, please call this tool again and specifically ask for updating only the description or the overview of the repository.`,
+                            },
+                        ],
+                    };
+                }
+                body.status = status === 'active' ? 1 : 0;
+                extraContent.push({
+                    type: 'text',
+                    text: `Requested a status change from ${currentStatus} to ${status}. This is potentially a dangerous operation and should be done with caution. If you are not sure, please go on Docker Hub and revert the status manually.\nhttps://hub.docker.com/r/${namespace}/${repository}`,
+                });
+            }
+        }
+        const response = await this.callAPI<z.infer<typeof Repository>>(
             url,
             { method: 'PATCH', body: JSON.stringify(body) },
             `Repository ${repository} updated successfully. :response`,
             `Error updating repository ${repository}`
         );
+        if (extraContent.length > 0) {
+            response.content = [...response.content, ...extraContent];
+        }
+        return response;
     }
 
     private async getRepositoryTag({
