@@ -2,7 +2,7 @@
     "tools": [
         {
             "name": "listRepositoriesByNamespace",
-            "description": "List paginated repositories by namespace",
+            "description": "List Repositories by Organisation (namespace)",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -618,7 +618,7 @@
         },
         {
             "name": "createRepository",
-            "description": "Create a new repository in the given namespace. You MUST ask the user for the repository name and if the repository has to be public or private. Can optionally pass a description.\nIMPORTANT: Before calling this tool, you must ensure you have:\n - The repository name (name).",
+            "description": "Create a repository in organisation (namespace) or personal namespace",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -1150,7 +1150,7 @@
         },
         {
             "name": "getRepositoryInfo",
-            "description": "Get the details of a repository in the given namespace.",
+            "description": "Get Repository Details",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -1664,7 +1664,7 @@
         },
         {
             "name": "updateRepositoryInfo",
-            "description": "Update the details of a repository in the given namespace. Description, overview and status are the only fields that can be updated. While description and overview changes are fine, a status change is a dangerous operation so the user must explicitly ask for it.",
+            "description": "Update Repository Details",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -2206,7 +2206,7 @@
         },
         {
             "name": "checkRepository",
-            "description": "Check if a repository exists in the given namespace.",
+            "description": "Check Repository Exists",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -2227,7 +2227,7 @@
         },
         {
             "name": "listRepositoryTags",
-            "description": "List paginated tags by repository",
+            "description": "List tags by repository",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -2775,7 +2775,7 @@
         },
         {
             "name": "getRepositoryTag",
-            "description": "Get the details of a tag in a repository. It can be use to show the latest tag details for example.",
+            "description": "Get Repository Tag Details",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -3224,7 +3224,7 @@
         },
         {
             "name": "checkRepositoryTag",
-            "description": "Check if a tag exists in a repository",
+            "description": "Check Repository Tag Exists",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -3248,7 +3248,7 @@
         },
         {
             "name": "listNamespaces",
-            "description": "List paginated namespaces",
+            "description": "List organisations (namespaces) the user has access to",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -3435,7 +3435,7 @@
         },
         {
             "name": "getPersonalNamespace",
-            "description": "Get the personal namespace name",
+            "description": "Get user personal namespace",
             "inputSchema": {
                 "type": "object"
             },
@@ -3445,7 +3445,7 @@
         },
         {
             "name": "listAllNamespacesMemberOf",
-            "description": "List all namespaces the user is a member of",
+            "description": "List all organisations (namespaces) the user is a member of including personal namespace",
             "inputSchema": {
                 "type": "object"
             },
@@ -3455,7 +3455,7 @@
         },
         {
             "name": "search",
-            "description": "Search for repositories. It sorts results by best match if no sort criteria is provided.",
+            "description": "Search Repositories",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -3559,7 +3559,7 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "List Repositories by Namespace"
+                "title": "Search Repositories"
             },
             "outputSchema": {
                 "type": "object",
@@ -3778,14 +3778,14 @@
             }
         },
         {
-            "name": "docker-hardened-images",
-            "description": "This API is used to list Docker Hardened Images (DHIs) mirrored into one of the organisations of the user from the dhi organisation. Must be always prompted to input the organisation by the user. Docker Hardened Images are the most secure, minimal, production-ready images available, with near-zero CVEs and enterprise-grade SLA. Should be used to search for secure images in an organisation.",
+            "name": "dockerHardenedImages",
+            "description": "List available Docker Hardened Images in user organisations",
             "inputSchema": {
                 "type": "object",
                 "properties": {
                     "organisation": {
                         "type": "string",
-                        "description": "The organisation for which the DHIs are listed for. Must be always prompted to input the organisation by the user."
+                        "description": "The organisation for which the DHIs are listed for. If user does not explicitly ask for a specific organisation, the \"listNamespaces\" tool should be called first to get the list of organisations the user has access to."
                     }
                 },
                 "required": ["organisation"],

@@ -57,22 +57,23 @@ export class ScoutAPI extends Asset {
     }
     RegisterTools(): void {
         this.tools.set(
-            'docker-hardened-images',
+            'dockerHardenedImages',
             this.server.registerTool(
-                'docker-hardened-images',
+                'dockerHardenedImages',
                 {
                     description:
-                        'This API is used to list Docker Hardened Images (DHIs) mirrored into one of the organisations of the user from the dhi organisation. Must be always prompted to input the organisation by the user. Docker Hardened Images are the most secure, minimal, production-ready images available, with near-zero CVEs and enterprise-grade SLA. Should be used to search for secure images in an organisation.',
+                        'This API is used to list Docker Hardened Images (DHIs) available in the user organisations. The tool takes the organisation name as input and returns the list of DHI images available in the organisation. It depends on the "listNamespaces" tool to be called first to get the list of organisations the user has access to.',
                     inputSchema: z.object({
                         organisation: z
                             .string()
                             .describe(
-                                'The organisation for which the DHIs are listed for. Must be always prompted to input the organisation by the user.'
+                                'The organisation for which the DHIs are listed for. If user does not explicitly ask for a specific organisation, the "listNamespaces" tool should be called first to get the list of organisations the user has access to.'
                             ),
                     }).shape,
                     annotations: {
                         title: 'List available Docker Hardened Images',
                     },
+                    title: 'List available Docker Hardened Images in user organisations',
                 },
                 this.dhis.bind(this)
             )

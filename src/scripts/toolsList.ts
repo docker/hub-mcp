@@ -70,7 +70,7 @@ function getToolDefinitionList(): { tools: Tool[] } {
             tools.forEach((tool, name) => {
                 const toolDefinition: Tool = {
                     name,
-                    description: tool.description,
+                    description: tool.title, // Use title instead of description to have less noise in the tools list
                     inputSchema: tool.inputSchema
                         ? (zodToJsonSchema(tool.inputSchema, {
                               strictUnions: true,

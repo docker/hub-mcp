@@ -76,6 +76,7 @@ export class Accounts extends Asset {
                     annotations: {
                         title: 'List Namespaces',
                     },
+                    title: 'List organisations (namespaces) the user has access to',
                 },
                 this.listNamespaces.bind(this)
             )
@@ -89,6 +90,7 @@ export class Accounts extends Asset {
                     annotations: {
                         title: 'Get Personal Namespace',
                     },
+                    title: 'Get user personal namespace',
                 },
                 this.getPersonalNamespace.bind(this)
             )
@@ -102,6 +104,7 @@ export class Accounts extends Asset {
                     annotations: {
                         title: 'List All Namespaces user is a member of',
                     },
+                    title: 'List all organisations (namespaces) the user is a member of including personal namespace',
                 },
                 () => {
                     return {

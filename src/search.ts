@@ -95,7 +95,7 @@ export class Search extends Asset {
                 'search',
                 {
                     description:
-                        'Search for repositories. It sorts results by best match if no sort criteria is provided.',
+                        'Search for repositories in Docker Hub. It sorts results by best match if no sort criteria is provided. If user asks for secure, production-ready images the "dockerHardenedImages" tool should be called first to get the list of DHI images available in the user organisations (if any) and fallback to search tool if no DHI images are available or user is not authenticated.',
                     inputSchema: {
                         query: z.string().describe('The query to search for'),
                         badges: z
@@ -148,8 +148,9 @@ export class Search extends Asset {
                     },
                     outputSchema: searchResults.shape,
                     annotations: {
-                        title: 'List Repositories by Namespace',
+                        title: 'Search Repositories',
                     },
+                    title: 'Search Repositories',
                 },
                 this.search.bind(this)
             )
