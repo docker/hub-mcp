@@ -66,8 +66,10 @@ HUB_PAT_TOKEN=<a_pat_token> npm start -- [--username=<the_hub_username_for_the_p
 ```
 HUB_PAT_TOKEN=<a_pat_token> npx @modelcontextprotocol/inspector node dist/index.js[--username=<the_hub_username_for_the_pat>]
 ```
+## Usage in Docker Ask Gordon 
+You can configure Gordon to be a host that can interact with the Docker Hub MCP server.
 
-## Gordon Setup
+### Gordon Setup
 
 [Ask Gordon](https://docs.docker.com/ai/gordon/) is your personal AI assistant embedded in Docker Desktop and the Docker CLI. It's designed to streamline your workflow and help you make the most of the Docker ecosystem.
 
@@ -89,7 +91,9 @@ services:
 2. Run `docker build -t hub .`
 3. Run `docker ai`
 
-## Usage with Claude Desktop
+## Usage in other MCP Hosts
+
+### Usage with Claude Desktop
 
 > NOTE: Make sure you have already built the application as mentioned in Step 1.
 
