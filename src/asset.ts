@@ -53,6 +53,7 @@ export class Asset implements Asset {
     protected async authFetch<T>(url: string, options: RequestInit): Promise<AssetResponse<T>> {
         const headers = options.headers || {
             'Content-Type': 'application/json',
+            'User-Agent': 'DockerHub-MCP-Server/1.0.0',
         };
         const token = await this.authenticate();
         if (token) {
