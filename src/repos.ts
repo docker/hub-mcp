@@ -291,7 +291,7 @@ export class Repos extends Asset {
                 'createRepository',
                 {
                     description:
-                        'Create a new repository in the given namespace. You MUST ask the user for the repository name and if the repository has to be public or private. Can optionally pass a description.\nIMPORTANT: Before calling this tool, you must ensure you have:\n - The repository name (name).',
+                        'Create a new repository in the given namespace. You MUST ask the user for the repository name and if the repository has to be public or private. Can optionally pass a description.\nIMPORTANT: Before calling this tool, you must ensure you have:\n The repository name (name).',
                     inputSchema: CreateRepositoryRequest.shape,
                     outputSchema: Repository.shape,
                     annotations: {
