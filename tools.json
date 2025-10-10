@@ -566,6 +566,24 @@
                                                         }
                                                     ]
                                                 },
+                                                "source": {
+                                                    "anyOf": [
+                                                        {
+                                                            "anyOf": [
+                                                                {
+                                                                    "not": {}
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "The source of the repository"
+                                                },
                                                 "error": {
                                                     "anyOf": [
                                                         {
@@ -1126,6 +1144,24 @@
                             }
                         ]
                     },
+                    "source": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The source of the repository"
+                    },
                     "error": {
                         "anyOf": [
                             {
@@ -1639,6 +1675,24 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "source": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The source of the repository"
                     },
                     "error": {
                         "anyOf": [
@@ -2181,6 +2235,24 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "source": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "The source of the repository"
                     },
                     "error": {
                         "anyOf": [
