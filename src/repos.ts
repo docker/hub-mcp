@@ -120,6 +120,7 @@ const Repository = z.object({
         })
         .optional()
         .nullable(),
+    source: z.string().optional().nullable().describe('The source of the repository'),
     error: z.string().optional().nullable(),
 });
 
