@@ -50,4 +50,4 @@ USER appuser
 ENV NODE_ENV=production
 
 # Command to run the application
-ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["node", "dist/index.js", "--transport=http"]

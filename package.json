@@ -31,6 +31,7 @@
         "@modelcontextprotocol/specification": "github:modelcontextprotocol/specification",
         "express": "^5.1.0",
         "jwt-decode": "^4.0.0",
+        "run": "^1.5.0",
         "winston": "^3.17.0",
         "zod": "^3.25.67"
     },
@@ -45,7 +46,7 @@
         "i": "^0.3.7",
         "lodash": "^4.17.21",
         "nodemon": "^3.1.10",
-        "npm": "^11.4.2",
+        "npm": "^11.6.2",
         "prettier": "^3.6.1",
         "tsx": "^4.20.1",
         "typescript": "^5.3.0",
@@ -53,5 +54,10 @@
     },
     "engines": {
         "node": ">=22"
+    },
+    "overrides": {
+        "js-yaml": "^4.1.0",
+        "uglify-js": "^3.17.4",
+        "@eslint/plugin-kit": "^0.3.4"
     }
 }
