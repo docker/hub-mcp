@@ -20,7 +20,10 @@ COPY package.json .
 COPY package-lock.json .
 COPY tsconfig.json .
 
-RUN npm ci
+# Refresh the lock file to be sure we include Linux-only packages that might not
+# be in the existing package-lock.json.
+RUN npm install --package-lock-only \
+    && npm ci
 
 COPY src/ ./src/
 
