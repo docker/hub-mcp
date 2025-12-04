@@ -72,7 +72,7 @@ function getToolDefinitionList(): { tools: Tool[] } {
                     name,
                     description: tool.title, // Use title instead of description to have less noise in the tools list
                     inputSchema: tool.inputSchema
-                        ? (zodToJsonSchema(tool.inputSchema, {
+                        ? (zodToJsonSchema(tool.inputSchema as any, {
                               strictUnions: true,
                           }) as Tool['inputSchema'])
                         : EMPTY_OBJECT_JSON_SCHEMA,
@@ -80,7 +80,7 @@ function getToolDefinitionList(): { tools: Tool[] } {
                 };
 
                 if (tool.outputSchema) {
-                    toolDefinition.outputSchema = zodToJsonSchema(tool.outputSchema, {
+                    toolDefinition.outputSchema = zodToJsonSchema(tool.outputSchema as any, {
                         strictUnions: true,
                     }) as Tool['outputSchema'];
                 }
