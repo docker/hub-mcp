@@ -21,6 +21,7 @@ import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
 import { program } from 'commander';
+import { ZodTypeAny } from 'zod';
 
 const EMPTY_OBJECT_JSON_SCHEMA = {
     type: 'object' as const,
@@ -72,7 +73,7 @@ function getToolDefinitionList(): { tools: Tool[] } {
                     name,
                     description: tool.title, // Use title instead of description to have less noise in the tools list
                     inputSchema: tool.inputSchema
-                        ? (zodToJsonSchema(tool.inputSchema, {
+                        ? (zodToJsonSchema(tool.inputSchema as ZodTypeAny, {
                               strictUnions: true,
                           }) as Tool['inputSchema'])
                         : EMPTY_OBJECT_JSON_SCHEMA,
@@ -80,7 +81,7 @@ function getToolDefinitionList(): { tools: Tool[] } {
                 };
 
                 if (tool.outputSchema) {
-                    toolDefinition.outputSchema = zodToJsonSchema(tool.outputSchema, {
+                    toolDefinition.outputSchema = zodToJsonSchema(tool.outputSchema as ZodTypeAny, {
                         strictUnions: true,
                     }) as Tool['outputSchema'];
                 }

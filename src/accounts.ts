@@ -164,9 +164,9 @@ export class Accounts extends Asset {
                     {
                         type: 'text',
                         text: `Error getting personal namespace: ${error}. Please provide the name of the personal namespace.`,
-                        isError: true,
                     },
                 ],
+                isError: true,
             };
         }
     }
