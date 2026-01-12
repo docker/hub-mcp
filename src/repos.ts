@@ -544,7 +544,10 @@ export class Repos extends Asset {
             page_size = 10;
         }
         let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
-        const params: Record<string, string> = {};
+        const params: Record<string, string> = {
+            page: page.toString(),
+            page_size: page_size.toString(),
+        };
         if (architecture) {
             params.architecture = architecture;
         }
