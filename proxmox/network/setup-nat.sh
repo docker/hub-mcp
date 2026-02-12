@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 # setup-nat.sh — Configure NAT (MASQUERADE) on a Proxmox host
-# This enables VMs on an internal bridge (e.g. vmbr1) to reach the internet
-# through the host's primary interface.
+# This enables VMs on the internal bridge (vmbr1 / 192.168.20.0/24) to reach
+# the internet through the host's primary interface (vmbr0 / 192.168.16.0/24).
+#
+# Network topology:
+#   Host 1:    192.168.16.2  (RX 6800 XT 16GB)
+#   Host 2:    192.168.16.3  (GTX 1080 8GB)
+#   ThinkPad:  192.168.16.10
+#   VM-Netz:   192.168.20.0/24 (vmbr1)
 #
 # Usage: sudo bash setup-nat.sh [WAN_IFACE] [INTERNAL_BRIDGE] [INTERNAL_SUBNET]
 
@@ -9,7 +15,7 @@ set -euo pipefail
 
 WAN_IFACE="${1:-vmbr0}"
 INTERNAL_BRIDGE="${2:-vmbr1}"
-INTERNAL_SUBNET="${3:-10.10.10.0/24}"
+INTERNAL_SUBNET="${3:-192.168.20.0/24}"
 
 echo "==> Configuring NAT"
 echo "    WAN interface:    $WAN_IFACE"
