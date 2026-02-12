@@ -5,3 +5,13 @@ dist/
 logs/
 gordon-mcp.yml
 /.idea/
+
+# Proxmox artifacts
+*.iso
+*.img
+*.qcow2
+*.raw
+*.vmdk
+proxmox/secrets/
+*.pem
+*.key
