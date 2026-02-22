@@ -7,6 +7,7 @@ src/scout/genql
 .gitignore
 .github
 .vscode
+.claude
 package-lock.json
 package.json
 tsconfig.json

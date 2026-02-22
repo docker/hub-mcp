@@ -91,11 +91,7 @@ const Repository = z.object({
         .optional()
         .nullable()
         .describe('The categories of the repository'),
-    storage_size: z
-        .number()
-        .nullable()
-        .optional()
-        .describe('The storage size of the repository'),
+    storage_size: z.number().nullable().optional().describe('The storage size of the repository'),
     user: z.string().optional().nullable().describe('The user of the repository'),
     hub_user: z.string().optional().nullable().describe('The repository username on hub'),
     has_starred: z
@@ -487,7 +483,9 @@ export class Repos extends Asset {
                     description:
                         'Delete a repository in the given namespace. This is a destructive and irreversible operation. You MUST ask the user to explicitly confirm before calling this tool.',
                     inputSchema: z.object({
-                        namespace: z.string().describe('The namespace of the repository (required)'),
+                        namespace: z
+                            .string()
+                            .describe('The namespace of the repository (required)'),
                         repository: z.string().describe('The repository name (required)'),
                     }).shape,
                     annotations: {
@@ -509,7 +507,9 @@ export class Repos extends Asset {
                     description:
                         'Delete a tag from a repository. This is a destructive and irreversible operation. You MUST ask the user to explicitly confirm before calling this tool.',
                     inputSchema: z.object({
-                        namespace: z.string().describe('The namespace of the repository (required)'),
+                        namespace: z
+                            .string()
+                            .describe('The namespace of the repository (required)'),
                         repository: z.string().describe('The repository name (required)'),
                         tag: z.string().describe('The tag name to delete (required)'),
                     }).shape,

@@ -6,6 +6,8 @@
 - name: listRepositoryTags
 - name: getRepositoryTag
 - name: checkRepositoryTag
+- name: deleteRepository
+- name: deleteRepositoryTag
 - name: listNamespaces
 - name: getPersonalNamespace
 - name: listAllNamespacesMemberOf

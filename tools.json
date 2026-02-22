@@ -10,6 +10,10 @@
                         "type": "string",
                         "description": "The namespace to list repositories from"
                     },
+                    "name": {
+                        "type": "string",
+                        "description": "Filter repositories by name (partial match supported)"
+                    },
                     "page": {
                         "type": "number",
                         "description": "The page number to list repositories from"
@@ -422,21 +426,7 @@
                                                     "description": "The categories of the repository"
                                                 },
                                                 "storage_size": {
-                                                    "anyOf": [
-                                                        {
-                                                            "anyOf": [
-                                                                {
-                                                                    "not": {}
-                                                                },
-                                                                {
-                                                                    "type": ["number", "null"]
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "null"
-                                                        }
-                                                    ],
+                                                    "type": ["number", "null"],
                                                     "description": "The storage size of the repository"
                                                 },
                                                 "user": {
@@ -1004,21 +994,7 @@
                         "description": "The categories of the repository"
                     },
                     "storage_size": {
-                        "anyOf": [
-                            {
-                                "anyOf": [
-                                    {
-                                        "not": {}
-                                    },
-                                    {
-                                        "type": ["number", "null"]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
+                        "type": ["number", "null"],
                         "description": "The storage size of the repository"
                     },
                     "user": {
@@ -1536,21 +1512,7 @@
                         "description": "The categories of the repository"
                     },
                     "storage_size": {
-                        "anyOf": [
-                            {
-                                "anyOf": [
-                                    {
-                                        "not": {}
-                                    },
-                                    {
-                                        "type": ["number", "null"]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
+                        "type": ["number", "null"],
                         "description": "The storage size of the repository"
                     },
                     "user": {
@@ -2096,21 +2058,7 @@
                         "description": "The categories of the repository"
                     },
                     "storage_size": {
-                        "anyOf": [
-                            {
-                                "anyOf": [
-                                    {
-                                        "not": {}
-                                    },
-                                    {
-                                        "type": ["number", "null"]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
+                        "type": ["number", "null"],
                         "description": "The storage size of the repository"
                     },
                     "user": {
@@ -3319,6 +3267,58 @@
             }
         },
         {
+            "name": "deleteRepository",
+            "description": "Delete a repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace of the repository (required)"
+                    },
+                    "repository": {
+                        "type": "string",
+                        "description": "The repository name (required)"
+                    }
+                },
+                "required": ["namespace", "repository"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Delete Repository",
+                "destructiveHint": true
+            }
+        },
+        {
+            "name": "deleteRepositoryTag",
+            "description": "Delete a tag from a repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace of the repository (required)"
+                    },
+                    "repository": {
+                        "type": "string",
+                        "description": "The repository name (required)"
+                    },
+                    "tag": {
+                        "type": "string",
+                        "description": "The tag name to delete (required)"
+                    }
+                },
+                "required": ["namespace", "repository", "tag"],
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+                "title": "Delete Repository Tag",
+                "destructiveHint": true
+            }
+        },
+        {
             "name": "listNamespaces",
             "description": "List organisations (namespaces) the user has access to",
             "inputSchema": {
@@ -3523,6 +3523,51 @@
             },
             "annotations": {
                 "title": "List All Namespaces user is a member of"
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "namespaces": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "All namespace names the user is a member of, including personal namespace"
+                    },
+                    "error": {
+                        "anyOf": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "not": {}
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "$schema": "http://json-schema.org/draft-07/schema#"
             }
         },
         {
