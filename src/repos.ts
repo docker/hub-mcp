@@ -95,7 +95,6 @@ const Repository = z.object({
         .number()
         .nullable()
         .optional()
-        .nullable()
         .describe('The storage size of the repository'),
     user: z.string().optional().nullable().describe('The user of the repository'),
     hub_user: z.string().optional().nullable().describe('The repository username on hub'),
@@ -544,16 +543,17 @@ export class Repos extends Asset {
             page_size = 10;
         }
         let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
-        const params: Record<string, string> = {};
+        const params: Record<string, string> = {
+            page: page.toString(),
+            page_size: page_size.toString(),
+        };
         if (architecture) {
             params.architecture = architecture;
         }
         if (os) {
             params.os = os;
         }
-        if (Object.keys(params).length > 0) {
-            url += `?${new URLSearchParams(params).toString()}`;
-        }
+        url += `?${new URLSearchParams(params).toString()}`;
 
         return this.callAPI<RepositoryTagPaginatedResponse>(
             url,
@@ -655,9 +655,10 @@ export class Repos extends Asset {
             const currentStatus = (
                 currentRepository.structuredContent as z.infer<typeof Repository>
             ).status;
-            if (currentStatus !== status) {
+            const currentStatusStr = currentStatus === 1 ? 'active' : 'inactive';
+            if (currentStatusStr !== status) {
                 logger.info(
-                    `Repository ${repository} in ${namespace} is currently in status ${currentStatus}. Updating to ${status}.`
+                    `Repository ${repository} in ${namespace} is currently in status ${currentStatusStr}. Updating to ${status}.`
                 );
                 if (status === 'active') {
                     return {
@@ -673,10 +674,10 @@ export class Repos extends Asset {
                         },
                     };
                 }
-                body.status = status === 'active' ? 1 : 0;
+                body.status = 0;
                 extraContent.push({
                     type: 'text',
-                    text: `Requested a status change from ${currentStatus} to ${status}. This is potentially a dangerous operation and should be done with caution. If you are not sure, please go on Docker Hub and revert the status manually.\nhttps://hub.docker.com/r/${namespace}/${repository}`,
+                    text: `Requested a status change from ${currentStatusStr} to ${status}. This is potentially a dangerous operation and should be done with caution. If you are not sure, please go on Docker Hub and revert the status manually.\nhttps://hub.docker.com/r/${namespace}/${repository}`,
                 });
             }
         }

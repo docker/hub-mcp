@@ -139,7 +139,7 @@ export class Accounts extends Asset {
             url,
             { method: 'GET' },
             `Here are the namespaces (Note: this list does not include the personal namespace): :response`,
-            `Error getting repositories for ${namespace}`
+            `Error getting namespaces`
         );
     }
 
@@ -160,11 +160,11 @@ export class Accounts extends Asset {
             };
         } catch (error) {
             return {
+                isError: true,
                 content: [
                     {
                         type: 'text',
                         text: `Error getting personal namespace: ${error}. Please provide the name of the personal namespace.`,
-                        isError: true,
                     },
                 ],
             };
