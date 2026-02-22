@@ -239,6 +239,10 @@ export class Repos extends Asset {
                     description: 'List paginated repositories by namespace',
                     inputSchema: {
                         namespace: z.string().describe('The namespace to list repositories from'),
+                        name: z
+                            .string()
+                            .optional()
+                            .describe('Filter repositories by name (partial match supported)'),
                         page: z
                             .number()
                             .optional()
@@ -473,10 +477,56 @@ export class Repos extends Asset {
                 this.checkRepositoryTag.bind(this)
             )
         );
+
+        // Delete Repository
+        this.tools.set(
+            'deleteRepository',
+            this.server.registerTool(
+                'deleteRepository',
+                {
+                    description:
+                        'Delete a repository in the given namespace. This is a destructive and irreversible operation. You MUST ask the user to explicitly confirm before calling this tool.',
+                    inputSchema: z.object({
+                        namespace: z.string().describe('The namespace of the repository (required)'),
+                        repository: z.string().describe('The repository name (required)'),
+                    }).shape,
+                    annotations: {
+                        title: 'Delete Repository',
+                        destructiveHint: true,
+                    },
+                    title: 'Delete a repository',
+                },
+                this.deleteRepository.bind(this)
+            )
+        );
+
+        // Delete Repository Tag
+        this.tools.set(
+            'deleteRepositoryTag',
+            this.server.registerTool(
+                'deleteRepositoryTag',
+                {
+                    description:
+                        'Delete a tag from a repository. This is a destructive and irreversible operation. You MUST ask the user to explicitly confirm before calling this tool.',
+                    inputSchema: z.object({
+                        namespace: z.string().describe('The namespace of the repository (required)'),
+                        repository: z.string().describe('The repository name (required)'),
+                        tag: z.string().describe('The tag name to delete (required)'),
+                    }).shape,
+                    annotations: {
+                        title: 'Delete Repository Tag',
+                        destructiveHint: true,
+                    },
+                    title: 'Delete a tag from a repository',
+                },
+                this.deleteRepositoryTag.bind(this)
+            )
+        );
     }
 
     private async listRepositoriesByNamespace({
         namespace,
+        name,
         page,
         page_size,
         ordering,
@@ -484,6 +534,7 @@ export class Repos extends Asset {
         content_types,
     }: {
         namespace: string;
+        name?: string;
         page?: number;
         page_size?: number;
         ordering?: string;
@@ -500,6 +551,9 @@ export class Repos extends Asset {
             page_size = 10;
         }
         let url = `${this.config.host}/namespaces/${namespace}/repositories?page=${page}&page_size=${page_size}`;
+        if (name) {
+            url += `&name=${encodeURIComponent(name)}`;
+        }
         if (ordering) {
             url += `&ordering=${ordering}`;
         }
@@ -754,6 +808,46 @@ export class Repos extends Asset {
             { method: 'HEAD' },
             `Repository :${repository} in ${namespace} contains tag ${tag}.`,
             `Repository :${repository} in ${namespace} does not contain tag ${tag}.`
+        );
+    }
+
+    private async deleteRepository({
+        namespace,
+        repository,
+    }: {
+        namespace: string;
+        repository: string;
+    }): Promise<CallToolResult> {
+        if (!namespace || !repository) {
+            throw new Error('Namespace and repository name are required');
+        }
+        const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}`;
+        return this.callAPI(
+            url,
+            { method: 'DELETE' },
+            `Repository ${namespace}/${repository} has been deleted successfully.`,
+            `Error deleting repository ${namespace}/${repository}`
+        );
+    }
+
+    private async deleteRepositoryTag({
+        namespace,
+        repository,
+        tag,
+    }: {
+        namespace: string;
+        repository: string;
+        tag: string;
+    }): Promise<CallToolResult> {
+        if (!namespace || !repository || !tag) {
+            throw new Error('Namespace, repository name and tag are required');
+        }
+        const url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags/${tag}`;
+        return this.callAPI(
+            url,
+            { method: 'DELETE' },
+            `Tag ${tag} in ${namespace}/${repository} has been deleted successfully.`,
+            `Error deleting tag ${tag} in ${namespace}/${repository}`
         );
     }
 }

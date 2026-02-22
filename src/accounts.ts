@@ -20,6 +20,7 @@ import { z } from 'zod';
 import { createPaginatedResponseSchema } from './types';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
+import { logger } from './logger';
 
 //#region  Types
 const namespace = z.object({
@@ -45,6 +46,15 @@ const namespace = z.object({
 
 const namespacePaginatedResponseSchema = createPaginatedResponseSchema(namespace);
 export type NamespacePaginatedResponse = z.infer<typeof namespacePaginatedResponseSchema>;
+
+const allNamespacesResponseSchema = z.object({
+    namespaces: z
+        .array(z.string())
+        .optional()
+        .nullable()
+        .describe('All namespace names the user is a member of, including personal namespace'),
+    error: z.string().optional().nullable(),
+});
 //#endregion
 
 export class Accounts extends Asset {
@@ -100,22 +110,15 @@ export class Accounts extends Asset {
             this.server.registerTool(
                 'listAllNamespacesMemberOf',
                 {
-                    description: 'List all namespaces the user is a member of',
+                    description:
+                        'List all namespaces the user is a member of, including the personal namespace and all org namespaces.',
+                    outputSchema: allNamespacesResponseSchema.shape,
                     annotations: {
                         title: 'List All Namespaces user is a member of',
                     },
                     title: 'List all organisations (namespaces) the user is a member of including personal namespace',
                 },
-                () => {
-                    return {
-                        content: [
-                            {
-                                type: 'text',
-                                text: "To get all namespaces the user is a member of, call the 'listNamespaces' tool and the 'getPersonalNamespace' tool to get the personal namespace name.",
-                            },
-                        ],
-                    };
-                }
+                this.listAllNamespacesMemberOf.bind(this)
             )
         );
     }
@@ -143,18 +146,17 @@ export class Accounts extends Asset {
         );
     }
 
+    private async getUsername(): Promise<string> {
+        const token = await this.authenticate();
+        const jwt = jwtDecode<JwtPayload & { 'https://hub.docker.com': { username: string } }>(
+            token
+        );
+        return jwt['https://hub.docker.com'].username;
+    }
+
     private async getPersonalNamespace(): Promise<CallToolResult> {
         try {
-            const token = await this.authenticate();
-            const jwt = jwtDecode<
-                JwtPayload & {
-                    'https://hub.docker.com': {
-                        username: string;
-                    };
-                }
-            >(token);
-            const dockerData = jwt['https://hub.docker.com'];
-            const username = dockerData.username;
+            const username = await this.getUsername();
             return {
                 content: [{ type: 'text', text: `The personal namespace is ${username}` }],
             };
@@ -169,5 +171,55 @@ export class Accounts extends Asset {
                 ],
             };
         }
+    }
+
+    private async listAllNamespacesMemberOf(): Promise<CallToolResult> {
+        const namespaces: string[] = [];
+
+        // Get personal namespace from JWT
+        try {
+            const username = await this.getUsername();
+            namespaces.push(username);
+        } catch (error) {
+            logger.warn(`Could not get personal namespace: ${error}`);
+        }
+
+        // Paginate through all org namespaces
+        let page = 1;
+        const pageSize = 100;
+        try {
+            while (true) {
+                const url = `${this.config.host}/user/orgs?page=${page}&page_size=${pageSize}`;
+                const response = await this.authFetch<NamespacePaginatedResponse>(url, {
+                    method: 'GET',
+                });
+                const data = response.content;
+                if (data?.results) {
+                    namespaces.push(...data.results.map((ns) => ns.orgname));
+                }
+                if (!data?.next) break;
+                page++;
+            }
+        } catch (error) {
+            if (namespaces.length === 0) {
+                return {
+                    isError: true,
+                    content: [{ type: 'text', text: `Error getting namespaces: ${error}` }],
+                    structuredContent: { error: (error as Error).message },
+                };
+            }
+            // Return what we have so far
+            logger.warn(`Could not fetch all org namespaces: ${error}`);
+        }
+
+        return {
+            content: [
+                {
+                    type: 'text',
+                    text: `Here are all namespaces the user is a member of: ${namespaces.join(', ')}`,
+                },
+            ],
+            structuredContent: { namespaces },
+        };
     }
 }
