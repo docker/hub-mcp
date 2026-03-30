@@ -52,6 +52,10 @@ The MCP Inspector provides a web interface to test your server:
 npx @modelcontextprotocol/inspector node dist/index.js [--transport=http|stdio] [--port=3000]
 ```
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/docker-hub-mcp).
+
 ## Authenticate with docker
 
 By default this MCP server can only query public content on Docker Hub. In order to manage your repositories you need to provide authentication.
