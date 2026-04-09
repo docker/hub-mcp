@@ -56,6 +56,7 @@ export class Accounts extends Asset {
     }
 
     RegisterTools(): void {
+        // Fork note: these namespace lookups are read-only and should stay marked as such.
         this.tools.set(
             'listNamespaces',
             this.server.registerTool(
@@ -75,6 +76,7 @@ export class Accounts extends Asset {
                     outputSchema: namespacePaginatedResponseSchema.shape,
                     annotations: {
                         title: 'List Namespaces',
+                        readOnlyHint: true,
                     },
                     title: 'List organisations (namespaces) the user has access to',
                 },
@@ -89,6 +91,7 @@ export class Accounts extends Asset {
                     description: 'Get the personal namespace name',
                     annotations: {
                         title: 'Get Personal Namespace',
+                        readOnlyHint: true,
                     },
                     title: 'Get user personal namespace',
                 },
@@ -103,6 +106,7 @@ export class Accounts extends Asset {
                     description: 'List all namespaces the user is a member of',
                     annotations: {
                         title: 'List All Namespaces user is a member of',
+                        readOnlyHint: true,
                     },
                     title: 'List all organisations (namespaces) the user is a member of including personal namespace',
                 },
