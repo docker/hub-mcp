@@ -32,3 +32,6 @@ jobs:
       
       - name: Run Formatting
         run: npm run format:check
+
+      - name: Run property tests
+        run: npm run test:property
