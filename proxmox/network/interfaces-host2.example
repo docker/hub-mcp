@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# interfaces-host2.example — /etc/network/interfaces for Host 2 (192.168.16.3)
+#
+# Network topology:
+#   vmbr0: 192.168.16.3/24  — Management / LAN bridge
+#   vmbr1: 192.168.20.1/24  — Internal VM network (NAT)
+#
+# Copy to /etc/network/interfaces and adjust as needed.
+
+cat <<'INTERFACES'
+auto lo
+iface lo inet loopback
+
+# Physical NIC (adjust eno1/enp6s0 to your actual interface)
+auto eno1
+iface eno1 inet manual
+
+# vmbr0 — Management bridge (LAN)
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.16.3/24
+    gateway 192.168.16.1
+    bridge-ports eno1
+    bridge-stp off
+    bridge-fd 0
+
+# vmbr1 — Internal VM network (no physical port, NAT)
+auto vmbr1
+iface vmbr1 inet static
+    address 192.168.20.1/24
+    bridge-ports none
+    bridge-stp off
+    bridge-fd 0
+    post-up   echo 1 > /proc/sys/net/ipv4/ip_forward
+    post-up   iptables -t nat -A POSTROUTING -s 192.168.20.0/24 -o vmbr0 -j MASQUERADE
+    post-down iptables -t nat -D POSTROUTING -s 192.168.20.0/24 -o vmbr0 -j MASQUERADE
+INTERFACES
