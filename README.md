@@ -143,6 +143,33 @@ Replace the following values:
 }
 ```
 
+#### Optional local guardrail
+
+You can also wrap the same stdio command with [Armorer Guard](https://github.com/ArmorerLabs/Armorer-Guard) to inspect tool-call arguments before they reach the Docker Hub MCP server:
+
+```json
+{
+    "mcpServers": {
+        "docker-hub": {
+            "command": "armorer-guard",
+            "args": [
+                "mcp-proxy",
+                "--",
+                "node",
+                "/FULL/PATH/TO/YOUR/docker-hub-mcp-server/dist/index.js",
+                "--transport=stdio",
+                "--username=YOUR_DOCKER_HUB_USERNAME"
+            ],
+            "env": {
+                "HUB_PAT_TOKEN": "YOUR_DOCKER_HUB_PERSONAL_ACCESS_TOKEN"
+            }
+        }
+    }
+}
+```
+
+The proxy runs locally and checks for prompt injection, credential leakage, exfiltration risk, and dangerous actions before forwarding safe calls.
+
 2. Save the configuration file and completely restart Claude Desktop for the changes to take effect.
 
 ## Usage with VS Code
