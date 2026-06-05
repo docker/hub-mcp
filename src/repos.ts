@@ -20,6 +20,7 @@ import { z } from 'zod';
 import { createPaginatedResponseSchema } from './types';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { logger } from './logger';
+import { buildNamespaceRepositoriesUrl, buildRepositoryTagsUrl } from './query-builders';
 
 //#region  Types
 // all items in the types are optional and nullable because structured content is always evaluated even when an error occurs.
@@ -494,22 +495,14 @@ export class Repos extends Asset {
         if (!namespace) {
             throw new Error('Namespace is required');
         }
-        if (!page) {
-            page = 1;
-        }
-        if (!page_size) {
-            page_size = 10;
-        }
-        let url = `${this.config.host}/namespaces/${namespace}/repositories?page=${page}&page_size=${page_size}`;
-        if (ordering) {
-            url += `&ordering=${ordering}`;
-        }
-        if (media_types) {
-            url += `&media_types=${media_types}`;
-        }
-        if (content_types) {
-            url += `&content_types=${content_types}`;
-        }
+        const url = buildNamespaceRepositoriesUrl(this.config.host, {
+            namespace,
+            page,
+            page_size,
+            ordering,
+            media_types,
+            content_types,
+        });
 
         return this.callAPI<RepositoryPaginatedResponse>(
             url,
@@ -534,29 +527,14 @@ export class Repos extends Asset {
         architecture?: string;
         os?: string;
     }): Promise<CallToolResult> {
-        if (!namespace) {
-            namespace = 'library';
-        }
-        if (!page) {
-            page = 1;
-        }
-        if (!page_size) {
-            page_size = 10;
-        }
-        let url = `${this.config.host}/namespaces/${namespace}/repositories/${repository}/tags`;
-        const params: Record<string, string> = {
-            page: page.toString(),
-            page_size: page_size.toString(),
-        };
-        if (architecture) {
-            params.architecture = architecture;
-        }
-        if (os) {
-            params.os = os;
-        }
-        if (Object.keys(params).length > 0) {
-            url += `?${new URLSearchParams(params).toString()}`;
-        }
+        const url = buildRepositoryTagsUrl(this.config.host, {
+            namespace,
+            repository,
+            page,
+            page_size,
+            architecture,
+            os,
+        });
 
         return this.callAPI<RepositoryTagPaginatedResponse>(
             url,

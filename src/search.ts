@@ -19,6 +19,7 @@ import { Asset, AssetConfig } from './asset';
 import { z } from 'zod';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { logger } from './logger';
+import { buildSearchUrl, SearchRequest } from './query-builders';
 
 //#region  Types
 const searchResult = z.object({
@@ -157,22 +158,8 @@ export class Search extends Asset {
         );
     }
 
-    private async search(request: {
-        query: string;
-        badges?: string[];
-        type?: string;
-        categories?: string[];
-        architectures?: string[];
-        operating_systems?: string[];
-        extension_reviewed?: boolean;
-        from?: number;
-        size?: number;
-        sort?: 'pull_count' | 'updated_at' | null;
-        order?: 'asc' | 'desc' | null;
-        images?: string[];
-    }): Promise<CallToolResult> {
+    private async search(request: SearchRequest): Promise<CallToolResult> {
         logger.info(`Searching for repositories with request: ${JSON.stringify(request)}`);
-        let url = `${this.config.host}/v4?custom_boosted_results=true`;
         if (!request.query) {
             return {
                 content: [{ type: 'text', text: 'Please provide a query to search for' }],
@@ -180,51 +167,7 @@ export class Search extends Asset {
                 isError: true,
             };
         }
-        const queryParams = new URLSearchParams();
-        for (const key in request) {
-            const param = key as keyof typeof request;
-            switch (param) {
-                case 'badges':
-                case 'categories':
-                case 'architectures':
-                case 'operating_systems':
-                case 'images': {
-                    if (request[param] && request[param].length > 0) {
-                        queryParams.set(param, request[param].join(','));
-                    }
-                    break;
-                }
-                case 'query':
-                case 'type':
-                case 'order':
-                case 'sort':
-                case 'from':
-                case 'size': {
-                    if (
-                        request[param] !== undefined &&
-                        request[param] !== null &&
-                        request[param] !== ''
-                    ) {
-                        queryParams.set(param, request[param].toString());
-                        logger.info(`Setting parameter: ${param} to ${request[param]}`);
-                    }
-                    break;
-                }
-                case 'extension_reviewed': {
-                    if (request[param]) {
-                        queryParams.set(param, 'true');
-                    }
-                    break;
-                }
-                default: {
-                    logger.warn(`Unknown parameter: ${param}`);
-                    break;
-                }
-            }
-        }
-        if (queryParams.size > 0) {
-            url += `&${queryParams.toString()}`;
-        }
+        const url = buildSearchUrl(this.config.host, request);
         const response = await this.callAPI<typeof searchResults>(
             url,
             { method: 'GET' },
