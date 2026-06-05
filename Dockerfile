@@ -22,6 +22,7 @@ COPY tsconfig.json .
 
 # Refresh the lock file to be sure we include Linux-only packages that might not
 # be in the existing package-lock.json.
+COPY .npmrc .
 RUN npm install --package-lock-only \
     && npm ci
 
@@ -41,6 +42,7 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist/ ./dist/
 
 # Install production dependencies only
+COPY .npmrc .
 RUN npm ci --omit=dev && npm cache clean --force
 
 # Set proper permissions
