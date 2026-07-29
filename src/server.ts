@@ -283,7 +283,7 @@ export class HubMCPServer {
      */
     private sanitizeForLog(value: string): string {
         // eslint-disable-next-line no-control-regex
-        return value.replace(/[\u0000-\u001f\u007f]/g, '');
+        return value.replace(/\n|\r/g, '').replace(/[\u0000-\u001f\u007f]/g, '');
     }
 
     /** Extracts the hostname from a Host header, stripping any port and IPv6 brackets. */
