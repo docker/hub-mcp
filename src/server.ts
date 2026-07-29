@@ -220,14 +220,18 @@ export class HubMCPServer {
         return (req: Request, res: Response, next: NextFunction): void => {
             const origin = this.headerValue(req.headers['origin']);
             if (origin && !allowedOrigins.has(origin.toLowerCase())) {
-                logger.warn(`rejected request with disallowed origin: ${origin}`);
+                logger.warn(
+                    `rejected request with disallowed origin: ${this.sanitizeForLog(origin)}`
+                );
                 this.rejectRequest(res, 403, FORBIDDEN, 'Origin not allowed');
                 return;
             }
 
             const hostname = this.parseHostname(this.headerValue(req.headers['host']));
             if (!hostname || !allowedHosts.has(hostname.toLowerCase())) {
-                logger.warn(`rejected request with disallowed host: ${hostname ?? '<none>'}`);
+                logger.warn(
+                    `rejected request with disallowed host: ${this.sanitizeForLog(hostname ?? '<none>')}`
+                );
                 this.rejectRequest(res, 403, FORBIDDEN, 'Host not allowed');
                 return;
             }
@@ -244,9 +248,8 @@ export class HubMCPServer {
                 return;
             }
 
-            const header = this.headerValue(req.headers['authorization'])?.trim() ?? '';
-            const match = /^Bearer\s+(.+)$/i.exec(header);
-            if (!options.authToken || !match || !safeCompare(match[1], options.authToken)) {
+            const token = this.parseBearerToken(this.headerValue(req.headers['authorization']));
+            if (!options.authToken || !token || !safeCompare(token, options.authToken)) {
                 this.rejectRequest(res, 401, UNAUTHORIZED, 'Unauthorized');
                 return;
             }
@@ -257,6 +260,30 @@ export class HubMCPServer {
 
     private headerValue(value: string | string[] | undefined): string | undefined {
         return Array.isArray(value) ? value[0] : value;
+    }
+
+    /**
+     * Extracts the token from an `Authorization: Bearer <token>` header.
+     * Parsed with indexOf/slice rather than a regex so an attacker-controlled
+     * header value cannot trigger catastrophic backtracking (ReDoS).
+     */
+    private parseBearerToken(header?: string): string | undefined {
+        const value = header?.trim() ?? '';
+        const space = value.indexOf(' ');
+        if (space === -1 || value.slice(0, space).toLowerCase() !== 'bearer') {
+            return undefined;
+        }
+        const token = value.slice(space + 1).trim();
+        return token.length > 0 ? token : undefined;
+    }
+
+    /**
+     * Strips CR/LF and other control characters so an attacker-controlled header
+     * value cannot forge or split log entries (log injection).
+     */
+    private sanitizeForLog(value: string): string {
+        // eslint-disable-next-line no-control-regex
+        return value.replace(/[\u0000-\u001f\u007f]/g, '');
     }
 
     /** Extracts the hostname from a Host header, stripping any port and IPv6 brackets. */
