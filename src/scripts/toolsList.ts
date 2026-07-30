@@ -102,7 +102,9 @@ function loadCurrentToolsList(): { tools: Tool[] } {
 
 function loadCurrentToolsNames(): string[] {
     const toolsList = fs.readFileSync(path.join(__dirname, '../..', 'tools.txt'), 'utf8');
-    return toolsList.split('\n').map((line) => line.split('- name: ')[1].replace(/^"|"$/g, ''));
+    return toolsList
+        .split('\n')
+        .map((line) => line.trimEnd().split('- name: ')[1].replace(/^"|"$/g, ''));
 }
 
 function saveToolsList(toolsList: { tools: Tool[] }) {

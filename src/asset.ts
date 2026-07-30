@@ -202,13 +202,13 @@ export class Asset implements Asset {
             throw new Error('PAT auth: Username is empty');
         }
         console.error(`Authenticating PAT for ${username}`);
-        const url = `https://hub.docker.com/v2/users/login`;
+        const url = `https://hub.docker.com/v2/auth/token`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                username: username,
-                password: this.config.auth?.token,
+                identifier: username,
+                secret: this.config.auth?.token?.trim(),
             }),
         });
         if (!response.ok) {
@@ -217,9 +217,11 @@ export class Asset implements Asset {
             );
         }
         const data = (await response.json()) as {
-            token: string;
-            refresh_token: string;
+            access_token: string;
         };
-        return data.token;
+        if (!data.access_token) {
+            throw new Error(`Failed to authenticate PAT for ${username}: missing access token`);
+        }
+        return data.access_token;
     }
 }
