@@ -46,7 +46,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "List Repositories by Namespace"
+                "title": "List Repositories by Namespace",
+                "readOnlyHint": true
             },
             "outputSchema": {
                 "type": "object",
@@ -1204,7 +1205,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "Get Repository Info"
+                "title": "Get Repository Info",
+                "readOnlyHint": true
             },
             "outputSchema": {
                 "type": "object",
@@ -2294,7 +2296,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "Check Repository Exists"
+                "title": "Check Repository Exists",
+                "readOnlyHint": true
             }
         },
         {
@@ -2333,7 +2336,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "List Repository Tags"
+                "title": "List Repository Tags",
+                "readOnlyHint": true
             },
             "outputSchema": {
                 "type": "object",
@@ -2866,7 +2870,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "Get Repository Tag"
+                "title": "Get Repository Tag",
+                "readOnlyHint": true
             },
             "outputSchema": {
                 "type": "object",
@@ -3315,7 +3320,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "Check Repository Tag"
+                "title": "Check Repository Tag",
+                "readOnlyHint": true
             }
         },
         {
@@ -3337,7 +3343,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "List Namespaces"
+                "title": "List Namespaces",
+                "readOnlyHint": true
             },
             "outputSchema": {
                 "type": "object",
@@ -3512,7 +3519,8 @@
                 "type": "object"
             },
             "annotations": {
-                "title": "Get Personal Namespace"
+                "title": "Get Personal Namespace",
+                "readOnlyHint": true
             }
         },
         {
@@ -3522,7 +3530,8 @@
                 "type": "object"
             },
             "annotations": {
-                "title": "List All Namespaces user is a member of"
+                "title": "List All Namespaces user is a member of",
+                "readOnlyHint": true
             }
         },
         {
@@ -3631,7 +3640,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "Search Repositories"
+                "title": "Search Repositories",
+                "readOnlyHint": true
             },
             "outputSchema": {
                 "type": "object",
@@ -3865,7 +3875,8 @@
                 "$schema": "http://json-schema.org/draft-07/schema#"
             },
             "annotations": {
-                "title": "List available Docker Hardened Images"
+                "title": "List available Docker Hardened Images",
+                "readOnlyHint": true
             }
         }
     ]

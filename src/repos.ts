@@ -231,6 +231,7 @@ export class Repos extends Asset {
     }
 
     RegisterTools(): void {
+        // Fork note: non-mutating repository and tag operations must keep readOnlyHint=true.
         // List Repositories by Namespace
         this.tools.set(
             'listRepositoriesByNamespace',
@@ -279,6 +280,7 @@ export class Repos extends Asset {
                     outputSchema: repositoryPaginatedResponseSchema.shape,
                     annotations: {
                         title: 'List Repositories by Namespace',
+                        readOnlyHint: true,
                     },
                     title: 'List Repositories by Organisation (namespace)',
                 },
@@ -321,6 +323,7 @@ export class Repos extends Asset {
                     outputSchema: Repository.shape,
                     annotations: {
                         title: 'Get Repository Info',
+                        readOnlyHint: true,
                     },
                     title: 'Get Repository Details',
                 },
@@ -382,6 +385,7 @@ export class Repos extends Asset {
                     inputSchema: z.object({ namespace: z.string(), repository: z.string() }).shape,
                     annotations: {
                         title: 'Check Repository Exists',
+                        readOnlyHint: true,
                     },
                     title: 'Check Repository Exists',
                 },
@@ -425,6 +429,7 @@ export class Repos extends Asset {
                     outputSchema: repositoryTagPaginatedResponseSchema.shape,
                     annotations: {
                         title: 'List Repository Tags',
+                        readOnlyHint: true,
                     },
                     title: 'List tags by repository',
                 },
@@ -448,6 +453,7 @@ export class Repos extends Asset {
                     outputSchema: RepositoryTag.shape,
                     annotations: {
                         title: 'Get Repository Tag',
+                        readOnlyHint: true,
                     },
                     title: 'Get Repository Tag Details',
                 },
@@ -468,6 +474,7 @@ export class Repos extends Asset {
                     }).shape,
                     annotations: {
                         title: 'Check Repository Tag',
+                        readOnlyHint: true,
                     },
                     title: 'Check Repository Tag Exists',
                 },

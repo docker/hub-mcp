@@ -89,6 +89,7 @@ export class Search extends Asset {
     }
 
     RegisterTools(): void {
+        // Fork note: Docker Hub search is non-mutating and should stay marked as read-only.
         this.tools.set(
             'search',
             this.server.registerTool(
@@ -149,6 +150,7 @@ export class Search extends Asset {
                     outputSchema: searchResults.shape,
                     annotations: {
                         title: 'Search Repositories',
+                        readOnlyHint: true,
                     },
                     title: 'Search Repositories',
                 },

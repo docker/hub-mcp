@@ -56,6 +56,7 @@ export class ScoutAPI extends Asset {
         });
     }
     RegisterTools(): void {
+        // Fork note: DHI discovery is a read-only query and should stay marked as such.
         this.tools.set(
             'dockerHardenedImages',
             this.server.registerTool(
@@ -72,6 +73,7 @@ export class ScoutAPI extends Asset {
                     }).shape,
                     annotations: {
                         title: 'List available Docker Hardened Images',
+                        readOnlyHint: true,
                     },
                     title: 'List available Docker Hardened Images in user organisations',
                 },
