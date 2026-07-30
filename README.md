@@ -1,4 +1,5 @@
 # Docker Hub MCP Server
+
 [![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/docker/hub-mcp)](https://archestra.ai/mcp-catalog/docker__hub-mcp)
 
 The Docker Hub MCP Server is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that interfaces with Docker Hub APIs to make them accessible to LLMs, enabling intelligent content discovery and repository management.
@@ -36,13 +37,19 @@ Developers building with containers, especially in AI and LLM-powered workflows,
 2. **Run**
 
     ```bash
-     npm start -- [--transport=http|stdio] [--port=3000]
+     npm start -- [--transport=http|stdio] [--port=3000] [--host=127.0.0.1]
     ```
 
 - Default args:
-  - `transport`: Choose between `http` or `stdio` (default: `stdio`)
-  - `port=3000`
-    This starts the server with default settings and can only access public Docker Hub content.
+    - `transport`: Choose between `http` or `stdio` (default: `stdio`)
+    - `port=3000`
+    - `host=127.0.0.1` (HTTP transport only)
+      This starts the server with default settings and can only access public Docker Hub content.
+
+> [!IMPORTANT]
+> The `http` transport binds to `127.0.0.1` (loopback) by default and **requires
+> authentication**. See [Securing the HTTP transport](#securing-the-http-transport)
+> before exposing it to a network.
 
 ### Run in inspector [Optional]
 
@@ -51,6 +58,53 @@ The MCP Inspector provides a web interface to test your server:
 ```
 npx @modelcontextprotocol/inspector node dist/index.js [--transport=http|stdio] [--port=3000]
 ```
+
+## Securing the HTTP transport
+
+The `stdio` transport is only reachable by the local process that spawns it. The
+`http` transport, however, dispatches every tool call using the server operator's
+Docker Hub Personal Access Token (`HUB_PAT_TOKEN`). Anyone who can reach the HTTP
+endpoint can therefore act as that Docker Hub identity — including creating and
+modifying repositories. To prevent this, the HTTP transport is locked down by
+default:
+
+- **Loopback binding.** The listener binds to `127.0.0.1` unless you pass
+  `--host=<addr>` (for example `--host=0.0.0.0` to expose it from a container).
+- **Authentication required (fail-closed).** In `http` mode the server refuses to
+  start unless you either provide a bearer token or explicitly opt out. Set the
+  token via the `MCP_AUTH_TOKEN` environment variable; clients must then send it as
+  `Authorization: Bearer <token>` on every request.
+- **DNS-rebinding / CSRF protection.** Requests are rejected when the `Host` header
+  is not in the allow-list (loopback plus `--host`, extendable with
+  `--allowed-hosts`), or when they carry a browser `Origin` header that is not
+  listed in `--allowed-origins`. Non-browser MCP clients are unaffected.
+
+Run the HTTP transport with authentication:
+
+```bash
+MCP_AUTH_TOKEN=<a_long_random_secret> npm start -- --transport=http
+```
+
+Expose it beyond loopback (e.g. inside a container), still authenticated:
+
+```bash
+MCP_AUTH_TOKEN=<a_long_random_secret> npm start -- \
+  --transport=http --host=0.0.0.0 \
+  --allowed-hosts=my-host.internal --allowed-origins=https://my-app.example.com
+```
+
+| Flag / env var            | Purpose                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| `MCP_AUTH_TOKEN`          | Bearer token required on every `/mcp` request.                  |
+| `--host=<addr>`           | Address to bind (default `127.0.0.1`).                          |
+| `--allowed-hosts=a,b`     | Extra `Host` header values to accept (comma-separated).         |
+| `--allowed-origins=a,b`   | Browser `Origin` values to accept (comma-separated).            |
+| `--allow-unauthenticated` | Serve `/mcp` with **no** authentication. Insecure; opt-in only. |
+
+> [!WARNING]
+> `--allow-unauthenticated` disables authentication entirely and exposes your
+> Docker Hub PAT to any client that can reach the port. Only use it on a trusted,
+> isolated network.
 
 ## Authenticate with docker
 
@@ -67,7 +121,9 @@ HUB_PAT_TOKEN=<a_pat_token> npm start -- [--username=<the_hub_username_for_the_p
 ```
 HUB_PAT_TOKEN=<a_pat_token> npx @modelcontextprotocol/inspector node dist/index.js[--username=<the_hub_username_for_the_pat>]
 ```
+
 ## Usage in Docker Ask Gordon
+
 You can configure Gordon to be a host that can interact with the Docker Hub MCP server.
 
 ### Gordon Setup
@@ -77,7 +133,7 @@ You can configure Gordon to be a host that can interact with the Docker Hub MCP 
 You can configure Gordon to be a client that can interact with the Docker Hub MCP server.
 
 1. Create the [`gordon-mcp.yml` file](https://docs.docker.com/ai/gordon/mcp/yaml/) file in your working directory.
-2. Replace environment variables in the `gordon-mcp.yml`  with your Docker Hub username and a PAT token.
+2. Replace environment variables in the `gordon-mcp.yml` with your Docker Hub username and a PAT token.
 
 ```
 services:

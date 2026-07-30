@@ -17,6 +17,9 @@ import { logger } from './logger';
 import { HubMCPServer } from './server';
 
 const DEFAULT_PORT = 3000;
+// Bind to loopback by default so the HTTP transport is not exposed to the
+// network unless the operator explicitly opts in with --host. See RG-4626.
+const DEFAULT_HOST = '127.0.0.1';
 const STDIO_OPTION = 'stdio';
 
 function parseTransportFlag(args: string[]): string {
@@ -55,6 +58,32 @@ function parsePortFlag(args: string[]): number {
     return portParsed;
 }
 
+function parseHostFlag(args: string[]): string {
+    const hostArg = args.find((arg) => arg.startsWith('--host='))?.split('=')[1];
+    if (!hostArg || hostArg.length === 0) {
+        logger.info(`host unspecified, defaulting to ${DEFAULT_HOST}`);
+        return DEFAULT_HOST;
+    }
+
+    return hostArg;
+}
+
+function parseBooleanFlag(args: string[], name: string): boolean {
+    return args.includes(`--${name}`);
+}
+
+function parseListFlag(args: string[], name: string): string[] {
+    const value = args.find((arg) => arg.startsWith(`--${name}=`))?.split('=')[1];
+    if (!value) {
+        return [];
+    }
+
+    return value
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0);
+}
+
 // Main execution
 async function main() {
     const args = process.argv.slice(2);
@@ -66,7 +95,15 @@ async function main() {
 
     const server = new HubMCPServer(username, patToken);
     // Start the server
-    await server.run(port, transportArg);
+    await server.run(port, transportArg, {
+        host: parseHostFlag(args),
+        // The bearer token clients must present on the HTTP transport. Read from
+        // the environment (not argv) so it is not exposed via the process table.
+        authToken: process.env.MCP_AUTH_TOKEN,
+        allowUnauthenticated: parseBooleanFlag(args, 'allow-unauthenticated'),
+        allowedHosts: parseListFlag(args, 'allowed-hosts'),
+        allowedOrigins: parseListFlag(args, 'allowed-origins'),
+    });
     logger.info('🚀 dockerhub mcp server is running...');
 }
 
@@ -76,7 +113,12 @@ process.on('unhandledRejection', (error) => {
 });
 
 main().catch((error) => {
-    logger.info(`failed to start server: ${error}`);
+    const message = error instanceof Error ? error.message : String(error);
+    // Write synchronously to stderr as well: the logger's transports flush
+    // asynchronously and would be truncated by the immediate process.exit below,
+    // hiding the reason a startup was refused (e.g. the HTTP auth fail-closed check).
+    console.error(`failed to start server: ${message}`);
+    logger.error(`failed to start server: ${error}`);
     process.exit(1);
 });
 
