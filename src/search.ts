@@ -26,8 +26,8 @@ const searchResult = z.object({
     name: z.string().describe('The name of the repository in the format of namespace/repository'),
     slug: z.string().describe('The slug of the repository'),
     type: z
-        .enum(['image', 'plugin', 'extension'])
-        .describe('The type of the repository. Can be "image", "plugin" or "extension"'),
+        .enum(['image', 'plugin', 'extension', 'dhi'])
+        .describe('The type of the repository. Can be "image", "plugin", "extension" or "dhi"'),
     publisher: z.object({
         id: z.string().describe('The id of the publisher'),
         name: z.string().describe('The name of the publisher'),
@@ -36,7 +36,7 @@ const searchResult = z.object({
     updated_at: z.string().describe('The date and time the repository was last updated'),
     short_description: z.string().describe('The short description of the repository'),
     badge: z
-        .enum(['official', 'verified_publisher', 'open_source', 'none'])
+        .enum(['official', 'verified_publisher', 'open_source', 'hardened', 'none'])
         .nullable()
         .describe(
             "The badge of the repository. If the repository is from community publisher, the badge is either 'none' or null."
@@ -99,9 +99,18 @@ export class Search extends Asset {
                     inputSchema: {
                         query: z.string().describe('The query to search for'),
                         badges: z
-                            .array(z.enum(['official', 'verified_publisher', 'open_source']))
+                            .array(
+                                z.enum([
+                                    'official',
+                                    'verified_publisher',
+                                    'open_source',
+                                    'hardened',
+                                ])
+                            )
                             .optional()
-                            .describe('The trusted content to search for'),
+                            .describe(
+                                'The trusted content to search for. Use "hardened" for Docker Hardened Images'
+                            ),
                         type: z
                             .string()
                             .optional()
