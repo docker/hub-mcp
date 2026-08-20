@@ -3539,9 +3539,9 @@
                         "type": "array",
                         "items": {
                             "type": "string",
-                            "enum": ["official", "verified_publisher", "open_source"]
+                            "enum": ["official", "verified_publisher", "open_source", "hardened"]
                         },
-                        "description": "The trusted content to search for"
+                        "description": "The trusted content to search for. Use \"hardened\" for Docker Hardened Images"
                     },
                     "type": {
                         "type": "string",
@@ -3659,8 +3659,8 @@
                                 },
                                 "type": {
                                     "type": "string",
-                                    "enum": ["image", "plugin", "extension"],
-                                    "description": "The type of the repository. Can be \"image\", \"plugin\" or \"extension\""
+                                    "enum": ["image", "plugin", "extension", "dhi"],
+                                    "description": "The type of the repository. Can be \"image\", \"plugin\", \"extension\" or \"dhi\""
                                 },
                                 "publisher": {
                                     "type": "object",
@@ -3697,6 +3697,7 @@
                                                 "official",
                                                 "verified_publisher",
                                                 "open_source",
+                                                "hardened",
                                                 "none"
                                             ]
                                         },
