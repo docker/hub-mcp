@@ -1,0 +1,39 @@
+{
+    "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+    "name": "io.github.docker/hub-mcp",
+    "title": "Docker Hub MCP Server",
+    "description": "MCP server that connects LLMs to Docker Hub for image search, repository, and tag management",
+    "version": "0.17.0",
+    "repository": {
+        "url": "https://github.com/docker/hub-mcp",
+        "source": "github",
+        "id": "1000982653"
+    },
+    "packages": [
+        {
+            "registryType": "oci",
+            "registryBaseUrl": "https://docker.io",
+            "identifier": "docker.io/docker/dockerhub-mcp:0.17.0",
+            "version": "0.17.0",
+            "transport": {
+                "type": "stdio"
+            },
+            "packageArguments": [
+                {
+                    "type": "named",
+                    "name": "--username",
+                    "description": "Docker Hub username associated with HUB_PAT_TOKEN, used for authenticated requests.",
+                    "isRequired": false
+                }
+            ],
+            "environmentVariables": [
+                {
+                    "name": "HUB_PAT_TOKEN",
+                    "description": "Docker Hub Personal Access Token. Required to manage repositories; omit for read-only access to public content.",
+                    "isRequired": false,
+                    "isSecret": true
+                }
+            ]
+        }
+    ]
+}
