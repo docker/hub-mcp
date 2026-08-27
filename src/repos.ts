@@ -421,6 +421,12 @@ export class Repos extends Asset {
                             .describe(
                                 'The operating system to list tags from. If not provided, all operating systems will be listed.'
                             ),
+                        name: z
+                            .string()
+                            .optional()
+                            .describe(
+                                'Filter tags by name substring. Useful for resolving a partial git SHA (e.g. a short commit hash) to a full tag.'
+                            ),
                     }).shape,
                     outputSchema: repositoryTagPaginatedResponseSchema.shape,
                     annotations: {
@@ -526,6 +532,7 @@ export class Repos extends Asset {
         page_size,
         architecture,
         os,
+        name,
     }: {
         repository: string;
         namespace?: string;
@@ -533,6 +540,7 @@ export class Repos extends Asset {
         page_size?: number;
         architecture?: string;
         os?: string;
+        name?: string;
     }): Promise<CallToolResult> {
         if (!namespace) {
             namespace = 'library';
@@ -553,6 +561,9 @@ export class Repos extends Asset {
         }
         if (os) {
             params.os = os;
+        }
+        if (name) {
+            params.name = name;
         }
         if (Object.keys(params).length > 0) {
             url += `?${new URLSearchParams(params).toString()}`;

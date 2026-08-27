@@ -2326,6 +2326,10 @@
                     "os": {
                         "type": "string",
                         "description": "The operating system to list tags from. If not provided, all operating systems will be listed."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Filter tags by name substring. Useful for resolving a partial git SHA (e.g. a short commit hash) to a full tag."
                     }
                 },
                 "required": ["repository"],
