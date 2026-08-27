@@ -151,7 +151,7 @@ const RepositoryTag = z.object({
         .array(
             z.object({
                 architecture: z.string().describe('The architecture of the tag'),
-                features: z.string().describe('The features of the tag'),
+                features: z.string().nullable().describe('The features of the tag'),
                 variant: z.string().optional().nullable().describe('The variant of the tag'),
                 digest: z.string().nullable().describe('image layer digest'),
                 layers: z

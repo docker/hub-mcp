@@ -2408,7 +2408,10 @@
                                                                                 "description": "The architecture of the tag"
                                                                             },
                                                                             "features": {
-                                                                                "type": "string",
+                                                                                "type": [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
                                                                                 "description": "The features of the tag"
                                                                             },
                                                                             "variant": {
@@ -2906,7 +2909,7 @@
                                                     "description": "The architecture of the tag"
                                                 },
                                                 "features": {
-                                                    "type": "string",
+                                                    "type": ["string", "null"],
                                                     "description": "The features of the tag"
                                                 },
                                                 "variant": {
