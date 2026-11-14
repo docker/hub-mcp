@@ -259,7 +259,7 @@ export class Repos extends Asset {
                             ])
                             .optional()
                             .describe(
-                                'The ordering of the repositories. Use "-" to reverse the ordering. For example, "last_updated" will order the repositories by last updated in descending order while "-last_updated" will order the repositories by last updated in ascending order.'
+                                'The ordering of the repositories. Without a prefix, "name" sorts alphabetically (A to Z), "last_updated" puts the most recently updated first and "pull_count" puts the most pulled first. Prefix the field with "-" to reverse the order: "-name" sorts Z to A, "-last_updated" puts the least recently updated first and "-pull_count" puts the least pulled first.'
                             ),
                         media_types: z
                             .string()
